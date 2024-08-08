@@ -1,0 +1,2 @@
+/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Final project/build/CMakeFiles/edit_cache.dir
+/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Final project/build/CMakeFiles/rebuild_cache.dir
