@@ -1,2 +1,3 @@
-/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Final project/build/CMakeFiles/edit_cache.dir
-/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Final project/build/CMakeFiles/rebuild_cache.dir
+/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/build/CMakeFiles/ParkingLotAnalysis.dir
+/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/build/CMakeFiles/edit_cache.dir
+/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/build/CMakeFiles/rebuild_cache.dir
