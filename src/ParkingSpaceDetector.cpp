@@ -19,10 +19,33 @@ std::vector<Mat> loadImages (int sequence) {
 
     std::vector<Mat> imgs;
     for (int i = 0; i < fileNames.size(); i++) {
-        imgs.push_back(imread(fileNames[i]));
+        Mat img = imread(fileNames[i]);
+        if (img.empty()) {
+            std::cerr << "Error loading image: " << fileNames[i] << std::endl;
+            continue;
+        }
+        imgs.push_back(img);
     }
 
     return imgs;
+}
+
+std::vector<Mat> preprocessImages (const std::vector<Mat>& imgs) {
+    std::vector<Mat> processedImages;
+    for (int i = 0; i < imgs.size(); i++) {
+        Mat grayImg;
+        cvtColor(imgs[i], grayImg, COLOR_BGR2GRAY);
+        
+        Mat blurImg;
+        bilateralFilter(grayImg, blurImg, 9, 150, 150);
+
+        Mat processedImg;
+        equalizeHist(blurImg, processedImg);
+
+        processedImages.push_back(processedImg);
+    }
+
+    return processedImages;
 }
 
 void showImages (const std::vector<Mat>& imgs) {
@@ -32,23 +55,26 @@ void showImages (const std::vector<Mat>& imgs) {
     }
 }
 
-Mat detectEdges (const Mat& img) {
-    Mat edges;
-    Canny(img, edges, 50, 150);
+std::vector<Mat> detectEdges (const std::vector<Mat>& imgs) {
+    std::vector<Mat> edges;
+    Mat img;
+    for (int i = 0; i < imgs.size(); i++) {
+        Canny(imgs[i], img, 100, 200);
+        edges.push_back(img);
+    }
+
     return edges;
 }
 
-std::vector<Vec4i> detectLines (const Mat& img) {
-    std::vector<Vec4i> lines;
-    HoughLinesP(img, lines, 1, CV_PI/180, 50, 50, 10);
-    
-    return lines;
-}
+std::vector<std::vector<Vec4i>> detectLines (const std::vector<Mat>& imgs) {
+    std::vector<std::vector<Vec4i>> lines;
+    std::vector<Vec4i> line;
+    for (int i = 0; i < imgs.size(); i++) {
+        HoughLinesP(imgs[i], line, 1, CV_PI/180, 50, 50, 10);
+        lines.push_back(line);
+    }
 
-std::vector<std::vector<Point>> detectContours (const Mat& img) {
-    std::vector<std::vector<Point>> contours;
-    findContours(img, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
-    return contours;
+    return lines;
 }
 
 double calculateAngle (const Vec4i& line) {
@@ -72,49 +98,4 @@ std::vector<std::vector<Vec4i>> filterLines (const std::vector<Vec4i>& lines) {
     }
 
     return parallelLines;
-}
-
-void drawParkingSpaces (const Mat& img, const std::vector<Vec4i>& lines, const std::vector<std::vector<Point>>& contours) {
-    // Draw the lines
-    for (int i = 0; i < lines.size(); i++) {
-        line(img, Point(lines[i][0], lines[i][1]), Point(lines[i][2], lines[i][3]), Scalar(0, 0, 255), 3, LINE_AA);
-    }
-
-    // Draw the constours and the bouding boxes
-    for (const auto& contour : contours) {
-        RotatedRect box = minAreaRect(contour);
-        Point2f vertices[4];
-        box.points(vertices);
-        for (int i = 0; i < 4; i++) {
-            line(img, vertices[i], vertices[(i + 1) % 4], Scalar(255, 0, 0), 2, LINE_AA);
-        }
-    }
-}
-
-void drawBoundingBoxes (const Mat& img, const std::vector<std::vector<Vec4i>>& parallelLines, const std::vector<std::vector<Point>>& contours) {
-    for (const auto& lines : parallelLines) {
-       std::vector<Point> points;
-        for (const auto& line : lines) {
-              points.push_back(Point(line[0], line[1]));
-              points.push_back(Point(line[2], line[3]));
-        }
-
-        // Create a bounding box for the lines
-        Rect boundingBox = boundingRect(points);
-
-        // Check if the bounding box contains any of the contours
-        for (const auto& contour: contours) {
-            Rect counterBoundingBox = boundingRect(contour);
-            if ((counterBoundingBox & boundingBox).area() > 0) {
-                RotatedRect box = minAreaRect(contour);
-                Point2f vertices[4];
-                box.points(vertices);
-                for (int i = 0; i < 4; i++) {
-                    line(img, vertices[i], vertices[(i + 1) % 4], Scalar(255, 0, 0), 2, LINE_AA);
-                }
-                
-                break;
-            }
-        }
-    }
 }

@@ -10,45 +10,26 @@ int main (int argc, char** argv) {
     int sequence = 0;
     std::vector<Mat> imgs = loadImages(sequence);
 
-    // Convert the images to grayscale
-    for (int i = 0; i < imgs.size(); i++) {
-        cvtColor(imgs[i], imgs[i], COLOR_BGR2GRAY);
-    }
-
-    // Apply a Gaussian filter to the images
-    for (int i = 0; i < imgs.size(); i++) {
-        GaussianBlur(imgs[i], imgs[i], Size(7, 7), 0);
-    }
+    // Preprocess the images
+    std::vector<Mat> images = preprocessImages(imgs);
 
     // Detect the edges in the images
-    std::vector<Mat> edges;
-    for (int i = 0; i < imgs.size(); i++) {
-        edges.push_back(detectEdges(imgs[i]));
-    }
+    std::vector<Mat> edges = detectEdges(images);
 
     // Detect the lines in the images
-    std::vector<std::vector<Vec4i>> lines;
-    for (int i = 0; i < edges.size(); i++) {
-        lines.push_back(detectLines(edges[i]));
+    std::vector<std::vector<Vec4i>> lines = detectLines(edges);
+
+   // Draw the lines in the images
+    for (int i = 0; i < imgs.size(); i++) {
+        for (int j = 0; j < lines[i].size(); j++) {
+            line(imgs[i], Point(lines[i][j][0], lines[i][j][1]), Point(lines[i][j][2], lines[i][j][3]), Scalar(0, 0, 255), 3, LINE_AA);
+        }
     }
 
-    // Detect the contours in the images
-    std::vector<std::vector<std::vector<Point>>> contours;
-    for (int i = 0; i < edges.size(); i++) {
-        contours.push_back(detectContours(edges[i]));
-    }
-
-//    // Draw the lines in the images
-//     for (int i = 0; i < imgs.size(); i++) {
-//         for (int j = 0; j < lines[i].size(); j++) {
-//             line(imgs[i], Point(lines[i][j][0], lines[i][j][1]), Point(lines[i][j][2], lines[i][j][3]), Scalar(0, 0, 255), 3, LINE_AA);
-//         }
-//     }
-
-    // Draw the bounding boxes in the images
-    for (int i = 0; i < imgs.size(); i++ ) {
-        drawParkingSpaces(imgs[i], lines[i], contours[i]);
-    }
+    // // Draw the bounding boxes in the images
+    // for (int i = 0; i < imgs.size(); i++ ) {
+    //     drawParkingSpaces(imgs[i], lines[i], contours[i]);
+    // }
 
     // std::vector<std::vector<std::vector<Vec4i>>> parallelLines;
     // for (int i = 0; i < lines.size(); i++) {
@@ -71,5 +52,7 @@ int main (int argc, char** argv) {
     // }
 
     // Show the images
-    showImages(imgs);
+    showImages(images);
+
+    return 0;
 }
