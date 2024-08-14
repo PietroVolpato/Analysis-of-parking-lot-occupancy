@@ -11,48 +11,28 @@ int main (int argc, char** argv) {
     std::vector<Mat> imgs = loadImages(sequence);
 
     // Preprocess the images
-    std::vector<Mat> images = preprocessImages(imgs);
+    std::vector<Mat> images = preprocessImages(imgs, 9, 105, 105);
 
     // Detect the edges in the images
-    std::vector<Mat> edges = detectEdges(images);
+    std::vector<Mat> edges = detectEdges(images, 50, 150);
 
     // Detect the lines in the images
-    std::vector<std::vector<Vec4i>> lines = detectLines(edges);
+    std::vector<std::vector<Vec4i>> lines = detectLines(edges, 80, 50, 20);
 
-   // Draw the lines in the images
-    for (int i = 0; i < imgs.size(); i++) {
-        for (int j = 0; j < lines[i].size(); j++) {
-            line(imgs[i], Point(lines[i][j][0], lines[i][j][1]), Point(lines[i][j][2], lines[i][j][3]), Scalar(0, 0, 255), 3, LINE_AA);
-        }
-    }
+    // Filter the lines
+    std::vector<std::vector<Vec4i>> filteredLines = filterLines(lines);
 
-    // // Draw the bounding boxes in the images
-    // for (int i = 0; i < imgs.size(); i++ ) {
-    //     drawParkingSpaces(imgs[i], lines[i], contours[i]);
-    // }
+    // Cluster the lines
+    // std::vector<std::vector<Vec4i>> clusteredLines = clusterLines(filteredLines);
 
-    // std::vector<std::vector<std::vector<Vec4i>>> parallelLines;
-    // for (int i = 0; i < lines.size(); i++) {
-    //     parallelLines.push_back(filterLines(lines[i]));
-    // }
+    // Draw the lines
+    drawLines(imgs, filteredLines);
 
-    // for (int i = 0; i < imgs.size(); i++) {
-    //     for (int j = 0; j < parallelLines[i].size(); j++) {
-    //         for (int k = 0; k < parallelLines[i][j].size(); k++) {
-    //             line(imgs[i], Point(parallelLines[i][j][k][0], parallelLines[i][j][k][1]), Point(parallelLines[i][j][k][2], parallelLines[i][j][k][3]), Scalar(0, 0, 255), 3, LINE_AA);
-    //         }
-    //     }
-
-    //     // drawBoundingBoxes(imgs[i], parallelLines[i], contours[i]);
-    // }
-
-    // // Detect the bounding boxes in the images
-    // for (int i = 0; i < imgs.size(); i++) {
-    //     drawBoundingBoxes(imgs[i], lines[i]);
-    // }
+    // Draw the bounding boxes
+    // drawBoundingBoxes(imgs, lines);
 
     // Show the images
-    showImages(images);
+    showImages(imgs);
 
     return 0;
 }
