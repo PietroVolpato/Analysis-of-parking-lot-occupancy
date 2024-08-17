@@ -8,20 +8,34 @@ RotatedRect createBoundingBox(const Point2f& center, const Size2f& size, float a
 }
 
 // Function to determine if a parking space is occupied
-bool isOccupied(const Mat &roi) {
-    // Convert ROI to grayscale
-    Mat grayRoi;
-    cvtColor(roi, grayRoi, COLOR_BGR2GRAY);
+bool isOccupied(const Mat &bbox)  {
+    // Convert to grayscale for edge detection
+    Mat gray_sclaed;
+    cvtColor(bbox, gray_sclaed, cv::COLOR_BGR2GRAY);
 
-    // Thresholding to create a binary image
-    Mat binaryRoi;
-    threshold(grayRoi, binaryRoi, 0, 255, THRESH_BINARY | THRESH_OTSU);
+    // Perform edge detection
+    Mat edges;
+    Canny(gray_sclaed, edges, 50, 150);
 
-    // Count non-zero pixels (i.e., white pixels) in the binary image
-    int nonZeroCount = countNonZero(binaryRoi);
+    // Count the number of edge pixels
+    int edgePixelCount = countNonZero(edges);
 
-    // Heuristic: If there are many non-zero pixels, the space is occupied
-    return nonZeroCount > 0.2 * binaryRoi.total(); // Adjust the threshold as necessary
+    // Calculate the mean color of the bounding box
+    Scalar meanColor = mean(bbox);
+
+    // Threshold values need to be adjusted
+    int edgeThreshold = 500;  // Edge count threshold
+    double colorThreshold = 50;  // Color threshold (distance from grey)
+
+    // Calculate the distance from asphalt color
+    double distanceFromGrey = norm(meanColor - Scalar(127, 127, 127));
+
+    // Classification logic
+    if (distanceFromGrey > colorThreshold || edgePixelCount > edgeThreshold) {
+        return true;  // Occupied by a car
+    } else {
+        return false; // Not occupied (likely just asphalt)
+    }
 }
 
 // Function to classify parking spaces
