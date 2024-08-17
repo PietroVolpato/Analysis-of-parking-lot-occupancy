@@ -11,19 +11,16 @@ int main (int argc, char** argv) {
     std::vector<Mat> imgs = loadImages(sequence);
 
     // Preprocess the images
-    std::vector<Mat> images = preprocessImages(imgs, 9, 105, 105);
+    std::vector<Mat> images = preprocessImages(imgs);
 
     // Detect the edges in the images
     std::vector<Mat> edges = detectEdges(images, 50, 150);
 
     // Detect the lines in the images
-    std::vector<std::vector<Vec4i>> lines = detectLines(edges, 80, 50, 20);
+    std::vector<std::vector<Vec4i>> lines = detectLines(edges, 50, 50, 10);
 
     // Filter the lines
     std::vector<std::vector<Vec4i>> filteredLines = filterLines(lines);
-
-    // Cluster the lines
-    // std::vector<std::vector<Vec4i>> clusteredLines = clusterLines(filteredLines);
 
     // Draw the lines
     drawLines(imgs, filteredLines);

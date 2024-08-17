@@ -30,7 +30,7 @@ std::vector<Mat> loadImages (int sequence) {
     return imgs;
 }
 
-std::vector<Mat> preprocessImages (const std::vector<Mat>& imgs, int d, double sigmaColor, double sigmaSpace) {
+std::vector<Mat> preprocessImages (const std::vector<Mat>& imgs) {
     std::vector<Mat> processedImages;
     processedImages.reserve(imgs.size());
     for (const auto& img: imgs) {
@@ -38,7 +38,7 @@ std::vector<Mat> preprocessImages (const std::vector<Mat>& imgs, int d, double s
         cvtColor(img, grayImg, COLOR_BGR2GRAY);
         
         Mat blurImg;
-        bilateralFilter(grayImg, blurImg, d, sigmaColor, sigmaSpace);
+        GaussianBlur(grayImg, blurImg, Size(5, 5), 0);
 
         Mat processedImg;
         equalizeHist(blurImg, processedImg);
@@ -81,68 +81,51 @@ std::vector<std::vector<Vec4i>> detectLines (const std::vector<Mat>& imgs, int t
 
 // Filter the lines to only include horizontal and vertical lines
 std::vector<std::vector<Vec4i>> filterLines (const std::vector<std::vector<Vec4i>>& linesVector) {
-    std::vector<std::vector<Vec4i>> filteredLines;
-    const double tolerance = 10;
+    std::vector<std::vector<Vec4i>> filteredLinesVector;
+    const double angleThreshold = 5.0;
+
     for (const auto& lines: linesVector) {
-        std::vector<Vec4i> filteredImgLines;
+        std::vector<Vec4i> filteredLines;
         for (const auto& line: lines) {
-            double angle = std::atan2(line[3] - line[1], line[2] - line[0]) * 180 / CV_PI;
-            if (std::abs(angle) < tolerance || std::abs(angle - 90) < tolerance) {
-                filteredImgLines.push_back(line);
+            double dx1 = line[2] - line[0];
+            double dy1 = line[3] - line[1];
+            double length1 = sqrt(dx1*dx1 + dy1*dy1);
+            double angle1 = atan2(dy1, dx1) * 180 / CV_PI;
+
+            // Filter for length
+            if (length1 < 100) {
+                // Filter for angle
+                if ((angle1 > 30 && angle1 < 60) || (angle1 > 120 && angle1 < 150)) {
+                    bool isParallel = false;
+
+                    // Check if the line is parallel to any other line
+                    for (const auto& l: filteredLines) {
+                        double dx2 = l[2] - l[0];
+                        double dy2 = l[3] - l[1];
+                        double length2 = sqrt(dx2*dx2 + dy2*dy2);
+                        double angle2 = atan2(dy2, dx2) * 180 / CV_PI;
+
+                        if (abs(angle1 - angle2) < angleThreshold) {
+                            isParallel = true;
+                            break;
+                        }
+                    }
+
+                    if (isParallel || filteredLines.empty()) {
+                        filteredLines.push_back(line);
+                    }
+                }
             }
-            filteredLines.push_back(filteredImgLines);
-        }
-    }
-    
-    return filteredLines;
-}
 
-// Cluster the lines into groups of parallel lines
-std::vector<std::vector<Vec4i>> clusterLines (const std::vector<std::vector<Vec4i>>& linesVector) {
-    std::vector<std::vector<Vec4i>> clusteredLines;
-    for (const auto& lines: linesVector) {
-        std::vector<Vec4i> clusteredLine;
-        if (lines.empty()) {
-            clusteredLines.push_back(clusteredLine);
-            continue;
-        }
-
-        Vec4i averageLine = lines[0];
-        int count = 1;
-
-        for (const auto& line: lines) {
-            double angle1 = std::atan2(averageLine[3] - averageLine[1], averageLine[2] - averageLine[0]);
-            double angle2 = std::atan2(line[3] - line[1], line[2] - line[0]);
-
-            if (std::abs(angle1 - angle2) < CV_PI / 180 * 10) {
-                averageLine[0] += line[0];
-                averageLine[1] += line[1];
-                averageLine[2] += line[2];
-                averageLine[3] += line[3];
-                count++;
-            }
-            else {
-                averageLine[0] /= count;
-                averageLine[1] /= count;
-                averageLine[2] /= count;
-                averageLine[3] /= count;
-                clusteredLine.push_back(averageLine);
-                averageLine = line;
-                count = 1;
-            }
         }
 
-        averageLine[0] /= count;
-        averageLine[1] /= count;
-        averageLine[2] /= count;
-        averageLine[3] /= count;
-        clusteredLine.push_back(averageLine);
-
-        clusteredLines.push_back(clusteredLine);
+        filteredLinesVector.push_back(filteredLines);
     }
 
-    return clusteredLines;
+    return filteredLinesVector;
 }
+
+
 
 void drawLines (std::vector<Mat>& imgs, const std::vector<std::vector<Vec4i>>& lines) {
     for (const auto& img: imgs) {
@@ -155,37 +138,4 @@ void drawLines (std::vector<Mat>& imgs, const std::vector<std::vector<Vec4i>>& l
 }
 
 void drawBoundingBoxes (std::vector<Mat>& imgs, const std::vector<std::vector<Vec4i>>& linesVector) {
-    for (size_t i = 0; i < imgs.size(); i++) {
-        for (size_t j = 0; j < linesVector[i].size(); j += 2) {
-            if (j + 1 < linesVector[i].size()) {
-                Vec4i line1 = linesVector[i][j];
-                Vec4i line2 = linesVector[i][j + 1];
-
-                // Midde point of the lines
-                Point2f midpoint1 ((line1[0] + line1[2]) / 2, (line1[1] + line1[3]) / 2);
-                Point2f midpoint2 ((line2[0] + line2[2]) / 2, (line2[1] + line2[3]) / 2);
-
-                // Calculate the angle of the bbox
-                double angle = std::atan2(midpoint2.y - midpoint1.y, midpoint2.x - midpoint1.x) * 180 / CV_PI;
-
-                // Distance between the midpoints
-                double width = cv::norm(midpoint1 - midpoint2);
-
-                // Estimate the width and height of the bbox
-                double height = 0.5 * width;
-
-                // Center of the bbox
-                Point2f center ((midpoint1.x + midpoint2.x) / 2, (midpoint1.y + midpoint2.y) / 2);
-
-                // Create the bbox
-                RotatedRect bbox (center, Size2f(width, height), angle);
-
-                // Draw the bbox
-                cv::Point2f vertices[4];
-                bbox.points(vertices);  
-                for (int k = 0; k < 4; k++)
-                    cv::line(imgs[k], vertices[k], vertices[(k + 1) % 4], Scalar(0, 255, 0), 2);
-            }
-        }
-    }
 }
