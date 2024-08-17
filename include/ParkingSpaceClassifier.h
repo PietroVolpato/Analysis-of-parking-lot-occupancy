@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <opencv2/opencv.hpp>
+#include "tinyxml2.h"
 #include <vector>
 
 cv::RotatedRect createBoundingBox(const cv::Point2f& center, const cv::Size2f& size, float angle);
