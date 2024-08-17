@@ -1,6 +1,9 @@
 #include "ParkingSpaceClassifier.h"
+#include "tinyxml2.h"
+#include <iostream>
 
 using namespace cv;
+using namespace tinyxml2;
 
 // Function to create a bounding box
 RotatedRect createBoundingBox(const Point2f& center, const Size2f& size, float angle) {
@@ -8,44 +11,24 @@ RotatedRect createBoundingBox(const Point2f& center, const Size2f& size, float a
 }
 
 // Function to determine if a parking space is occupied
-bool isOccupied(const Mat &bbox)  {
-    // Convert to grayscale for edge detection
-    Mat gray_sclaed;
-    cvtColor(bbox, gray_sclaed, cv::COLOR_BGR2GRAY);
+bool isOccupied(const Mat &roi) {
+    Mat grayRoi;
+    cvtColor(roi, grayRoi, COLOR_BGR2GRAY);
 
-    // Perform edge detection
-    Mat edges;
-    Canny(gray_sclaed, edges, 50, 150);
+    Mat binaryRoi;
+    threshold(grayRoi, binaryRoi, 0, 255, THRESH_BINARY | THRESH_OTSU);
 
-    // Count the number of edge pixels
-    int edgePixelCount = countNonZero(edges);
+    int nonZeroCount = countNonZero(binaryRoi);
 
-    // Calculate the mean color of the bounding box
-    Scalar meanColor = mean(bbox);
-
-    // Threshold values need to be adjusted
-    int edgeThreshold = 500;  // Edge count threshold
-    double colorThreshold = 50;  // Color threshold (distance from grey)
-
-    // Calculate the distance from asphalt color
-    double distanceFromGrey = norm(meanColor - Scalar(127, 127, 127));
-
-    // Classification logic
-    if (distanceFromGrey > colorThreshold || edgePixelCount > edgeThreshold) {
-        return true;  // Occupied by a car
-    } else {
-        return false; // Not occupied (likely just asphalt)
-    }
+    return nonZeroCount > 0.2 * binaryRoi.total(); // Adjust the threshold as necessary
 }
 
 // Function to classify parking spaces
 void classifyParkingSpaces(const Mat &parkingLotImage, std::vector<RotatedRect> &parkingSpaces, std::vector<bool> &occupancyStatus) {
     for (size_t i = 0; i < parkingSpaces.size(); ++i) {
-        // Extract the region of interest (ROI) corresponding to the parking space
         Mat roi;
         getRectSubPix(parkingLotImage, parkingSpaces[i].size, parkingSpaces[i].center, roi);
 
-        // Determine if the space is occupied
         occupancyStatus[i] = isOccupied(roi);
     }
 }
@@ -56,9 +39,55 @@ void drawParkingSpaces(Mat &image, const std::vector<RotatedRect> &parkingSpaces
         Point2f vertices[4];
         parkingSpaces[i].points(vertices);
         
-        Scalar color = occupancyStatus[i] ? Scalar(0, 0, 255) : Scalar(0, 255, 0); // Red for occupied, green for empty
+        Scalar color = occupancyStatus[i] ? Scalar(0, 0, 255) : Scalar(0, 255, 0);
 
         for (int j = 0; j < 4; j++)
             line(image, vertices[j], vertices[(j+1)%4], color, 2);
     }
+}
+
+// Function to extract bounding boxes and their occupancy status from an XML file
+std::vector<RotatedRect> extractBoundingBoxesFromXML(const std::string &xmlFilePath, std::vector<bool> &occupancyStatus) {
+    std::vector<RotatedRect> boundingBoxes;
+
+    XMLDocument xmlDoc;
+    XMLError eResult = xmlDoc.LoadFile(xmlFilePath.c_str());
+
+    if (eResult != XML_SUCCESS) {
+        std::cerr << "Error: Unable to load XML file!" << std::endl;
+        return boundingBoxes;
+    }
+
+    XMLElement* root = xmlDoc.FirstChildElement("parking");
+    if (root == nullptr) {
+        std::cerr << "Error: Invalid XML format!" << std::endl;
+        return boundingBoxes;
+    }
+
+    for (XMLElement* spaceElement = root->FirstChildElement("space"); spaceElement != nullptr; spaceElement = spaceElement->NextSiblingElement("space")) {
+        int occupied;
+        spaceElement->QueryIntAttribute("occupied", &occupied);
+        occupancyStatus.push_back(occupied == 1);
+
+        XMLElement* rotatedRectElement = spaceElement->FirstChildElement("rotatedRect");
+        if (rotatedRectElement == nullptr) continue;
+
+        float centerX, centerY, width, height, angle;
+        rotatedRectElement->FirstChildElement("center")->QueryFloatAttribute("x", &centerX);
+        rotatedRectElement->FirstChildElement("center")->QueryFloatAttribute("y", &centerY);
+        rotatedRectElement->FirstChildElement("size")->QueryFloatAttribute("w", &width);
+        rotatedRectElement->FirstChildElement("size")->QueryFloatAttribute("h", &height);
+        rotatedRectElement->FirstChildElement("angle")->QueryFloatAttribute("d", &angle);
+
+        boundingBoxes.push_back(RotatedRect(Point2f(centerX, centerY), Size2f(width, height), angle));
+    }
+
+    return boundingBoxes;
+}
+
+// Function to draw the true parking spaces from an XML file
+void drawTrueParkingSpaces(Mat &image, const std::string &xmlFilePath) {
+    std::vector<bool> occupancyStatus;
+    std::vector<RotatedRect> parkingSpaces = extractBoundingBoxesFromXML(xmlFilePath, occupancyStatus);
+    drawParkingSpaces(image, parkingSpaces, occupancyStatus);
 }

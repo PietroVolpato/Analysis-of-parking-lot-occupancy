@@ -1,69 +1,50 @@
+#include "ParkingSpaceClassifier.h"
 #include <opencv2/opencv.hpp>
 #include "tinyxml2.h"
 #include <string>
 
-using namespace cv;
-using namespace tinyxml2;
-
-// Function to draw the true parking spaces from an XML file
-void drawTrueParkingSpaces(Mat &image, const std::string &xmlFilePath) {
-    XMLDocument xmlDoc;
-    XMLError eResult = xmlDoc.LoadFile(xmlFilePath.c_str());
-
-    if (eResult != XML_SUCCESS) {
-        std::cerr << "Error: Unable to load XML file!" << std::endl;
-        return;
-    }
-
-    XMLElement* root = xmlDoc.FirstChildElement("parking");
-    if (root == nullptr) {
-        std::cerr << "Error: Invalid XML format!" << std::endl;
-        return;
-    }
-
-    for (XMLElement* spaceElement = root->FirstChildElement("space"); spaceElement != nullptr; spaceElement = spaceElement->NextSiblingElement("space")) {
-        int occupied;
-        spaceElement->QueryIntAttribute("occupied", &occupied);
-
-        XMLElement* rotatedRectElement = spaceElement->FirstChildElement("rotatedRect");
-        if (rotatedRectElement == nullptr) continue;
-
-        float centerX, centerY, width, height, angle;
-        rotatedRectElement->FirstChildElement("center")->QueryFloatAttribute("x", &centerX);
-        rotatedRectElement->FirstChildElement("center")->QueryFloatAttribute("y", &centerY);
-        rotatedRectElement->FirstChildElement("size")->QueryFloatAttribute("w", &width);
-        rotatedRectElement->FirstChildElement("size")->QueryFloatAttribute("h", &height);
-        rotatedRectElement->FirstChildElement("angle")->QueryFloatAttribute("d", &angle);
-
-        // Create RotatedRect from the parsed data
-        RotatedRect parkingSpace(Point2f(centerX, centerY), Size2f(width, height), angle);
-
-        // Draw the bounding box
-        Point2f vertices[4];
-        parkingSpace.points(vertices);
-
-        Scalar color = occupied ? Scalar(0, 0, 255) : Scalar(0, 255, 0); // Red for occupied, green for empty
-
-        for (int i = 0; i < 4; ++i)
-            line(image, vertices[i], vertices[(i + 1) % 4], color, 2);
-    }
-}
-
 int main() {
     // Load the parking lot image
-    Mat parkingLotImage = imread("data/sequence0/frames/2013-02-24_10_05_04.jpg");
+    cv::Mat parkingLotImage = cv::imread("data/sequence1/frames/2013-02-22_07_10_01.png");
     if (parkingLotImage.empty()) {
         std::cerr << "Error: Unable to load image!" << std::endl;
         return -1;
     }
 
-    // Draw the true parking spaces on the image using the XML file
-    std::string xmlFilePath = "data/sequence0/bounding_boxes/2013-02-24_10_05_04.xml";
-    drawTrueParkingSpaces(parkingLotImage, xmlFilePath);
+    // Clone the image to create a separate copy for each method of occupancy detection
+    cv::Mat imageFromXML = parkingLotImage.clone();
+    cv::Mat imageFromDetection = parkingLotImage.clone();
 
-    // Display the result
-    imshow("True Parking Space Classification", parkingLotImage);
-    waitKey(0);
+    // Path to the XML file
+    std::string xmlFilePath = "data/sequence1/bounding_boxes/2013-02-22_07_10_01.xml";
+
+    // 1. Draw the parking spaces based on the XML file (using the occupancy status from the XML file)
+    drawTrueParkingSpaces(imageFromXML, xmlFilePath);
+
+    // 2. Draw the parking spaces based on the occupancy detected using the isOccupied function
+    std::vector<bool> occupancyStatus;
+    std::vector<cv::RotatedRect> parkingSpaces = extractBoundingBoxesFromXML(xmlFilePath, occupancyStatus);
+
+    classifyParkingSpaces(parkingLotImage, parkingSpaces, occupancyStatus);  // Re-classify using isOccupied
+    drawParkingSpaces(imageFromDetection, parkingSpaces, occupancyStatus);
+
+    // Determine the maximum width and height that can fit on the screen
+    int screenHeight = 400;  // Example screen height, adjust as needed
+    int maxImageHeight = std::min(imageFromXML.rows, screenHeight);
+    
+    // Resize images to fit within the screen height
+    double scaleFactor = static_cast<double>(maxImageHeight) / imageFromXML.rows;
+
+    cv::resize(imageFromXML, imageFromXML, cv::Size(), scaleFactor, scaleFactor);
+    cv::resize(imageFromDetection, imageFromDetection, cv::Size(), scaleFactor, scaleFactor);
+
+    // Combine the two images side by side for comparison
+    cv::Mat combined;
+    cv::hconcat(imageFromXML, imageFromDetection, combined);
+
+    // Display the combined result
+    cv::imshow("Parking Space Occupancy Comparison", combined);
+    cv::waitKey(0);
 
     return 0;
 }
