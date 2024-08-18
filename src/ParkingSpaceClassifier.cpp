@@ -14,10 +14,20 @@ RotatedRect createBoundingBox(const Point2f& center, const Size2f& size, float a
 bool isOccupied(const Mat &roi) {
     Mat grayRoi;
     cvtColor(roi, grayRoi, COLOR_BGR2GRAY);
-
+    
+    // Define the lower and upper thresholds
+    int lower_threshold = 70;
+    int upper_threshold = 95;
+    
+    Mat lower_mask;
+    threshold(grayRoi, lower_mask, lower_threshold, 255, THRESH_BINARY);
+    Mat upper_mask;
+    threshold(grayRoi, upper_mask, upper_threshold, 255, THRESH_BINARY_INV);
     Mat binaryRoi;
-    threshold(grayRoi, binaryRoi, 0, 255, THRESH_BINARY | THRESH_OTSU);
-
+    binaryRoi = lower_mask & upper_mask;
+    // threshold(grayRoi, binaryRoi, 0, 255, THRESH_BINARY | THRESH_OTSU);
+    imshow("Bbox", binaryRoi);
+    waitKey(0);
     int nonZeroCount = countNonZero(binaryRoi);
 
     return nonZeroCount > 0.2 * binaryRoi.total(); // Adjust the threshold as necessary
