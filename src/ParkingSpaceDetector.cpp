@@ -38,10 +38,10 @@ std::vector<Mat> preprocessImages (const std::vector<Mat>& imgs) {
         cvtColor(img, grayImg, COLOR_BGR2GRAY);
         
         Mat blurImg;
-        GaussianBlur(grayImg, blurImg, Size(5, 5), 0);
+        // GaussianBlur(grayImg, blurImg, Size(5, 5), 0);
 
         Mat processedImg;
-        equalizeHist(blurImg, processedImg);
+        equalizeHist(grayImg, processedImg);
 
         processedImages.push_back(processedImg);
     }
@@ -82,7 +82,7 @@ std::vector<std::vector<Vec4i>> detectLines (const std::vector<Mat>& imgs, int t
 // Filter the lines to only include horizontal and vertical lines
 std::vector<std::vector<Vec4i>> filterLines (const std::vector<std::vector<Vec4i>>& linesVector) {
     std::vector<std::vector<Vec4i>> filteredLinesVector;
-    const double angleThreshold = 5.0;
+    const double angleThreshold = 10.0;
 
     for (const auto& lines: linesVector) {
         std::vector<Vec4i> filteredLines;
@@ -95,7 +95,7 @@ std::vector<std::vector<Vec4i>> filterLines (const std::vector<std::vector<Vec4i
             // Filter for length
             if (length1 < 100) {
                 // Filter for angle
-                if ((angle1 > 30 && angle1 < 60) || (angle1 > 120 && angle1 < 150)) {
+                if (abs(angle1) < angleThreshold || abs(angle1 - 90) < angleThreshold) {
                     bool isParallel = false;
 
                     // Check if the line is parallel to any other line
@@ -138,4 +138,55 @@ void drawLines (std::vector<Mat>& imgs, const std::vector<std::vector<Vec4i>>& l
 }
 
 void drawBoundingBoxes (std::vector<Mat>& imgs, const std::vector<std::vector<Vec4i>>& linesVector) {
+    for (const auto& img: imgs) {
+        for (const auto& lines: linesVector) {
+            for (size_t i = 0; i < lines.size(); i++) {
+                for (size_t j = 0; j < lines.size(); i++) {
+                    Vec4i l1 = lines[i];
+                    Vec4i l2 = lines[j];
+
+                    double dx1 = l1[2] - l1[0];
+                    double dy1 = l1[3] - l1[1];
+                    double length1 = sqrt(dx1*dx1 + dy1*dy1);
+                    double angle1 = atan2(dy1, dx1) * 180 / CV_PI;
+
+                    double dx2 = l2[2] - l2[0];
+                    double dy2 = l2[3] - l2[1];
+                    double length2 = sqrt(dx2*dx2 + dy2*dy2);
+                    double angle2 = atan2(dy2, dx2) * 180 / CV_PI;
+
+                    if (abs(angle1 - angle2) < 10) {
+                        double x1 = (l1[0] + l1[2]) / 2;
+                        double y1 = (l1[1] + l1[3]) / 2;
+                        double x2 = (l2[0] + l2[2]) / 2;
+                        double y2 = (l2[1] + l2[3]) / 2;
+
+                        double dx = x2 - x1;
+                        double dy = y2 - y1;
+                        double length = sqrt(dx*dx + dy*dy);
+
+                        if (length > 100) {
+                            double angle = atan2(dy, dx) * 180 / CV_PI;
+                            double x = (x1 + x2) / 2;
+                            double y = (y1 + y2) / 2;
+
+                            double width = 100;
+                            double height = 100;
+
+                            Point2f center(x, y);
+                            Size2f size(width, height);
+                            RotatedRect rect(center, size, angle);
+
+                            Point2f vertices[4];
+                            rect.points(vertices);
+
+                            for (int i = 0; i < 4; i++) {
+                                line(img, vertices[i], vertices[(i+1)%4], Scalar(255, 255, 255), 3, LINE_AA);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
