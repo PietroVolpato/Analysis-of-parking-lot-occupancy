@@ -10,54 +10,39 @@ RotatedRect createBoundingBox(const Point2f& center, const Size2f& size, float a
     return RotatedRect(center, size, angle);
 }
 
-void Thresholding(Mat &img) {
-    Mat grayImg;
-    cvtColor(img, grayImg, COLOR_BGR2GRAY);
-    int lower_threshold = 70;
-    int upper_threshold = 95;
-
-    Mat lower_mask;
-    threshold(grayImg, lower_mask, lower_threshold, 255, THRESH_BINARY);
-    Mat upper_mask;
-    threshold(grayImg, upper_mask, upper_threshold, 255, THRESH_BINARY_INV);
-    Mat binaryImg;
-    binaryImg = lower_mask & upper_mask;
-    imshow("lower Threshold", lower_mask);
-    imshow("Upper Threshold", upper_mask);
-    //imshow("Filtered Image", binaryImg);
-    waitKey(0);
-}
-// Function to determine if a parking space is occupied
-bool isOccupied(const Mat &roi) {
-    Mat grayRoi;
-    cvtColor(roi, grayRoi, COLOR_BGR2GRAY);
-    //imshow("Bbox", roi);
-    //waitKey(0);
-    // Define the lower and upper thresholds
-    int lower_threshold = 70;
-    int upper_threshold = 95;
-    
-    Mat lower_mask;
-    threshold(grayRoi, lower_mask, lower_threshold, 255, THRESH_BINARY);
-    Mat upper_mask;
-    threshold(grayRoi, upper_mask, upper_threshold, 255, THRESH_BINARY_INV);
-    Mat binaryRoi;
-    binaryRoi = lower_mask & upper_mask;
-    // threshold(grayRoi, binaryRoi, 0, 255, THRESH_BINARY | THRESH_OTSU);
-    
-    int nonZeroCount = countNonZero(binaryRoi);
-
-    return nonZeroCount > 0.2 * binaryRoi.total(); // Adjust the threshold as necessary
-}
-
-// Function to classify parking spaces
 void classifyParkingSpaces(const Mat &parkingLotImage, std::vector<RotatedRect> &parkingSpaces, std::vector<bool> &occupancyStatus) {
     for (size_t i = 0; i < parkingSpaces.size(); ++i) {
         Mat roi;
         getRectSubPix(parkingLotImage, parkingSpaces[i].size, parkingSpaces[i].center, roi);
+        std::string windowName = "Parking Space " + std::to_string(i + 1);
+        imshow(windowName, roi);
 
-        occupancyStatus[i] = isOccupied(roi);
+        // Convert to grayscale
+        Mat grayRoi;
+        cvtColor(roi, grayRoi, COLOR_BGR2GRAY);
+
+        // Apply Canny edge detection
+        Mat edges;
+        Canny(grayRoi, edges, 50, 150);
+
+        // Flatten the edge image for K-Means clustering
+        Mat data;
+        edges.convertTo(data, CV_32F);
+        data = data.reshape(1, data.total());
+
+        // Apply K-Means clustering with 2 clusters
+        Mat labels, centers;
+        kmeans(data, 2, labels, TermCriteria(TermCriteria::EPS + TermCriteria::COUNT, 10, 1.0), 3, KMEANS_PP_CENTERS, centers);
+
+        // Count the number of pixels in each cluster
+        int occupiedCluster = centers.at<float>(0) < centers.at<float>(1) ? 0 : 1;
+        int occupiedCount = countNonZero(labels == occupiedCluster);
+
+        // Set occupancy status based on cluster with the majority of edge pixels
+        occupancyStatus[i] = occupiedCount > (data.total() / 2);
     }
+    waitKey(0);
+
 }
 
 // Function to draw the parking spaces on the image
