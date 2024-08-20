@@ -13,5 +13,6 @@ void drawParkingSpaces(cv::Mat &image, const std::vector<cv::RotatedRect> &parki
 // New functions for XML parsing and drawing
 std::vector<cv::RotatedRect> extractBoundingBoxesFromXML(const std::string &xmlFilePath, std::vector<bool> &occupancyStatus);
 void drawTrueParkingSpaces(cv::Mat &image, const std::string &xmlFilePath);
+void Thresholding(cv::Mat &img);
 
 #endif

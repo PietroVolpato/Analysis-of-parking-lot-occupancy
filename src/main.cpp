@@ -11,6 +11,8 @@ int main() {
         return -1;
     }
 
+    Thresholding(parkingLotImage);
+
     // Clone the image to create a separate copy for each method of occupancy detection
     cv::Mat imageFromXML = parkingLotImage.clone();
     cv::Mat imageFromDetection = parkingLotImage.clone();

@@ -10,11 +10,29 @@ RotatedRect createBoundingBox(const Point2f& center, const Size2f& size, float a
     return RotatedRect(center, size, angle);
 }
 
+void Thresholding(Mat &img) {
+    Mat grayImg;
+    cvtColor(img, grayImg, COLOR_BGR2GRAY);
+    int lower_threshold = 70;
+    int upper_threshold = 95;
+
+    Mat lower_mask;
+    threshold(grayImg, lower_mask, lower_threshold, 255, THRESH_BINARY);
+    Mat upper_mask;
+    threshold(grayImg, upper_mask, upper_threshold, 255, THRESH_BINARY_INV);
+    Mat binaryImg;
+    binaryImg = lower_mask & upper_mask;
+    imshow("lower Threshold", lower_mask);
+    imshow("Upper Threshold", upper_mask);
+    //imshow("Filtered Image", binaryImg);
+    waitKey(0);
+}
 // Function to determine if a parking space is occupied
 bool isOccupied(const Mat &roi) {
     Mat grayRoi;
     cvtColor(roi, grayRoi, COLOR_BGR2GRAY);
-    
+    //imshow("Bbox", roi);
+    //waitKey(0);
     // Define the lower and upper thresholds
     int lower_threshold = 70;
     int upper_threshold = 95;
@@ -26,8 +44,7 @@ bool isOccupied(const Mat &roi) {
     Mat binaryRoi;
     binaryRoi = lower_mask & upper_mask;
     // threshold(grayRoi, binaryRoi, 0, 255, THRESH_BINARY | THRESH_OTSU);
-    imshow("Bbox", binaryRoi);
-    waitKey(0);
+    
     int nonZeroCount = countNonZero(binaryRoi);
 
     return nonZeroCount > 0.2 * binaryRoi.total(); // Adjust the threshold as necessary
