@@ -64,7 +64,7 @@ int main() {
     std::vector<cv::RotatedRect> parkingSpaces = extractBoundingBoxesFromXML(xmlFilePath, occupancyStatus);
 
     // Show bounding boxes separately
-    showBoundingBoxesSeparately(parkingLotImage, parkingSpaces);
+    // showBoundingBoxesSeparately(parkingLotImage, parkingSpaces);
     
     classifyParkingSpaces(parkingLotImage, parkingSpaces, occupancyStatus);  // Re-classify using K-Means
     drawParkingSpaces(imageFromDetection, parkingSpaces, occupancyStatus);

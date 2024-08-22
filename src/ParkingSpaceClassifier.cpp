@@ -14,8 +14,6 @@ void classifyParkingSpaces(const Mat &parkingLotImage, std::vector<RotatedRect> 
     for (size_t i = 0; i < parkingSpaces.size(); ++i) {
         Mat roi;
         getRectSubPix(parkingLotImage, parkingSpaces[i].size, parkingSpaces[i].center, roi);
-        std::string windowName = "Parking Space " + std::to_string(i + 1);
-        imshow(windowName, roi);
 
         // Convert to grayscale
         Mat grayRoi;
@@ -24,7 +22,9 @@ void classifyParkingSpaces(const Mat &parkingLotImage, std::vector<RotatedRect> 
         // Apply Canny edge detection
         Mat edges;
         Canny(grayRoi, edges, 50, 150);
-
+        std::string window_name = "Edge map " + std::to_string(i + 1);
+        imshow(window_name, edges);
+        waitKey(0);
         // Flatten the edge image for K-Means clustering
         Mat data;
         edges.convertTo(data, CV_32F);
@@ -41,7 +41,6 @@ void classifyParkingSpaces(const Mat &parkingLotImage, std::vector<RotatedRect> 
         // Set occupancy status based on cluster with the majority of edge pixels
         occupancyStatus[i] = occupiedCount > (data.total() / 2);
     }
-    waitKey(0);
 
 }
 
