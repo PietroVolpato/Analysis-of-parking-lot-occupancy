@@ -34,12 +34,7 @@ void classifyParkingSpaces(const Mat &parkingLotImage, std::vector<RotatedRect> 
 
         if (bounding_box.width > 0 && bounding_box.height > 0) {
             cropped_image = rotated_image(bounding_box);
-
-            // Display the cropped and scaled image
-            std::string window_name = "Cropped Image " + std::to_string(&rotated_rect - &parkingSpaces[0]);
-            imshow(window_name, cropped_image);
         }
-        waitKey(0);  // Wait for a key press to close all windows
 
         // Convert to grayscale
         Mat grayRoi;
@@ -49,21 +44,16 @@ void classifyParkingSpaces(const Mat &parkingLotImage, std::vector<RotatedRect> 
         Mat edges;
         Canny(grayRoi, edges, 50, 150);
         
-        // Flatten the edge image for K-Means clustering
-        Mat data;
-        edges.convertTo(data, CV_32F);
-        data = data.reshape(1, data.total());
+        // Count the number of edge pixels (non-zero pixels in the edge image)
+        int edgeCount = countNonZero(edges);
 
-        // Apply K-Means clustering with 2 clusters
-        Mat labels, centers;
-        kmeans(data, 2, labels, TermCriteria(TermCriteria::EPS + TermCriteria::COUNT, 10, 1.0), 3, KMEANS_PP_CENTERS, centers);
-
-        // Count the number of pixels in each cluster
-        int occupiedCluster = centers.at<float>(0) < centers.at<float>(1) ? 0 : 1;
-        int occupiedCount = countNonZero(labels == occupiedCluster);
-
-        // Set occupancy status based on cluster with the majority of edge pixels
-        occupancyStatus[i] = occupiedCount > (data.total() / 2);
+        // Heuristic: If there are many non-zero pixels, the space is occupied; otherwise, it's empty
+        if (edgeCount > 0.1 * edges.total()) {  // Adjust the threshold as necessary
+            occupancyStatus[i] = true;
+        } else {
+            occupancyStatus[i] = false;
+        }
+        std::cerr << occupancyStatus[i] << "," << edgeCount << std::endl;
     }
 
 }
