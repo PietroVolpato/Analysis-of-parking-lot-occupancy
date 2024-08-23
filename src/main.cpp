@@ -1,4 +1,5 @@
 #include "ParkingSpaceClassifier.h"
+#include "GroundTruthReader.h"
 #include <opencv2/opencv.hpp>
 #include "tinyxml2.h"
 #include <string>
@@ -57,7 +58,9 @@ int main() {
     std::string xmlFilePath = "data/sequence1/bounding_boxes/2013-02-22_07_10_01.xml";
 
     // 1. Draw the parking spaces based on the XML file (using the occupancy status from the XML file)
-    drawTrueParkingSpaces(imageFromXML, xmlFilePath);
+    std::vector<bool> occupancyStatus;
+    std::vector<cv::RotatedRect> parkingSpaces = extractBoundingBoxesFromXML(xmlFilePath, occupancyStatus);
+    drawParkingSpaces(imageFromXML, parkingSpaces, occupancyStatus);
 
     // 2. Draw the parking spaces based on the occupancy detected using the isOccupied function
     std::vector<bool> occupancyStatus;

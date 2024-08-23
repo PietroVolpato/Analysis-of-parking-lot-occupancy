@@ -7,6 +7,9 @@
     <ClCompile Include="C:\Users\Noji\Cpp\CV\Analysis-of-parking-lot-occupancy\src\tinyxml2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\Noji\Cpp\CV\Analysis-of-parking-lot-occupancy\src\GroundTruthReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Users\Noji\Cpp\CV\Analysis-of-parking-lot-occupancy\src\ParkingSpaceClassifier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

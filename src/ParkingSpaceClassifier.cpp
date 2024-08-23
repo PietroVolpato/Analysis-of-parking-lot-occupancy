@@ -1,9 +1,6 @@
 #include "ParkingSpaceClassifier.h"
-#include "tinyxml2.h"
-#include <iostream>
 
 using namespace cv;
-using namespace tinyxml2;
 
 // Function to create a bounding box
 RotatedRect createBoundingBox(const Point2f& center, const Size2f& size, float angle) {
@@ -55,50 +52,4 @@ void drawParkingSpaces(Mat &image, const std::vector<RotatedRect> &parkingSpaces
         for (int j = 0; j < 4; j++)
             line(image, vertices[j], vertices[(j+1)%4], color, 2);
     }
-}
-
-// Function to extract bounding boxes and their occupancy status from an XML file
-std::vector<RotatedRect> extractBoundingBoxesFromXML(const std::string &xmlFilePath, std::vector<bool> &occupancyStatus) {
-    std::vector<RotatedRect> boundingBoxes;
-
-    XMLDocument xmlDoc;
-    XMLError eResult = xmlDoc.LoadFile(xmlFilePath.c_str());
-
-    if (eResult != XML_SUCCESS) {
-        std::cerr << "Error: Unable to load XML file!" << std::endl;
-        return boundingBoxes;
-    }
-
-    XMLElement* root = xmlDoc.FirstChildElement("parking");
-    if (root == nullptr) {
-        std::cerr << "Error: Invalid XML format!" << std::endl;
-        return boundingBoxes;
-    }
-
-    for (XMLElement* spaceElement = root->FirstChildElement("space"); spaceElement != nullptr; spaceElement = spaceElement->NextSiblingElement("space")) {
-        int occupied;
-        spaceElement->QueryIntAttribute("occupied", &occupied);
-        occupancyStatus.push_back(occupied == 1);
-
-        XMLElement* rotatedRectElement = spaceElement->FirstChildElement("rotatedRect");
-        if (rotatedRectElement == nullptr) continue;
-
-        float centerX, centerY, width, height, angle;
-        rotatedRectElement->FirstChildElement("center")->QueryFloatAttribute("x", &centerX);
-        rotatedRectElement->FirstChildElement("center")->QueryFloatAttribute("y", &centerY);
-        rotatedRectElement->FirstChildElement("size")->QueryFloatAttribute("w", &width);
-        rotatedRectElement->FirstChildElement("size")->QueryFloatAttribute("h", &height);
-        rotatedRectElement->FirstChildElement("angle")->QueryFloatAttribute("d", &angle);
-
-        boundingBoxes.push_back(RotatedRect(Point2f(centerX, centerY), Size2f(width, height), angle));
-    }
-
-    return boundingBoxes;
-}
-
-// Function to draw the true parking spaces from an XML file
-void drawTrueParkingSpaces(Mat &image, const std::string &xmlFilePath) {
-    std::vector<bool> occupancyStatus;
-    std::vector<RotatedRect> parkingSpaces = extractBoundingBoxesFromXML(xmlFilePath, occupancyStatus);
-    drawParkingSpaces(image, parkingSpaces, occupancyStatus);
 }
