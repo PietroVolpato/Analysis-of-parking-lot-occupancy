@@ -12,6 +12,8 @@ std::vector<cv::Mat> loadImages (int);
 
 std::vector<cv::Mat> preprocessImages (const std::vector<cv::Mat>&);
 
+std::vector<cv::Mat> constrastStretch (const std::vector<cv::Mat>&);
+
 void showImages (const std::vector<cv::Mat>&);
 
 std::vector<cv::Mat> detectEdges (const std::vector<cv::Mat>&, double, double);

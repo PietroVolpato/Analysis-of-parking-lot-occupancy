@@ -33,20 +33,28 @@ std::vector<Mat> loadImages (int sequence) {
 std::vector<Mat> preprocessImages (const std::vector<Mat>& imgs) {
     std::vector<Mat> processedImages;
     for (const auto& img: imgs) {
-        Mat grayImg;
-        cvtColor(img, grayImg, COLOR_BGR2GRAY);
-        equalizeHist(grayImg, grayImg);
         Mat binaryImg;
-        adaptiveThreshold(grayImg, binaryImg, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 31, 0);
-        Mat blurImg;
-        // medianBlur(binaryImg, blurImg, 5);
-        // bilateralFilter(binaryImg, blurImg, 15, 150, 150);
-        // GaussianBlur(binaryImg, blurImg, Size(5, 5), 0);
-
+        cvtColor(img, binaryImg, COLOR_BGR2GRAY);
         processedImages.push_back(binaryImg);
     }
 
     return processedImages;
+}
+
+std::vector<Mat> constrastStretch (const std::vector<Mat>& imgs) {
+    std::vector<Mat> stretchedImages;
+    for (const auto& img: imgs) {
+        Mat stretchedImg;
+        Mat img32f;
+        img.convertTo(img32f, CV_32F);
+        normalize(img32f, img32f, 0, 1, NORM_MINMAX);
+        pow(img32f, 0.5, img32f);
+        normalize(img32f, img32f, 0, 255, NORM_MINMAX);
+        img32f.convertTo(stretchedImg, CV_8U);
+        stretchedImages.push_back(stretchedImg);
+    }
+
+    return stretchedImages;
 }
 
 void showImages (const std::vector<Mat>& imgs) {
@@ -93,34 +101,34 @@ std::vector<std::vector<Vec4i>> filterLines (const std::vector<std::vector<Vec4i
             double angle = atan2(dy, dx) * 180 / CV_PI;
             double length = sqrt(dx * dx + dy * dy);
 
-            if (angle >= minAngle && angle <= maxAngle && length >= minLength && length <= maxLength) {
+            if (abs(abs(angle) - 90) >= minAngle && abs(angle) - 90 <= maxAngle){//&& length >= minLength && length <= maxLength) {
                 filteredLines.push_back(l);
             }
         }
 
-        std::vector<Vec4i> finalLines;
-        for (size_t i = 0; i < filteredLines.size(); i++) {
-            Vec4i l1 = filteredLines[i];
-            bool keepLine = true;
+        // std::vector<Vec4i> finalLines;
+        // for (size_t i = 0; i < filteredLines.size(); i++) {
+        //     Vec4i l1 = filteredLines[i];
+        //     bool keepLine = true;
 
-            for (size_t j = i + 1; j < filteredLines.size(); j++) {
-                Vec4i l2 = filteredLines[j];
-                double distance = norm(Point(l1[0], l1[1]) - Point(l2[0], l2[1]));
+        //     for (size_t j = i + 1; j < filteredLines.size(); j++) {
+        //         Vec4i l2 = filteredLines[j];
+        //         double distance = norm(Point(l1[0], l1[1]) - Point(l2[0], l2[1]));
 
-                if (distance >= minDistance && distance <= maxDistance) {
-                    finalLines.push_back(l1);
-                    finalLines.push_back(l2);
-                    keepLine = false;
-                    break;
-                }
-            }
+        //         if (distance >= minDistance && distance <= maxDistance) {
+        //             finalLines.push_back(l1);
+        //             finalLines.push_back(l2);
+        //             keepLine = false;
+        //             break;
+        //         }
+        //     }
 
-            if (keepLine) {
-                finalLines.push_back(l1);
-            }
-        }
+        //     if (keepLine) {
+        //         finalLines.push_back(l1);
+        //     }
+        // }
 
-        filteredLinesVector.push_back(finalLines);
+        filteredLinesVector.push_back(filteredLines);
    }
     return filteredLinesVector;
 }
