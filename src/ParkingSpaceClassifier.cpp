@@ -42,10 +42,10 @@ void classifyParkingSpaces(const Mat &parkingLotImage, std::vector<RotatedRect> 
 
         // Apply Canny edge detection
         Mat edges;
-        Canny(grayRoi, edges, 50, 150);
+        Canny(grayRoi, edges, 80, 240);
         
         // Count the number of edge pixels (non-zero pixels in the edge image)
-        int edgeCount = countNonZero(edges);
+        double edgeCount = countNonZero(edges);
 
         // Heuristic: If there are many non-zero pixels, the space is occupied; otherwise, it's empty
         if (edgeCount > 0.1 * edges.total()) {  // Adjust the threshold as necessary
@@ -53,7 +53,7 @@ void classifyParkingSpaces(const Mat &parkingLotImage, std::vector<RotatedRect> 
         } else {
             occupancyStatus[i] = false;
         }
-        std::cerr << occupancyStatus[i] << "," << edgeCount << std::endl;
+        std::cerr << occupancyStatus[i] << "," << edgeCount / edges.total() << std::endl;
     }
 
 }
