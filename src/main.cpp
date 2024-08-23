@@ -58,16 +58,16 @@ int main() {
     std::string xmlFilePath = "data/sequence1/bounding_boxes/2013-02-22_07_10_01.xml";
 
     // 1. Draw the parking spaces based on the XML file (using the occupancy status from the XML file)
-    std::vector<bool> occupancyStatus;
-    std::vector<cv::RotatedRect> parkingSpaces = extractBoundingBoxesFromXML(xmlFilePath, occupancyStatus);
-    drawParkingSpaces(imageFromXML, parkingSpaces, occupancyStatus);
+    std::vector<bool> trueOccupancyStatus;
+    std::vector<cv::RotatedRect> trueParkingSpaces = extractBoundingBoxesFromXML(xmlFilePath, trueOccupancyStatus);
+    drawParkingSpaces(imageFromXML, trueParkingSpaces, trueOccupancyStatus);
 
     // 2. Draw the parking spaces based on the occupancy detected using the isOccupied function
     std::vector<bool> occupancyStatus;
     std::vector<cv::RotatedRect> parkingSpaces = extractBoundingBoxesFromXML(xmlFilePath, occupancyStatus);
 
     // Show bounding boxes separately
-    // showBoundingBoxesSeparately(parkingLotImage, parkingSpaces);
+    //showBoundingBoxesSeparately(parkingLotImage, parkingSpaces);
     
     classifyParkingSpaces(parkingLotImage, parkingSpaces, occupancyStatus);  // Re-classify using K-Means
     drawParkingSpaces(imageFromDetection, parkingSpaces, occupancyStatus);
