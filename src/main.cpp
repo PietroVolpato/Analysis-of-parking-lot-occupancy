@@ -1,51 +1,31 @@
 #include "ParkingSpaceClassifier.h"
+#include "ParkingSpaceDetector.h"
 #include "GroundTruthReader.h"
-#include <opencv2/opencv.hpp>
 #include "tinyxml2.h"
 #include <string>
 
-cv::Mat src, src_gray;
-cv::Mat dst, detected_edges;
-int lowThreshold = 0;
-const int max_lowThreshold = 100;
-int highThreshold = 100;
-const int max_highThreshold = 300;
-const int ratio = 3;
-const int kernel_size = 3;
-const char* window_name = "Edge Map";
+using namespace cv;
 
-static void CannyThreshold(int, void*){
-    cv::blur( src_gray, detected_edges, cv::Size(3,3) );
-    cv::Canny( detected_edges, detected_edges, lowThreshold, highThreshold, kernel_size );
-    dst = cv::Scalar::all(0);
-    src.copyTo( dst, detected_edges);
-    imshow( window_name, dst );
-}
 
 int main() {
-    // Load the parking lot image
-    cv::Mat parkingLotImage = cv::imread("data/sequence1/frames/2013-02-22_07_15_01.png");
-    if (parkingLotImage.empty()) {
-        std::cerr << "Error: Unable to load image!" << std::endl;
-        return -1;
-    }
-    // Displaying the edge map of the image
-    // src = parkingLotImage.clone();
-    // dst.create( src.size(), src.type() );
-    // cv::cvtColor( src, src_gray, cv::COLOR_BGR2GRAY );
-    // cv::namedWindow( window_name, cv::WINDOW_AUTOSIZE );
-    // cv::createTrackbar( "Min Threshold:", window_name, &lowThreshold, max_lowThreshold, CannyThreshold );
-    // cv::createTrackbar( "Max Threshold:", window_name, &highThreshold, max_highThreshold, CannyThreshold );
-    // CannyThreshold(0, 0);
-    // cv::waitKey(0);
+    // Load the images
+    int sequence = 1;
+    int img_num = 2;
+    std::vector<Mat> imgVector = loadImages(sequence);
+
+     // Contrast stretch the images
+    std::vector<Mat> stretchedImgVector = constrastStretch(imgVector);
     
+    cv::Mat parkingLotImage = stretchedImgVector[img_num];
     
+    // Path to the XML file
+    std::vector<String> xmlFilePaths = loadXmlAddress(sequence);
+    std::string xmlFilePath = xmlFilePaths[img_num];
+
+
     // Clone the image to create a separate copy for each method of occupancy detection
     cv::Mat imageFromXML = parkingLotImage.clone();
     cv::Mat imageFromDetection = parkingLotImage.clone();
-
-    // Path to the XML file
-    std::string xmlFilePath = "data/sequence1/bounding_boxes/2013-02-22_07_15_01.xml";
 
     // 1. Draw the parking spaces based on the XML file (using the occupancy status from the XML file)
     std::vector<bool> trueOccupancyStatus;

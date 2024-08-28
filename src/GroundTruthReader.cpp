@@ -3,6 +3,21 @@
 using namespace cv;
 using namespace tinyxml2;
 
+// Function to load the address
+std::vector<String> loadXmlAddress(int sequence) {
+    std::vector<String> fileNames;
+
+    if (sequence >= 0 && sequence <= 5) {
+        String path = "./data/sequence" + std::to_string(sequence) + "/bounding_boxes";
+        glob(path, fileNames);
+    } else {
+        // Handle the error case if needed
+        std::cerr << "Invalid sequence number: " << sequence << std::endl;
+    }
+
+    return fileNames;
+}
+
 // Function to extract bounding boxes and their occupancy status from an XML file
 std::vector<RotatedRect> extractBoundingBoxesFromXML(const std::string &xmlFilePath, std::vector<bool> &occupancyStatus) {
     std::vector<RotatedRect> boundingBoxes;
