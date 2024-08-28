@@ -8,13 +8,15 @@ cv::Mat src, src_gray;
 cv::Mat dst, detected_edges;
 int lowThreshold = 0;
 const int max_lowThreshold = 100;
+int highThreshold = 100;
+const int max_highThreshold = 300;
 const int ratio = 3;
 const int kernel_size = 3;
 const char* window_name = "Edge Map";
 
 static void CannyThreshold(int, void*){
     cv::blur( src_gray, detected_edges, cv::Size(3,3) );
-    cv::Canny( detected_edges, detected_edges, lowThreshold, lowThreshold*ratio, kernel_size );
+    cv::Canny( detected_edges, detected_edges, lowThreshold, highThreshold, kernel_size );
     dst = cv::Scalar::all(0);
     src.copyTo( dst, detected_edges);
     imshow( window_name, dst );
@@ -28,13 +30,14 @@ int main() {
         return -1;
     }
     // Displaying the edge map of the image
-    src = parkingLotImage.clone();
-    dst.create( src.size(), src.type() );
-    cv::cvtColor( src, src_gray, cv::COLOR_BGR2GRAY );
-    cv::namedWindow( window_name, cv::WINDOW_AUTOSIZE );
-    cv::createTrackbar( "Min Threshold:", window_name, &lowThreshold, max_lowThreshold, CannyThreshold );
-    CannyThreshold(0, 0);
-    cv::waitKey(0);
+    // src = parkingLotImage.clone();
+    // dst.create( src.size(), src.type() );
+    // cv::cvtColor( src, src_gray, cv::COLOR_BGR2GRAY );
+    // cv::namedWindow( window_name, cv::WINDOW_AUTOSIZE );
+    // cv::createTrackbar( "Min Threshold:", window_name, &lowThreshold, max_lowThreshold, CannyThreshold );
+    // cv::createTrackbar( "Max Threshold:", window_name, &highThreshold, max_highThreshold, CannyThreshold );
+    // CannyThreshold(0, 0);
+    // cv::waitKey(0);
     
     
     // Clone the image to create a separate copy for each method of occupancy detection
