@@ -47,13 +47,23 @@ void classifyParkingSpaces(const Mat &parkingLotImage, std::vector<RotatedRect> 
         // Count the number of edge pixels (non-zero pixels in the edge image)
         double edgeCount = countNonZero(edges);
 
+        // Apply Otsu's method to find the optimal threshold
+        double otsuThreshVal = cv::threshold(edges, edges, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+
+        // Apply the threshold to the edge map
+        // cv::Mat binary;
+        // cv::threshold(edges, binary, otsuThreshVal, 255, cv::THRESH_BINARY);
+        // // Display the result
+        // /cv::imshow("Otsu Thresholded Edges", binary);
+        // cv::waitKey(0);
+        
         // Heuristic: If there are many non-zero pixels, the space is occupied; otherwise, it's empty
         if (edgeCount > 0.1 * edges.total()) {  // Adjust the threshold as necessary
             occupancyStatus[i] = true;
         } else {
             occupancyStatus[i] = false;
         }
-        std::cerr << occupancyStatus[i] << "," << edgeCount / edges.total() << std::endl;
+        std::cerr << occupancyStatus[i] << "," << edgeCount / edges.total() << "," << otsuThreshVal << std::endl;
     }
 
 }
