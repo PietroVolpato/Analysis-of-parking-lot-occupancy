@@ -1,13 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="C:\Users\Noji\Cpp\CV\Analysis-of-parking-lot-occupancy\src\main.cpp">
+    <ClCompile Include="C:\Users\Noji\Cpp\CV\Analysis-of-parking-lot-occupancy\src\main2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\Noji\Cpp\CV\Analysis-of-parking-lot-occupancy\src\tinyxml2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\Noji\Cpp\CV\Analysis-of-parking-lot-occupancy\src\GroundTruthReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Noji\Cpp\CV\Analysis-of-parking-lot-occupancy\src\ParkingSpaceDetector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\Noji\Cpp\CV\Analysis-of-parking-lot-occupancy\src\ParkingSpaceClassifier.cpp">
