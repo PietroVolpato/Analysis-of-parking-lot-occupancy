@@ -40,23 +40,43 @@ void classifyParkingSpaces(const Mat &parkingLotImage, std::vector<RotatedRect> 
         Mat grayRoi;
         cvtColor(cropped_image, grayRoi, COLOR_BGR2GRAY);
 
+        // Perform contrast stretching using cv::normalize
+        cv::Mat stretched;
+        cv::normalize(grayRoi, stretched, 0, 255, cv::NORM_MINMAX);
+
+        cv::Mat blurred_image;
+        cv::GaussianBlur(stretched, blurred_image, cv::Size(5, 5), 0);
+        
+        // Apply adaptive thresholding
+        Mat binary;
+        threshold(blurred_image, binary, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+
+        // Perform morphological operations to clean the image
+        Mat kernel = getStructuringElement(MORPH_RECT, Size(3, 3));
+        Mat cleaned_image;
+        morphologyEx(binary, cleaned_image, MORPH_CLOSE, kernel);
+
+
+        imshow("grayscale roi", binary);
+        waitKey(0);
+
         // Apply Canny edge detection
         Mat edges;
-        Canny(grayRoi, edges, 70, 300, 3, true);
+        Canny(stretched, edges, 70, 300, 3, true);
         
         // Count the number of edge pixels (non-zero pixels in the edge image)
-        double edgeCount = countNonZero(edges);
+        double edgeCount = countNonZero(cleaned_image);
 
         // Apply Otsu's method to find the optimal threshold
         double otsuThreshVal = cv::threshold(edges, edges, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
         
         // Heuristic: If there are many non-zero pixels, the space is occupied; otherwise, it's empty
-        if (edgeCount > 0.07 * edges.total()) {  // Adjust the threshold as necessary
+        if (edgeCount > 0.8 * cleaned_image.total()) {  // Adjust the threshold as necessary
             occupancyStatus[i] = true;
         } else {
             occupancyStatus[i] = false;
         }
-        std::cerr << occupancyStatus[i] << "," << edgeCount / edges.total() << "," << otsuThreshVal << std::endl;
+        std::cerr << occupancyStatus[i] << "," << edgeCount / cleaned_image.total() << "," << otsuThreshVal << std::endl;
     }
 
 }
