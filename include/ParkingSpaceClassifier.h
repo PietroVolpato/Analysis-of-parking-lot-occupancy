@@ -5,7 +5,7 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 
-cv::RotatedRect createBoundingBox(const cv::Point2f& center, const cv::Size2f& size, float angle);
+cv::Mat createBoundingBox(const cv::Mat &parkingLotImage, cv::RotatedRect &rotated_rect);
 void classifyParkingSpaces(const cv::Mat &parkingLotImage, std::vector<cv::RotatedRect> &parkingSpaces, std::vector<bool> &occupancyStatus);
 void drawParkingSpaces(cv::Mat &image, const std::vector<cv::RotatedRect> &parkingSpaces, const std::vector<bool> &occupancyStatus);
 

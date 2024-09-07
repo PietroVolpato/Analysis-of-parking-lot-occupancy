@@ -14,9 +14,9 @@ int main() {
     std::vector<Mat> imgVector = loadImages(sequence);
 
      // Contrast stretch the images
-    std::vector<Mat> stretchedImgVector = constrastStretch(imgVector);
+    // std::vector<Mat> stretchedImgVector = constrastStretch(imgVector);
     
-    cv::Mat parkingLotImage = stretchedImgVector[img_num];
+    cv::Mat parkingLotImage = imgVector[img_num];
     
     // Path to the XML file
     std::vector<String> xmlFilePaths = loadXmlAddress(sequence);
