@@ -8,6 +8,8 @@ using namespace cv;
 
 
 int main() {
+    // Loading the seq0 image for comparison
+    std::vector<Mat> imgVectorSeq0 = loadImages(0);
     // Load the images
     int sequence = 1;
     int img_num = 2;
@@ -16,7 +18,8 @@ int main() {
      // Contrast stretch the images
     // std::vector<Mat> stretchedImgVector = constrastStretch(imgVector);
     
-    cv::Mat parkingLotImage = imgVector[img_num];
+    Mat parkingLotEmpty = imgVectorSeq0[img_num];
+    Mat parkingLotImage = imgVector[img_num];
     
     // Path to the XML file
     std::vector<String> xmlFilePaths = loadXmlAddress(sequence);
@@ -36,7 +39,7 @@ int main() {
     std::vector<bool> occupancyStatus;
     std::vector<cv::RotatedRect> parkingSpaces = extractBoundingBoxesFromXML(xmlFilePath, occupancyStatus);
     
-    classifyParkingSpaces(parkingLotImage, parkingSpaces, occupancyStatus);  // Re-classify using K-Means
+    classifyParkingSpaces(parkingLotImage,parkingLotEmpty, parkingSpaces, occupancyStatus);  
     drawParkingSpaces(imageFromDetection, parkingSpaces, occupancyStatus);
 
     // Determine the maximum width and height that can fit on the screen
