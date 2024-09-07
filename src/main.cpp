@@ -11,8 +11,8 @@ int main() {
     // Loading the seq0 image for comparison
     std::vector<Mat> imgVectorSeq0 = loadImages(0);
     // Load the images
-    int sequence = 1;
-    int img_num = 2;
+    int sequence = 5;
+    int img_num = 3;
     std::vector<Mat> imgVector = loadImages(sequence);
 
      // Contrast stretch the images

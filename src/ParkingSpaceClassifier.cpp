@@ -31,38 +31,39 @@ Mat createBoundingBox(const Mat &parkingLotImage, const RotatedRect &rotated_rec
 }
 
 void classifyParkingSpaces(const Mat &parkingLotImage, const Mat &parkingLotEmpty, std::vector<RotatedRect> &parkingSpaces, std::vector<bool> &occupancyStatus) {
+    // Step 1: Convert to grayscale before applying equalizeHist
+    cv::Mat emptyGray, currentGray;
+    cv::cvtColor(parkingLotEmpty, emptyGray, cv::COLOR_BGR2GRAY);
+    cv::cvtColor(parkingLotImage, currentGray, cv::COLOR_BGR2GRAY);
+
+    // Step 2: Apply Histogram Equalization
+    cv::Mat emptyEqualized, currentEqualized;
+    cv::equalizeHist(emptyGray, emptyEqualized);
+    cv::equalizeHist(currentGray, currentEqualized);
+
+    // Step 3: Compute absolute difference
+    cv::Mat diff, thresh;
+    cv::absdiff(emptyEqualized, currentEqualized, diff);
+
+    // Step 4: Threshold to detect significant differences
+    cv::threshold(diff, thresh, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+    imshow("difference", thresh);
+    waitKey(0);
 
     for (size_t i = 0; i < parkingSpaces.size(); ++i) {
         // Get the rotation matrix for the bounding box
         const RotatedRect &rotated_rect = parkingSpaces[i];
         
-        Mat cropped_bbox = createBoundingBox(parkingLotImage, rotated_rect);
-        Mat cropped_bbox_empty = createBoundingBox(parkingLotEmpty, rotated_rect);
-
-        // Step 1: Convert to grayscale before applying equalizeHist
-        cv::Mat emptyGray, currentGray;
-        cv::cvtColor(cropped_bbox_empty, emptyGray, cv::COLOR_BGR2GRAY);
-        cv::cvtColor(cropped_bbox, currentGray, cv::COLOR_BGR2GRAY);
-
-        // Step 2: Apply Histogram Equalization
-        cv::Mat emptyEqualized, currentEqualized;
-        cv::equalizeHist(emptyGray, emptyEqualized);
-        cv::equalizeHist(currentGray, currentEqualized);
+        Mat cropped_bbox = createBoundingBox(thresh, rotated_rect);          
         
-        // Step 3: Compute absolute difference
-        cv::Mat diff, thresh;
-        cv::absdiff(emptyEqualized, currentEqualized, diff);
-        
-        // Step 4: Threshold to detect significant differences
-        cv::threshold(diff, thresh, 30, 255, cv::THRESH_BINARY);
+        // Step 5: Calculate the percentage of white pixels
+        int whitePixels = cv::countNonZero(cropped_bbox);  // Count white pixels
+        double whiteRatio = (double)whitePixels / cropped_bbox.total();  // Ratio of white pixels
 
-        // Step 5: Find contours
-        std::vector<std::vector<cv::Point>> contours;
-        cv::findContours(thresh, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
-        std::cerr << cv::contourArea(contours[0]) << std::endl;
+        std::cerr << whiteRatio << std::endl;
         
         // Heuristic: If there are many non-zero pixels, the space is occupied; otherwise, it's empty
-        if (cv::contourArea(contours[0]) > 1) {  
+        if (whiteRatio > 0.40) {  
             occupancyStatus[i] = true;
         } else {
             occupancyStatus[i] = false;
