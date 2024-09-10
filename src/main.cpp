@@ -3,6 +3,7 @@
 #include "GroundTruthReader.h"
 #include "tinyxml2.h"
 #include <string>
+#include <list>
 
 using namespace cv;
 
@@ -11,12 +12,12 @@ int main() {
     // Loading the seq0 image for comparison
     std::vector<Mat> imgVectorSeq0 = loadImages(0);
     // Load the images
-    int sequence = 5;
-    int img_num = 3;
+    int sequence = 2;
+    int img_num = 2;
     std::vector<Mat> imgVector = loadImages(sequence);
 
-     // Contrast stretch the images
-    // std::vector<Mat> stretchedImgVector = constrastStretch(imgVector);
+    // Contrast stretch the images
+    //std::vector<Mat> stretchedImgVector = constrastStretch(imgVector);
     
     Mat parkingLotEmpty = imgVectorSeq0[img_num];
     Mat parkingLotImage = imgVector[img_num];
