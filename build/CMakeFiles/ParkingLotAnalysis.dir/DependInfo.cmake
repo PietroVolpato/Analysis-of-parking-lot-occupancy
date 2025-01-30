@@ -8,8 +8,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/src/ParkingSpaceDetector.cpp" "CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o" "gcc" "CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o.d"
-  "/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/src/main.cpp" "CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o" "gcc" "CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o.d"
+  "/home/pietro/Analysis-of-parking-lot-occupancy/src/ParkingSpaceDetector.cpp" "CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o" "gcc" "CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o.d"
+  "/home/pietro/Analysis-of-parking-lot-occupancy/src/main.cpp" "CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o" "gcc" "CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o.d"
   )
 
 # Targets to which this target links.

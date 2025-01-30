@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy"
+CMAKE_SOURCE_DIR = /home/pietro/Analysis-of-parking-lot-occupancy
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/build"
+CMAKE_BINARY_DIR = /home/pietro/Analysis-of-parking-lot-occupancy/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/ParkingLotAnalysis.dir/depend.make
@@ -72,30 +72,30 @@ include CMakeFiles/ParkingLotAnalysis.dir/flags.make
 CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: CMakeFiles/ParkingLotAnalysis.dir/flags.make
 CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: ../src/main.cpp
 CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: CMakeFiles/ParkingLotAnalysis.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o -MF CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o.d -o CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o -c "/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/src/main.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pietro/Analysis-of-parking-lot-occupancy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o -MF CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o.d -o CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o -c /home/pietro/Analysis-of-parking-lot-occupancy/src/main.cpp
 
 CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/src/main.cpp" > CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/pietro/Analysis-of-parking-lot-occupancy/src/main.cpp > CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.i
 
 CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/src/main.cpp" -o CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/pietro/Analysis-of-parking-lot-occupancy/src/main.cpp -o CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.s
 
 CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o: CMakeFiles/ParkingLotAnalysis.dir/flags.make
 CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o: ../src/ParkingSpaceDetector.cpp
 CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o: CMakeFiles/ParkingLotAnalysis.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o -MF CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o.d -o CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o -c "/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/src/ParkingSpaceDetector.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pietro/Analysis-of-parking-lot-occupancy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o -MF CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o.d -o CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o -c /home/pietro/Analysis-of-parking-lot-occupancy/src/ParkingSpaceDetector.cpp
 
 CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/src/ParkingSpaceDetector.cpp" > CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/pietro/Analysis-of-parking-lot-occupancy/src/ParkingSpaceDetector.cpp > CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.i
 
 CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/src/ParkingSpaceDetector.cpp" -o CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/pietro/Analysis-of-parking-lot-occupancy/src/ParkingSpaceDetector.cpp -o CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.s
 
 # Object files for target ParkingLotAnalysis
 ParkingLotAnalysis_OBJECTS = \
@@ -124,7 +124,7 @@ ParkingLotAnalysis: /usr/local/lib/libopencv_flann.so.4.9.0
 ParkingLotAnalysis: /usr/local/lib/libopencv_imgproc.so.4.9.0
 ParkingLotAnalysis: /usr/local/lib/libopencv_core.so.4.9.0
 ParkingLotAnalysis: CMakeFiles/ParkingLotAnalysis.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/build/CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable ParkingLotAnalysis"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/pietro/Analysis-of-parking-lot-occupancy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Linking CXX executable ParkingLotAnalysis"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ParkingLotAnalysis.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -136,6 +136,6 @@ CMakeFiles/ParkingLotAnalysis.dir/clean:
 .PHONY : CMakeFiles/ParkingLotAnalysis.dir/clean
 
 CMakeFiles/ParkingLotAnalysis.dir/depend:
-	cd "/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/build" && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" "/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy" "/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy" "/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/build" "/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/build" "/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/build/CMakeFiles/ParkingLotAnalysis.dir/DependInfo.cmake" --color=$(COLOR)
+	cd /home/pietro/Analysis-of-parking-lot-occupancy/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/pietro/Analysis-of-parking-lot-occupancy /home/pietro/Analysis-of-parking-lot-occupancy /home/pietro/Analysis-of-parking-lot-occupancy/build /home/pietro/Analysis-of-parking-lot-occupancy/build /home/pietro/Analysis-of-parking-lot-occupancy/build/CMakeFiles/ParkingLotAnalysis.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/ParkingLotAnalysis.dir/depend
 

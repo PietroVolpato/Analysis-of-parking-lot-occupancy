@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I"/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/(" -I"/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/include" -I"/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/)" -isystem /usr/local/include/opencv4
+CXX_INCLUDES = -I"/home/pietro/Analysis-of-parking-lot-occupancy/(" -I/home/pietro/Analysis-of-parking-lot-occupancy/include -I"/home/pietro/Analysis-of-parking-lot-occupancy/)" -isystem /usr/local/include/opencv4
 
 CXX_FLAGS = -g
 

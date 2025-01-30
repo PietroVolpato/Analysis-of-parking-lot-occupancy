@@ -1,4 +1,4 @@
-# Install script for directory: /mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy
+# Install script for directory: /home/pietro/Analysis-of-parking-lot-occupancy
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/pietro/Analysis-of-parking-lot-occupancy/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

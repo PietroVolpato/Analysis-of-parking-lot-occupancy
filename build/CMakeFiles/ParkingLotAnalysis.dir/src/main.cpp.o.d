@@ -1,7 +1,7 @@
 CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: \
- /mnt/c/Users/pietr/Desktop/Computer\ Vision\ Lab/Analysis-of-parking-lot-occupancy/src/main.cpp \
+ /home/pietro/Analysis-of-parking-lot-occupancy/src/main.cpp \
  /usr/include/stdc-predef.h \
- /mnt/c/Users/pietr/Desktop/Computer\ Vision\ Lab/Analysis-of-parking-lot-occupancy/include/ParkingSpaceDetector.h \
+ /home/pietro/Analysis-of-parking-lot-occupancy/include/ParkingSpaceDetector.h \
  /usr/local/include/opencv4/opencv2/highgui.hpp \
  /usr/local/include/opencv4/opencv2/core.hpp \
  /usr/local/include/opencv4/opencv2/core/cvdef.h \

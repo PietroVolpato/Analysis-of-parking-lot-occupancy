@@ -8,22 +8,31 @@
 #include <iostream>
 #include <cmath>
 
-std::vector<cv::Mat> loadImages (int);
 
-std::vector<cv::Mat> preprocessImages (const std::vector<cv::Mat>&);
+struct LineParams {
+    double rho;
+    double theta;
+    cv::Vec4i endpoints;
+};
 
-std::vector<cv::Mat> constrastStretch (const std::vector<cv::Mat>&);
+std::vector<cv::Mat> loadImages (const int);
 
-void showImages (const std::vector<cv::Mat>&);
+std::vector<LineParams> computeLineParams(const std::vector<cv::Vec4i>&);
 
-std::vector<cv::Mat> detectEdges (const std::vector<cv::Mat>&, double, double);
+std::vector<LineParams> computeLineParams(const std::vector<cv::Vec4i>&);
 
-std::vector<std::vector<cv::Vec4i>> detectLines (const std::vector<cv::Mat>&, int, double, double);
+cv::Mat preprocessImage (const cv::Mat&);
 
-std::vector<std::vector<cv::Vec4i>> filterLines (const std::vector<std::vector<cv::Vec4i>>&, const double, const double, const double, const double, const double, const double);
+void showImage (const cv::Mat&);
 
-void drawLines (std::vector<cv::Mat>&, const std::vector<std::vector<cv::Vec4i>>&);
+std::vector<cv::Vec4i> detectLines (const cv::Mat&, int, double, double);
 
-void drawBoundingBoxes (std::vector<cv::Mat>&, const std::vector<std::vector<cv::Vec4i>>&);
+void drawLines (cv::Mat&, const std::vector<cv::Vec4i>&);
+
+std::vector<std::vector<LineParams>> clusterLinesByTheta(const std::vector<LineParams>&, double);
+
+std::vector<cv::RotatedRect> detectParkingSpaces(const std::vector<cv::Vec4i>&);
+
+cv::Mat drawParkingSpaces(const cv::Mat&, const std::vector<cv::RotatedRect>&);
 
 #endif

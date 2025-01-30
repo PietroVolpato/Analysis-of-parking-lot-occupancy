@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/build"
+			"value" : "/home/pietro/Analysis-of-parking-lot-occupancy/build"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -514,10 +514,6 @@
 			"properties" : 
 			[
 				{
-					"name" : "ADVANCED",
-					"value" : "1"
-				},
-				{
 					"name" : "HELPSTRING",
 					"value" : "No help, variable specified on the command line."
 				}
@@ -595,7 +591,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy"
+			"value" : "/home/pietro/Analysis-of-parking-lot-occupancy"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -1155,7 +1151,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy/build"
+			"value" : "/home/pietro/Analysis-of-parking-lot-occupancy/build"
 		},
 		{
 			"name" : "ParkingLotAnalysis_IS_TOP_LEVEL",
@@ -1179,7 +1175,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/mnt/c/Users/pietr/Desktop/Computer Vision Lab/Analysis-of-parking-lot-occupancy"
+			"value" : "/home/pietro/Analysis-of-parking-lot-occupancy"
 		}
 	],
 	"kind" : "cache",
