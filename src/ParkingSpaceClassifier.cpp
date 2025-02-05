@@ -2,6 +2,7 @@
 
 using namespace cv;
 
+
 // Function to create a bounding box
 Mat createBoundingBox(const Mat &parkingLotImage, const RotatedRect &rotated_rect) {
     Mat rotation_matrix = getRotationMatrix2D(rotated_rect.center, rotated_rect.angle, 1.0);
@@ -30,86 +31,69 @@ Mat createBoundingBox(const Mat &parkingLotImage, const RotatedRect &rotated_rec
     return cropped_image;
 }
 
-void classifyParkingSpaces(const Mat &parkingLotImage, const Mat &parkingLotEmpty, std::vector<RotatedRect> &parkingSpaces, std::vector<bool> &occupancyStatus) {
-    // Step 1: Convert to grayscale before applying equalizeHist
-    cv::Mat emptyGray, currentGray;
-    cv::cvtColor(parkingLotEmpty, emptyGray, cv::COLOR_BGR2GRAY);
-    cv::cvtColor(parkingLotImage, currentGray, cv::COLOR_BGR2GRAY);
+void classifyParkingSpaces(const Mat &parkingLotImage, const Mat &parkingLotEmpty, 
+                           std::vector<RotatedRect> &parkingSpaces, std::vector<bool> &occupancyStatus) {
+    Ptr<ORB> orb = ORB::create(1000); // Increased keypoints
+    BFMatcher matcher(NORM_HAMMING);
 
-    // Step 2: Apply Histogram Equalization
-    cv::Mat emptyEqualized, currentEqualized;
-    cv::equalizeHist(emptyGray, emptyEqualized);
-    cv::equalizeHist(currentGray, currentEqualized);
+    Mat grayEmpty, grayCurrent;
+    cvtColor(parkingLotEmpty, grayEmpty, COLOR_BGR2GRAY);
+    cvtColor(parkingLotImage, grayCurrent, COLOR_BGR2GRAY);
 
-    // Step 3: Compute absolute difference
-    cv::Mat diff, thresh;
-    cv::absdiff(emptyEqualized, currentEqualized, diff);
+    // Apply CLAHE for better contrast
+    Ptr<CLAHE> clahe = createCLAHE(2.0, Size(8, 8));
+    clahe->apply(grayEmpty, grayEmpty);
+    clahe->apply(grayCurrent, grayCurrent);
 
-    // Step 4: Threshold to detect significant differences
-    cv::threshold(diff, thresh, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
-    // Step 4: Apply Canny edge detector for double thresholding
-    cv::Mat blurredDiff;
-    cv::GaussianBlur(thresh, blurredDiff, cv::Size(5, 5), 0);
-
-    // Contrast Stretching
-    cv::Mat stretched;
-    contrastStretching(blurredDiff, stretched);
-
-    cv::Mat edges;
-    cv::Canny(stretched, thresh, 150, 250);
-    imshow("difference", stretched);
-    waitKey(0);
-    
-    std::vector<Mat> bboxes;
-
-    Size uniformSize(100, 50);
-
+    occupancyStatus.clear();
 
     for (size_t i = 0; i < parkingSpaces.size(); ++i) {
-        // Get the rotation matrix for the bounding box
         const RotatedRect &rotated_rect = parkingSpaces[i];
         
-        Mat cropped_bbox = createBoundingBox(thresh, rotated_rect);
+        Mat roiEmpty = createBoundingBox(grayEmpty, rotated_rect);
+        Mat roiCurrent = createBoundingBox(grayCurrent, rotated_rect);
 
-        resize(cropped_bbox, cropped_bbox, uniformSize);
+        std::vector<KeyPoint> keypointsEmpty, keypointsCurrent;
+        Mat descriptorsEmpty, descriptorsCurrent;
 
-        if (!cropped_bbox.isContinuous()) {
-            cropped_bbox = cropped_bbox.clone(); // Make it continuous if it is not
+        // ORB Feature Detection
+        orb->detectAndCompute(roiEmpty, noArray(), keypointsEmpty, descriptorsEmpty);
+        orb->detectAndCompute(roiCurrent, noArray(), keypointsCurrent, descriptorsCurrent);
+
+        // Debugging: Print number of detected keypoints
+        std::cout << "Parking space: " << keypointsEmpty.size() << " (empty) vs " 
+             << keypointsCurrent.size() << " (current)" << std::endl;
+
+        // If no keypoints are found, assume occupied
+        if (descriptorsEmpty.empty() || descriptorsCurrent.empty()) {
+            std::cout << "No keypoints found in one of the spaces, assuming occupied." << std::endl;
+            occupancyStatus.push_back(true);
+            continue;
         }
-        Mat bbox_flaten = cropped_bbox.reshape(1, 1); // Flatten to 1 row          
-        bboxes.push_back(bbox_flaten);
 
-        // Step 5: Calculate the percentage of white pixels
-        int whitePixels = cv::countNonZero(cropped_bbox);  // Count white pixels
-        double whiteRatio = (double)whitePixels / cropped_bbox.total();  // Ratio of white pixels
+        // Match descriptors
+        std::vector<DMatch> matches;
+        matcher.match(descriptorsEmpty, descriptorsCurrent, matches);
 
-        std::cerr << whiteRatio << std::endl;
-        
-        // Heuristic: If there are many non-zero pixels, the space is occupied; otherwise, it's empty
-        // if (whiteRatio > 0.21) {  
-        //     occupancyStatus[i] = true;
-        // } else {
-        //     occupancyStatus[i] = false;
-        // }
-    }
-    // Prepare data for K-means clustering
-    Mat data;
-    vconcat(bboxes, data); // Stack all image features vertically
+        if (matches.empty()) {
+            std::cout << "No matches found for a parking space, assuming occupied." << std::endl;
+            occupancyStatus.push_back(true);
+            continue;
+        }
 
-    data.convertTo(data, CV_32F); // Convert data to float for K-means
+        // Count good matches
+        int goodMatches = 0;
+        for (const auto& match : matches) {
+            std::cout << match.distance << std::endl;
+            if (match.distance < 100) {
+                goodMatches++;
+            }
+        }
+        std::cout << "Roi #"<< i << ", Good matches =" << goodMatches << std::endl;
 
-    // Parameters for K-Means
-    int clusterCount = 2;  // Two groups
-    Mat labels, centers;
-
-    // Run K-Means Clustering
-    kmeans(data, clusterCount, labels,
-           TermCriteria(TermCriteria::EPS + TermCriteria::COUNT, 10, 1.0),
-           3, KMEANS_PP_CENTERS, centers);
-
-    // Output the clustering result
-    for (int i = 0; i < labels.rows; i++) {
-        occupancyStatus[i] = labels.at<int>(i, 0);
+        // Classification: Too few matches = occupied
+        bool occupied = goodMatches > 50;
+        occupancyStatus.push_back(occupied);
     }
 }
 
