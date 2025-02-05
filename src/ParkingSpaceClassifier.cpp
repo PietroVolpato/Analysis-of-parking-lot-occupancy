@@ -46,10 +46,10 @@ void classifyParkingSpaces(const Mat &parkingLotImage, const Mat &parkingLotEmpt
     cv::absdiff(emptyEqualized, currentEqualized, diff);
 
     // Step 4: Threshold to detect significant differences
-    //cv::threshold(diff, thresh, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+    cv::threshold(diff, thresh, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
     // Step 4: Apply Canny edge detector for double thresholding
     cv::Mat blurredDiff;
-    cv::GaussianBlur(diff, blurredDiff, cv::Size(5, 5), 0);
+    cv::GaussianBlur(thresh, blurredDiff, cv::Size(5, 5), 0);
 
     // Contrast Stretching
     cv::Mat stretched;

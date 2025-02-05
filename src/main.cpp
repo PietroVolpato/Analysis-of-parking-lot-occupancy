@@ -44,7 +44,7 @@ int main() {
     drawParkingSpaces(imageFromDetection, parkingSpaces, occupancyStatus);
 
     // Determine the maximum width and height that can fit on the screen
-    int screenHeight = 400;  // Example screen height, adjust as needed
+    int screenHeight = 400;  // Example screen height
     int maxImageHeight = std::min(imageFromXML.rows, screenHeight);
     
     // Resize images to fit within the screen height
