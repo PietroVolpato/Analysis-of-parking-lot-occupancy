@@ -13,7 +13,7 @@ int main() {
     std::vector<Mat> imgVectorSeq0 = loadImages(0);
     // Load the images
     int sequence = 2;
-    int img_num = 2;
+    int img_num = 3;
     std::vector<Mat> imgVector = loadImages(sequence);
 
     // Contrast stretch the images

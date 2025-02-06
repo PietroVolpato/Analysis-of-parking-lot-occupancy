@@ -2,7 +2,6 @@
 
 using namespace cv;
 
-
 // Function to create a bounding box
 Mat createBoundingBox(const Mat &parkingLotImage, const RotatedRect &rotated_rect) {
     Mat rotation_matrix = getRotationMatrix2D(rotated_rect.center, rotated_rect.angle, 1.0);
@@ -33,8 +32,9 @@ Mat createBoundingBox(const Mat &parkingLotImage, const RotatedRect &rotated_rec
 
 void classifyParkingSpaces(const Mat &parkingLotImage, const Mat &parkingLotEmpty, 
                            std::vector<RotatedRect> &parkingSpaces, std::vector<bool> &occupancyStatus) {
-    Ptr<ORB> orb = ORB::create(1000); // Increased keypoints
-    BFMatcher matcher(NORM_HAMMING);
+
+    Ptr<SIFT> sift = SIFT::create();  // Create SIFT detector
+    FlannBasedMatcher matcher;  // FLANN Matcher for SIFT
 
     Mat grayEmpty, grayCurrent;
     cvtColor(parkingLotEmpty, grayEmpty, COLOR_BGR2GRAY);
@@ -48,17 +48,23 @@ void classifyParkingSpaces(const Mat &parkingLotImage, const Mat &parkingLotEmpt
     occupancyStatus.clear();
 
     for (size_t i = 0; i < parkingSpaces.size(); ++i) {
-        const RotatedRect &rotated_rect = parkingSpaces[i];
-        
-        Mat roiEmpty = createBoundingBox(grayEmpty, rotated_rect);
-        Mat roiCurrent = createBoundingBox(grayCurrent, rotated_rect);
+        std::cout << "Roi #" << i << std::endl;
+        RotatedRect &rotated_rect = parkingSpaces[i];
 
+        // Scale the bounding box by 80%
+        Size2f newSize(rotated_rect.size.width * 0.7, rotated_rect.size.height * 0.7);
+        RotatedRect scaledRect(rotated_rect.center, newSize, rotated_rect.angle);
+        
+        Mat roiEmpty = createBoundingBox(grayEmpty, const_cast<const RotatedRect&>(scaledRect));
+        Mat roiCurrent = createBoundingBox(grayCurrent, const_cast<const RotatedRect&>(scaledRect));
+        //imshow("roi", roiCurrent);
+        //waitKey(0);
         std::vector<KeyPoint> keypointsEmpty, keypointsCurrent;
         Mat descriptorsEmpty, descriptorsCurrent;
 
-        // ORB Feature Detection
-        orb->detectAndCompute(roiEmpty, noArray(), keypointsEmpty, descriptorsEmpty);
-        orb->detectAndCompute(roiCurrent, noArray(), keypointsCurrent, descriptorsCurrent);
+        // SIFT Feature Detection
+        sift->detectAndCompute(roiEmpty, noArray(), keypointsEmpty, descriptorsEmpty);
+        sift->detectAndCompute(roiCurrent, noArray(), keypointsCurrent, descriptorsCurrent);
 
         // Debugging: Print number of detected keypoints
         std::cout << "Parking space: " << keypointsEmpty.size() << " (empty) vs " 
@@ -71,28 +77,24 @@ void classifyParkingSpaces(const Mat &parkingLotImage, const Mat &parkingLotEmpt
             continue;
         }
 
-        // Match descriptors
-        std::vector<DMatch> matches;
-        matcher.match(descriptorsEmpty, descriptorsCurrent, matches);
 
-        if (matches.empty()) {
-            std::cout << "No matches found for a parking space, assuming occupied." << std::endl;
-            occupancyStatus.push_back(true);
-            continue;
-        }
+        // KNN Matching (k=2)
+        std::vector<std::vector<DMatch>> knnMatches;
+        matcher.knnMatch(descriptorsEmpty, descriptorsCurrent, knnMatches, 2);
 
-        // Count good matches
+        // Apply NNDR (Lowe's Ratio Test)
         int goodMatches = 0;
-        for (const auto& match : matches) {
-            std::cout << match.distance << std::endl;
-            if (match.distance < 100) {
+        for (const auto& match : knnMatches) {
+            if (match.size() == 2 && match[0].distance < 0.75 * match[1].distance) {
                 goodMatches++;
             }
         }
-        std::cout << "Roi #"<< i << ", Good matches =" << goodMatches << std::endl;
+
+        // Debugging: Show number of good matches
+        std::cout << "Good matches: " << goodMatches << std::endl;
 
         // Classification: Too few matches = occupied
-        bool occupied = goodMatches > 50;
+        bool occupied = goodMatches < 2;  // Adjust threshold as needed
         occupancyStatus.push_back(occupied);
     }
 }
@@ -135,3 +137,4 @@ void contrastStretching(cv::Mat& input, cv::Mat& output) {
         }
     }
 }
+
