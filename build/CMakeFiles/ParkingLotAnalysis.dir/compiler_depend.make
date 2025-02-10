@@ -315,6 +315,9 @@ CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o: ../src/Parking
   /usr/local/include/opencv4/opencv2/videoio.hpp \
   /usr/local/include/opencv4/opencv2/imgproc.hpp \
   /usr/local/include/opencv4/opencv2/imgproc/segmentation.hpp \
+  /usr/local/include/opencv4/opencv2/imgproc/types_c.h \
+  /usr/local/include/opencv4/opencv2/core/core_c.h \
+  /usr/local/include/opencv4/opencv2/core/types_c.h \
   /usr/include/c++/11/iostream
 
 CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: ../src/main.cpp \
@@ -631,10 +634,19 @@ CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: ../src/main.cpp \
   /usr/local/include/opencv4/opencv2/videoio.hpp \
   /usr/local/include/opencv4/opencv2/imgproc.hpp \
   /usr/local/include/opencv4/opencv2/imgproc/segmentation.hpp \
+  /usr/local/include/opencv4/opencv2/imgproc/types_c.h \
+  /usr/local/include/opencv4/opencv2/core/core_c.h \
+  /usr/local/include/opencv4/opencv2/core/types_c.h \
   /usr/include/c++/11/iostream
 
 
 ../src/main.cpp:
+
+/usr/local/include/opencv4/opencv2/core/types_c.h:
+
+/usr/local/include/opencv4/opencv2/core/core_c.h:
+
+/usr/local/include/opencv4/opencv2/imgproc/types_c.h:
 
 /usr/local/include/opencv4/opencv2/imgproc/segmentation.hpp:
 

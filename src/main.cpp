@@ -1,74 +1,61 @@
 #include "ParkingSpaceDetector.h"
-// #include "ParkingSpaceClassifier.h"
-// #include "CarSegmenter.h"
-// #include "Visualizer.h"
 
 using namespace cv;
+using namespace std;
 
-int main (int argc, char** argv) {
+int main(int argc, char** argv) {
+    ParkingSpaceDetector detector;
+
     // Load the images
     int sequence = 0;
-    std::vector<Mat> imgVector = loadImages(sequence);
+    vector<Mat> imgVector = detector.loadImages(sequence);
 
     // Preprocess the images
-    std::vector<Mat> edgesImgVector;
+    vector<Mat> preprocessedImgVector;
     for (const auto& img : imgVector) {
-       edgesImgVector.push_back(preprocessImage(img));
+        preprocessedImgVector.push_back(detector.preprocessImage(img));
+    }
+
+    // Detect the edges in the images
+    vector<Mat> edgesImgVector;
+    for (const auto& img : preprocessedImgVector) {
+        edgesImgVector.push_back(detector.detectEdges(img));
     }
 
     // Detect the lines in the images
-    std::vector<std::vector<Vec4i>> linesVector;
-    for (const auto& img : edgesImgVector) {
-        linesVector.push_back(detectLines(img, 30, 30, 10));
+    vector<vector<Vec4i>> linesVector;
+    for (const auto& img : preprocessedImgVector) {
+        linesVector.push_back(detector.detectLines(img, 50, 30, 10));
     }
 
     // Compute the line parameters
-    std::vector<std::vector<LineParams>> lineParamsVector;
+    vector<vector<LineParams>> lineParamsVector;
     for (const auto& lines : linesVector) {
-        lineParamsVector.push_back(computeLineParams(lines));
+        lineParamsVector.push_back(detector.computeLineParams(lines));
     }
 
-    // for (size_t i = 0; i < edgesImgVector.size() && i < imgVector.size(); ++i) {
-    //     findContours(edgesImgVector[i], imgVector[i]);
-    // }
-
-    // Filter the lines
-    std::vector<std::vector<LineParams>> filteredLinesVector;
-    for (auto& lineParams : lineParamsVector) {
-        filteredLinesVector.push_back(filterLines(lineParams));
-    }
-
-    std::vector<Mat> imgWithLinesVector;
+    // Draw the detected lines
+    vector<Mat> imgWithLinesVector;
     for (size_t i = 0; i < imgVector.size(); ++i) {
         Mat img = imgVector[i];
         const auto& lines = lineParamsVector[i];
-        drawLines(img, lines);
+        detector.drawLines(img, lines);
         imgWithLinesVector.push_back(img);
     }
 
-    // Detect the parking spaces
-    std::vector<std::vector<RotatedRect>> parkingSpacesVector;
-    for (const auto& lines : filteredLinesVector) {
-        parkingSpacesVector.push_back(detectParkingSpaces(lines));
+    // Filter the lines
+    vector<vector<LineParams>> filteredLinesVector;
+    for (auto& lineParams : lineParamsVector) {
+        filteredLinesVector.push_back(detector.filterLines(lineParams));
     }
 
-    // Draw the parking spaces
-    std::vector<Mat> imgWithParkingSpacesVector;
-    for (size_t i = 0; i < imgVector.size(); ++i) {
-        Mat img = imgVector[i];
-        const auto& parkingSpaces = parkingSpacesVector[i];
-        imgWithParkingSpacesVector.push_back(drawParkingSpaces(img, parkingSpaces));
-    }
+    // Detect parking spaces based on the filtered lines (if desired)
+    vector<RotatedRect> parkingSpaces = detector.detectParkingSpaces(filteredLinesVector[0]);
 
-   
     // Show the images
-    for (const auto& img : edgesImgVector) {
-        showImage(img);
+    for (const auto& img : imgWithLinesVector) {
+        detector.showImage(img);
     }
-
-    // for (const auto& img: imgVector) {
-    //     prova(img);
-    // }
 
     return 0;
 }
