@@ -1,6 +1,7 @@
 #include "ParkingSpaceClassifier.h"
 
 using namespace cv;
+using namespace std;
 
 // Function to create a bounding box
 Mat createBoundingBox(const Mat &parkingLotImage, const RotatedRect &rotated_rect) {
@@ -32,69 +33,46 @@ Mat createBoundingBox(const Mat &parkingLotImage, const RotatedRect &rotated_rec
 
 void classifyParkingSpaces(const Mat &parkingLotImage, const Mat &parkingLotEmpty, 
                            std::vector<RotatedRect> &parkingSpaces, std::vector<bool> &occupancyStatus) {
+    double empty = 0.2;
+    // Frame processing
+    cv::Mat img_gray, img_stretched, img_clahe, img_blur, img_thresh;
 
-    Ptr<SIFT> sift = SIFT::create();  // Create SIFT detector
-    FlannBasedMatcher matcher;  // FLANN Matcher for SIFT
+    cv::cvtColor(parkingLotImage, img_gray, COLOR_BGR2GRAY);
+    contrastStretching(img_gray, img_stretched);
+    cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE(2.0, cv::Size(8, 8));
+    clahe->apply(img_stretched, img_clahe);
+    cv::GaussianBlur(img_clahe, img_blur, Size(3, 3), 1);
+    cv::adaptiveThreshold(img_blur, img_thresh, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY_INV, 25, 16);
+    // Blurring the image to reduce noise and normalize pixel value gaps caused by adaptive threshold
+    cv::Mat blur;
+    cv::medianBlur(img_thresh, blur, 5);
 
-    Mat grayEmpty, grayCurrent;
-    cvtColor(parkingLotEmpty, grayEmpty, COLOR_BGR2GRAY);
-    cvtColor(parkingLotImage, grayCurrent, COLOR_BGR2GRAY);
+    // Dilating to increase foreground object
+    Mat kernel_size = cv::Mat::ones(3, 3, CV_8U);
+    cv::Mat dilate;
+    cv::dilate(blur, dilate, kernel_size, Point(-1, -1), 1);
 
-    // Apply CLAHE for better contrast
-    Ptr<CLAHE> clahe = createCLAHE(2.0, Size(8, 8));
-    clahe->apply(grayEmpty, grayEmpty);
-    clahe->apply(grayCurrent, grayCurrent);
 
     occupancyStatus.clear();
 
     for (size_t i = 0; i < parkingSpaces.size(); ++i) {
         std::cout << "Roi #" << i << std::endl;
-        RotatedRect &rotated_rect = parkingSpaces[i];
+        const RotatedRect &rotated_rect = parkingSpaces[i];
+        Mat roi = createBoundingBox(img_thresh, rotated_rect);
 
-        // Scale the bounding box by 80%
-        Size2f newSize(rotated_rect.size.width * 0.7, rotated_rect.size.height * 0.7);
-        RotatedRect scaledRect(rotated_rect.center, newSize, rotated_rect.angle);
-        
-        Mat roiEmpty = createBoundingBox(grayEmpty, const_cast<const RotatedRect&>(scaledRect));
-        Mat roiCurrent = createBoundingBox(grayCurrent, const_cast<const RotatedRect&>(scaledRect));
-        //imshow("roi", roiCurrent);
-        //waitKey(0);
-        std::vector<KeyPoint> keypointsEmpty, keypointsCurrent;
-        Mat descriptorsEmpty, descriptorsCurrent;
-
-        // SIFT Feature Detection
-        sift->detectAndCompute(roiEmpty, noArray(), keypointsEmpty, descriptorsEmpty);
-        sift->detectAndCompute(roiCurrent, noArray(), keypointsCurrent, descriptorsCurrent);
-
-        // Debugging: Print number of detected keypoints
-        std::cout << "Parking space: " << keypointsEmpty.size() << " (empty) vs " 
-             << keypointsCurrent.size() << " (current)" << std::endl;
-
-        // If no keypoints are found, assume occupied
-        if (descriptorsEmpty.empty() || descriptorsCurrent.empty()) {
-            std::cout << "No keypoints found in one of the spaces, assuming occupied." << std::endl;
-            occupancyStatus.push_back(true);
-            continue;
+        int full = roi.rows * roi.cols;
+        int count = countNonZero(roi);
+        bool occupied;
+        double ratio = static_cast<double>(count) / full;
+        std::cout << ratio << std::endl; 
+        if (ratio < empty) {
+            occupied = false;
+        } else {
+            occupied = true;
         }
 
 
-        // KNN Matching (k=2)
-        std::vector<std::vector<DMatch>> knnMatches;
-        matcher.knnMatch(descriptorsEmpty, descriptorsCurrent, knnMatches, 2);
-
-        // Apply NNDR (Lowe's Ratio Test)
-        int goodMatches = 0;
-        for (const auto& match : knnMatches) {
-            if (match.size() == 2 && match[0].distance < 0.75 * match[1].distance) {
-                goodMatches++;
-            }
-        }
-
-        // Debugging: Show number of good matches
-        std::cout << "Good matches: " << goodMatches << std::endl;
-
-        // Classification: Too few matches = occupied
-        bool occupied = goodMatches < 2;  // Adjust threshold as needed
+        // Classify: If too many foreground pixels, it's occupied
         occupancyStatus.push_back(occupied);
     }
 }
