@@ -44,26 +44,35 @@ Mat createSmallerBoundingBox(const Mat &parkingLotImage, const RotatedRect &rota
 
 void classifyParkingSpaces(const Mat &parkingLotImage, const Mat &parkingLotEmpty, 
                            std::vector<RotatedRect> &parkingSpaces, std::vector<bool> &occupancyStatus) {
-    double empty = 0.3;
+    double empty = 0.4;
     // Frame processing
     cv::Mat img_gray, img_stretched, img_clahe, img_blur, img_thresh, img_edge;
 
-    //cv::cvtColor(parkingLotImage, img_gray, COLOR_BGR2GRAY);
     cv::cvtColor(parkingLotImage, img_gray, cv::COLOR_BGR2GRAY);
+    cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE(2.0, cv::Size(8, 8));
+    //clahe->apply(img_gray, img_clahe);
     cv::GaussianBlur(img_gray, img_blur, cv::Size(5, 5), 0);
     cv::Canny(img_blur, img_edge, 50, 150);
-    //cv::adaptiveThreshold(img_edge, img_thresh, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY_INV, 25, 16);
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
     cv::Mat dilated;
     cv::dilate(img_edge, dilated, kernel, cv::Point(-1, -1), 1);  // Expand regions
     //cv::morphologyEx(img_thresh, img_stretched, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5)));
     
+    // Thresholding
+    adaptiveThreshold(img_blur, img_thresh, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY_INV, 25, 16);
+
+
     // edge image
     Mat hsv, channels[3], edges, dilated2;
     cvtColor(parkingLotImage, hsv, COLOR_BGR2HSV);
     split(hsv, channels);
-    Canny(channels[1], edges, 100, 200);
+    Canny(channels[1], edges, 100, 150);
     cv::dilate(edges, dilated2, kernel, cv::Point(-1, -1), 1);  // Expand regions
+
+
+    // Perform bitwise OR
+    cv::Mat result;
+    cv::bitwise_or(dilated, img_thresh, result);
 
     //edge on empty
     Mat hsv_emp, channels_emp[3], edges_emp, dilated2_emp;
@@ -72,17 +81,20 @@ void classifyParkingSpaces(const Mat &parkingLotImage, const Mat &parkingLotEmpt
     Canny(channels_emp[1], edges_emp, 100, 200);
     cv::dilate(edges_emp, dilated2_emp, kernel, cv::Point(-1, -1), 2);  // Expand regions
 
-
-    // Perform bitwise OR
-    cv::Mat result;
-    cv::bitwise_or(dilated, dilated2, result);
-
     //subtracting parking lines
     Mat subtracted;
     cv::subtract(result, dilated2_emp, subtracted);
+    
+
+    // Find contours
+    std::vector<std::vector<cv::Point>> contours;
+    cv::findContours(subtracted, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+    // Fill the contours
+    cv::Mat filledImage = cv::Mat::zeros(result.size(), CV_8UC1);
+    cv::drawContours(filledImage, contours, -1, cv::Scalar(255), cv::FILLED);
 
     Mat morph_final;
-    morphologyEx(subtracted, morph_final, cv::MORPH_CLOSE, kernel);
+    morphologyEx(result, morph_final, cv::MORPH_CLOSE, kernel);
 
     // Apply dilation to enlarge regions
     cv::Mat dilated_final;
@@ -92,9 +104,9 @@ void classifyParkingSpaces(const Mat &parkingLotImage, const Mat &parkingLotEmpt
     cv::Mat closed;
     cv::morphologyEx(dilated_final, closed, cv::MORPH_CLOSE, kernel);
 
-    //imshow("hsv", subtracted);
-    //imshow("rgb", dilated);
-    imshow("sum", closed);
+    imshow("dilated_final", dilated_final);
+    imshow("filledImage", filledImage);
+    imshow("subtracted", subtracted);
     waitKey(0);
 
 
@@ -108,12 +120,12 @@ void classifyParkingSpaces(const Mat &parkingLotImage, const Mat &parkingLotEmpt
 
     occupancyStatus.clear();
 
-    Mat classification_input = closed;
+    Mat classification_input = filledImage;
 
     for (size_t i = 0; i < parkingSpaces.size(); ++i) {
         std::cout << "Roi #" << i << std::endl;
         const RotatedRect &rotated_rect = parkingSpaces[i];
-        Mat roi = createSmallerBoundingBox(classification_input, rotated_rect);
+        Mat roi = createBoundingBox(classification_input, rotated_rect);
         // imshow("roi", roi);
         // waitKey(0);
         int full = roi.rows * roi.cols;

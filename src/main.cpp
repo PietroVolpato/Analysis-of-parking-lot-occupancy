@@ -12,7 +12,7 @@ int main() {
     // Loading the seq0 image for comparison
     std::vector<Mat> imgVectorSeq0 = loadImages(0);
     // Load the images
-    int sequence = 4;
+    int sequence = 2;
     int img_num = 4;
     std::vector<Mat> imgVector = loadImages(sequence);
 
