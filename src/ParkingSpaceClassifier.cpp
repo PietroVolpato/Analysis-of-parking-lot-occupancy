@@ -31,35 +31,91 @@ Mat createBoundingBox(const Mat &parkingLotImage, const RotatedRect &rotated_rec
     return cropped_image;
 }
 
+Mat createSmallerBoundingBox(const Mat &parkingLotImage, const RotatedRect &rotated_rect) {
+    // Scale down the rotated rectangle size by half
+    RotatedRect smaller_rect(rotated_rect.center, 
+                             Size2f(rotated_rect.size.width / 2, rotated_rect.size.height / 2), 
+                             rotated_rect.angle);
+
+    // Call the existing function with the smaller rectangle
+    return createBoundingBox(parkingLotImage, smaller_rect);
+}
+
+
 void classifyParkingSpaces(const Mat &parkingLotImage, const Mat &parkingLotEmpty, 
                            std::vector<RotatedRect> &parkingSpaces, std::vector<bool> &occupancyStatus) {
-    double empty = 0.2;
+    double empty = 0.3;
     // Frame processing
-    cv::Mat img_gray, img_stretched, img_clahe, img_blur, img_thresh;
+    cv::Mat img_gray, img_stretched, img_clahe, img_blur, img_thresh, img_edge;
 
-    cv::cvtColor(parkingLotImage, img_gray, COLOR_BGR2GRAY);
-    contrastStretching(img_gray, img_stretched);
-    cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE(2.0, cv::Size(8, 8));
-    clahe->apply(img_stretched, img_clahe);
-    cv::GaussianBlur(img_clahe, img_blur, Size(3, 3), 1);
-    cv::adaptiveThreshold(img_blur, img_thresh, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY_INV, 25, 16);
-    // Blurring the image to reduce noise and normalize pixel value gaps caused by adaptive threshold
-    cv::Mat blur;
-    cv::medianBlur(img_thresh, blur, 5);
+    //cv::cvtColor(parkingLotImage, img_gray, COLOR_BGR2GRAY);
+    cv::cvtColor(parkingLotImage, img_gray, cv::COLOR_BGR2GRAY);
+    cv::GaussianBlur(img_gray, img_blur, cv::Size(5, 5), 0);
+    cv::Canny(img_blur, img_edge, 50, 150);
+    //cv::adaptiveThreshold(img_edge, img_thresh, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY_INV, 25, 16);
+    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
+    cv::Mat dilated;
+    cv::dilate(img_edge, dilated, kernel, cv::Point(-1, -1), 1);  // Expand regions
+    //cv::morphologyEx(img_thresh, img_stretched, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5)));
+    
+    // edge image
+    Mat hsv, channels[3], edges, dilated2;
+    cvtColor(parkingLotImage, hsv, COLOR_BGR2HSV);
+    split(hsv, channels);
+    Canny(channels[1], edges, 100, 200);
+    cv::dilate(edges, dilated2, kernel, cv::Point(-1, -1), 1);  // Expand regions
 
-    // Dilating to increase foreground object
-    Mat kernel_size = cv::Mat::ones(3, 3, CV_8U);
-    cv::Mat dilate;
-    cv::dilate(blur, dilate, kernel_size, Point(-1, -1), 1);
+    //edge on empty
+    Mat hsv_emp, channels_emp[3], edges_emp, dilated2_emp;
+    cvtColor(parkingLotEmpty, hsv_emp, COLOR_BGR2HSV);
+    split(hsv_emp, channels_emp);
+    Canny(channels_emp[1], edges_emp, 100, 200);
+    cv::dilate(edges_emp, dilated2_emp, kernel, cv::Point(-1, -1), 2);  // Expand regions
 
+
+    // Perform bitwise OR
+    cv::Mat result;
+    cv::bitwise_or(dilated, dilated2, result);
+
+    //subtracting parking lines
+    Mat subtracted;
+    cv::subtract(result, dilated2_emp, subtracted);
+
+    Mat morph_final;
+    morphologyEx(subtracted, morph_final, cv::MORPH_CLOSE, kernel);
+
+    // Apply dilation to enlarge regions
+    cv::Mat dilated_final;
+    cv::erode(morph_final, dilated_final, kernel);
+
+    // Apply closing (dilation followed by erosion) to connect regions
+    cv::Mat closed;
+    cv::morphologyEx(dilated_final, closed, cv::MORPH_CLOSE, kernel);
+
+    //imshow("hsv", subtracted);
+    //imshow("rgb", dilated);
+    imshow("sum", closed);
+    waitKey(0);
+
+
+    //contrastStretching(mask, img_stretched);
+    //cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE(2.0, cv::Size(8, 8));
+    //clahe->apply(img_stretched, img_clahe);
+    // cv::GaussianBlur(img_stretched, img_blur, Size(5, 5), 0);
+    // imshow("blur", img_blur);
+    // waitKey(0);
+    // cv::adaptiveThreshold(img_blur, img_thresh, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY_INV, 25, 16);
 
     occupancyStatus.clear();
+
+    Mat classification_input = closed;
 
     for (size_t i = 0; i < parkingSpaces.size(); ++i) {
         std::cout << "Roi #" << i << std::endl;
         const RotatedRect &rotated_rect = parkingSpaces[i];
-        Mat roi = createBoundingBox(img_thresh, rotated_rect);
-
+        Mat roi = createSmallerBoundingBox(classification_input, rotated_rect);
+        // imshow("roi", roi);
+        // waitKey(0);
         int full = roi.rows * roi.cols;
         int count = countNonZero(roi);
         bool occupied;
