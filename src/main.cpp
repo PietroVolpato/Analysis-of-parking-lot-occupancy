@@ -33,6 +33,7 @@ int main() {
     std::vector<cv::RotatedRect> trueParkingSpaces = extractBoundingBoxesFromXML(xmlFilePath, trueOccupancyStatus);
     drawParkingSpaces(imageFromXML, trueParkingSpaces, trueOccupancyStatus);
 
+
     // Determine the maximum width and height that can fit on the screen
     int screenHeight = 400;  // Example screen height
     int maxImageHeight = std::min(imageFromXML.rows, screenHeight);
@@ -44,6 +45,11 @@ int main() {
 
     // Display the combined result
     cv::imshow("Parking Space Occupancy Comparison", imageFromXML);
+    // Create a minimap (e.g., 500x500 pixels)
+    // Create a mock minimap that’s 500x300 pixels
+    cv::Mat minimap = createMockMinimap(500, 300);
+    // Display the minimap.
+    cv::imshow("minimap", minimap);
     cv::waitKey(0);
 
     return 0;
