@@ -39,17 +39,11 @@ vector<LineParams> ParkingSpaceDetector::computeLineParams(const vector<Vec4i>& 
         double c = x1 * y2 - x2 * y1;
         // angle in degrees
         double theta = atan2(b, a) * 180 / CV_PI;
-        double rho = -c / sqrt(a * a + b * b);
+        theta = std::fmod(theta + 90, 180) - 90;
         double length = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-        params.push_back({rho, theta, line, length});
+        params.push_back({theta, line, length});
     }
     return params;
-}
-
-Mat ParkingSpaceDetector::detectEdges(const Mat& img) {
-    Mat edges;
-    Canny(img, edges, 50, 200);
-    return edges;
 }
 
 Mat ParkingSpaceDetector::applyRoi(const Mat& img) {
@@ -57,8 +51,8 @@ Mat ParkingSpaceDetector::applyRoi(const Mat& img) {
     vector<vector<Point>> roi;
     Point pts[4] = {
         Point(0, 0),
-        Point(img.cols * 0.17, 0),
-        Point(img.cols * 0.45 , img.rows),
+        Point(img.cols * 0.15, 0),
+        Point(img.cols * 0.47 , img.rows),
         Point(0, img.rows),
     };
     roi.push_back(vector<Point>(pts, pts + 4));
@@ -86,22 +80,95 @@ Mat ParkingSpaceDetector::applyRoi(const Mat& img) {
     return masked;
 }
 
+Mat ParkingSpaceDetector::equalization(const Mat& img) {
+    Ptr<CLAHE> clahe = cv::createCLAHE(2.0, Size(8, 8));
+    Mat out;
+    clahe->apply(img, out);
+
+    return out;
+}
+
+float ParkingSpaceDetector::distance(const Vec4i& line1, const Vec4i& line2) {
+    float mx1 = (line1[0] + line1[2]) / 2.0;
+    float my1 = (line1[1] + line1[3]) / 2.0;
+    float mx2 = (line2[0] + line2[2]) / 2.0;
+    float my2 = (line2[1] + line2[3]) / 2.0;
+
+    return hypot(mx2 - mx1, my2 - my1);
+}
+
+Vec4i ParkingSpaceDetector::mergeLines(const Vec4i line1, const Vec4i& line2) {
+    return Vec4i(min(line1[0], line2[0]), min(line1[1], line2[1]),
+                 max(line1[2], line2[2]), max(line1[3], line2[3]));
+
+}
+
+bool ParkingSpaceDetector::isParallel(const double theta1, const double theta2) {
+    double tollerance = 5;
+    double diff = abs(abs(theta1) - abs(theta2));
+    diff = min(diff, 180 - diff);
+
+    return diff <= tollerance;
+}
+
+vector<Vec4i> ParkingSpaceDetector::mergeLines(const vector<LineParams>& lines) {
+    vector<Vec4i> mergedLines;
+    vector<bool> used(lines.size(), false);
+
+    for (size_t i = 0; i < lines.size(); ++i) {
+        if (used[i]) continue;
+        Vec4i merged = lines[i].endpoints;
+        for (size_t j = i + 1; j < lines.size(); ++j) {
+            if (used[j]) continue;
+            if (distance(lines[i].endpoints, lines[j].endpoints) < 10 && isParallel(lines[i].theta, lines[j].theta)) {
+                merged = mergeLines(merged, lines[j].endpoints);
+                used[j] = true;
+            }
+        }
+        mergedLines.push_back(merged);
+    }
+
+    return mergedLines;
+}
+
 Mat ParkingSpaceDetector::preprocessImage(const Mat& img) {
     Mat gray;
     cvtColor(img, gray, COLOR_BGR2GRAY);
-    Mat blurred;
-    // GaussianBlur(gray, blurred, Size(3, 3), 0);
+    Mat equalized = equalization(gray);
+    // Mat blurred;
+    // GaussianBlur(equalized, blurred, Size(3, 3), 0);
     // bilateralFilter(gray, blurred, 3, 50, 50);
     Mat thresh;
-    adaptiveThreshold(gray, thresh, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY_INV, 7, 9);
-    Mat closed;
-    Mat kernel = getStructuringElement(MORPH_RECT, Size(5, 5));
-    morphologyEx(thresh, closed, MORPH_CLOSE, kernel);
-    Mat thinned;
-    kernel = getStructuringElement(MORPH_CROSS, Size(3, 3));
-    erode(closed, thinned, kernel);
-    Mat masked = applyRoi(thinned);
-    return masked;
+    adaptiveThreshold(gray, thresh, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY_INV, 9, 15);
+    // Mat closed;
+    // Mat kernel = getStructuringElement(MORPH_RECT, Size(7, 7));
+    // morphologyEx(thresh, closed, MORPH_CLOSE, kernel);
+    // Mat thinned;
+    // kernel = getStructuringElement(MORPH_RECT, Size(5, 5));
+    // erode(closed, thinned, kernel);
+    Mat thresh_masked = applyRoi(thresh);
+
+    Mat sobelX, sobelY;
+    Sobel(equalized, sobelX, CV_32F, 1, 0);
+    Sobel(equalized, sobelY, CV_32F, 0, 1);
+    Mat sobel;
+    magnitude(sobelX, sobelY, sobel);
+    normalize(sobel, sobel, 0, 255, NORM_MINMAX);
+    sobel.convertTo(sobel, CV_8U);
+    Mat sobel_masked = applyRoi(sobel);
+
+    Mat out;
+    out = thresh_masked + sobel_masked;
+
+    // morphologyEx(out, out, MORPH_CLOSE, kernel);
+
+    return thresh_masked;
+}
+
+Mat ParkingSpaceDetector::detectEdges(const Mat& img, int threshold1, int threshold2) {
+    Mat edges;
+    Canny(img, edges, threshold1, threshold2);
+    return edges;
 }
 
 void ParkingSpaceDetector::showImage(const Mat& img) {
@@ -125,93 +192,30 @@ void ParkingSpaceDetector::drawLines(Mat& img, const vector<LineParams>& lines) 
 
 vector<LineParams> ParkingSpaceDetector::filterLines(vector<LineParams>& lines) {
     vector<LineParams> filteredLines;
-    double angle_tolerance = 10.0;
-    for (const auto& line : lines) {
+    double angleTarget = 75;
+    double tollerance = 10;
+    for (const auto& line: lines) {
         double angle = line.theta;
-        double length = line.length;
-        if (length > 50 && fabs(angle - 90) < angle_tolerance) {
+        if (abs(abs(angle) - angleTarget) <= tollerance) {
             filteredLines.push_back(line);
         }
     }
+
+    vector<Vec4i> mergedLines = mergeLines(filteredLines);
+    filteredLines = computeLineParams(mergedLines);
+
     return filteredLines;
 }
 
 vector<vector<LineParams>> ParkingSpaceDetector::clusterLinesByTheta(const vector<LineParams>& lines, double thetaThreshold) {
     vector<vector<LineParams>> clusters;
-    if (lines.empty()) return clusters;
-
-    vector<LineParams> sortedLines = lines;
-    sort(sortedLines.begin(), sortedLines.end(), [](const LineParams& a, const LineParams& b) {
-        return a.theta < b.theta;
-    });
-
-    vector<LineParams> currentCluster = {sortedLines[0]};
-    for (size_t i = 1; i < sortedLines.size(); ++i) {
-        double deltaTheta = abs(sortedLines[i].theta - currentCluster.back().theta);
-        // Adjust for angles wrapping around (if necessary)
-        if (deltaTheta > 180) deltaTheta = 360 - deltaTheta;
-        if (deltaTheta <= thetaThreshold) {
-            currentCluster.push_back(sortedLines[i]);
-        } else {
-            clusters.push_back(currentCluster);
-            currentCluster = {sortedLines[i]};
-        }
-    }
-    if (!currentCluster.empty())
-        clusters.push_back(currentCluster);
+    
     return clusters;
 }
 
 vector<RotatedRect> ParkingSpaceDetector::detectParkingSpaces(const vector<LineParams>& lineParams) {
-    double thetaThreshold = 5 * CV_PI / 180;
-    vector<vector<LineParams>> clusters = clusterLinesByTheta(lineParams, thetaThreshold);
-
     vector<RotatedRect> parkingSpaces;
-    for (const auto& cluster : clusters) {
-        if (cluster.size() < 2) continue;
-
-        vector<LineParams> sortedCluster = cluster;
-        sort(sortedCluster.begin(), sortedCluster.end(), [](const LineParams& a, const LineParams& b) {
-            return a.rho < b.rho;
-        });
-
-        vector<double> diffs;
-        for (size_t i = 1; i < sortedCluster.size(); ++i) {
-            diffs.push_back(sortedCluster[i].rho - sortedCluster[i-1].rho);
-        }
-        if (diffs.empty()) continue;
-
-        sort(diffs.begin(), diffs.end());
-        double medianDiff = diffs[diffs.size() / 2];
-        double tolerance = 0.2 * medianDiff;
-
-        for (size_t i = 0; i < sortedCluster.size() - 1; ++i) {
-            double diff = sortedCluster[i+1].rho - sortedCluster[i].rho;
-            if (abs(diff - medianDiff) <= tolerance) {
-                const LineParams& line1 = sortedCluster[i];
-                const LineParams& line2 = sortedCluster[i+1];
-
-                Vec4i l1 = line1.endpoints;
-                Vec4i l2 = line2.endpoints;
-                Point2f mid1((l1[0] + l1[2]) / 2.0, (l1[1] + l1[3]) / 2.0);
-                Point2f mid2((l2[0] + l2[2]) / 2.0, (l2[1] + l2[3]) / 2.0);
-                Point2f center((mid1.x + mid2.x) / 2.0, (mid1.y + mid2.y) / 2.0);
-
-                double len1 = norm(Point2f(l1[2], l1[3]) - Point2f(l1[0], l1[1]));
-                double len2 = norm(Point2f(l2[2], l2[3]) - Point2f(l2[0], l2[1]));
-                double avgLength = (len1 + len2) / 2.0;
-
-                double diffVal = diff;
-                double angleLine = line1.theta - CV_PI / 2;
-                angleLine = angleLine * 180 / CV_PI;
-                if (angleLine < 0)
-                    angleLine += 180;
-
-                parkingSpaces.emplace_back(center, Size2f(avgLength, diffVal), angleLine);
-                i++;
-            }
-        }
-    }
+    
     return parkingSpaces;
 }
 

@@ -19,13 +19,13 @@ int main(int argc, char** argv) {
     // Detect the edges in the images
     vector<Mat> edgesImgVector;
     for (const auto& img : preprocessedImgVector) {
-        edgesImgVector.push_back(detector.detectEdges(img));
+        edgesImgVector.push_back(detector.detectEdges(img, 120, 300));
     }
 
     // Detect the lines in the images
     vector<vector<Vec4i>> linesVector;
     for (const auto& img : preprocessedImgVector) {
-        linesVector.push_back(detector.detectLines(img, 50, 30, 10));
+        linesVector.push_back(detector.detectLines(img, 30, 30, 20));
     }
 
     // Compute the line parameters
@@ -34,23 +34,22 @@ int main(int argc, char** argv) {
         lineParamsVector.push_back(detector.computeLineParams(lines));
     }
 
-    // Draw the detected lines
-    vector<Mat> imgWithLinesVector;
-    for (size_t i = 0; i < imgVector.size(); ++i) {
-        Mat img = imgVector[i];
-        const auto& lines = lineParamsVector[i];
-        detector.drawLines(img, lines);
-        imgWithLinesVector.push_back(img);
-    }
-
     // Filter the lines
     vector<vector<LineParams>> filteredLinesVector;
     for (auto& lineParams : lineParamsVector) {
         filteredLinesVector.push_back(detector.filterLines(lineParams));
     }
 
-    // Detect parking spaces based on the filtered lines (if desired)
-    vector<RotatedRect> parkingSpaces = detector.detectParkingSpaces(filteredLinesVector[0]);
+    // Draw the detected lines
+    vector<Mat> imgWithLinesVector;
+    for (size_t i = 0; i < imgVector.size(); ++i) {
+        Mat img = imgVector[i];
+        // const auto& lines = lineParamsVector[i];
+        const auto& lines = filteredLinesVector[i];
+        detector.drawLines(img, lines);
+        imgWithLinesVector.push_back(img);
+    }
+
 
     // Show the images
     for (const auto& img : imgWithLinesVector) {

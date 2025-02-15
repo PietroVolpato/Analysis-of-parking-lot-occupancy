@@ -13,7 +13,6 @@
 #include <algorithm>
 
 struct LineParams {
-    double rho;
     double theta;
     cv::Vec4i endpoints;
     double length;
@@ -26,7 +25,7 @@ public:
     std::vector<cv::Mat> loadImages(const int sequence);
     std::vector<LineParams> computeLineParams(const std::vector<cv::Vec4i>& lines);
     cv::Mat preprocessImage(const cv::Mat& img);
-    cv::Mat detectEdges(const cv::Mat& img);
+    cv::Mat detectEdges(const cv::Mat& img, int threshold1, int threshold2);
     void showImage(const cv::Mat& img);
     std::vector<cv::Vec4i> detectLines(const cv::Mat& img, int threshold, double minLineLength, double maxLineGap);
     void drawLines(cv::Mat& img, const std::vector<LineParams>& lines);
@@ -37,6 +36,11 @@ public:
 
 private:
     cv::Mat applyRoi(const cv::Mat& img);
+    cv::Mat equalization(const cv::Mat& img);
+    float distance(const cv::Vec4i& line1, const cv::Vec4i& line2);
+    cv::Vec4i mergeLines(const cv::Vec4i line1, const cv::Vec4i& line2);
+    bool isParallel(const double theta1, const double theta2);
+    std::vector<cv::Vec4i> mergeLines(const std::vector<LineParams>& lines);
 };
 
 #endif
