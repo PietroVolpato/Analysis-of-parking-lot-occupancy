@@ -7,19 +7,24 @@
 #include <list>
 
 using namespace cv;
+using namespace std;
 
+int main(int argc, char** argv) {
 
-int main() {
+    if (argc < 2) {
+        cout << "Please provide sequence and image number." << endl;
+        return 1;
+    }
+
+    ParkingSpaceDetector detector;
     // Loading the seq0 image for comparison
-    std::vector<Mat> imgVectorSeq0 = loadImages(0);
+    std::vector<Mat> imgVectorSeq0 = detector.loadImages(0);
     // Load the images
-    int sequence = 2;
-    int img_num = 4;
-    std::vector<Mat> imgVector = loadImages(sequence);
+    int sequence = stoi(argv[1]);
+    vector<Mat> imgVector = detector.loadImages(sequence);
 
     // Contrast stretch the images
-    //std::vector<Mat> stretchedImgVector = constrastStretch(imgVector);
-    
+    int img_num = stoi(argv[2]);
     Mat parkingLotEmpty = imgVectorSeq0[img_num];
     Mat parkingLotImage = imgVector[img_num];
     

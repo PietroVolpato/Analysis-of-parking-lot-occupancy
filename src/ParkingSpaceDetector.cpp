@@ -6,7 +6,7 @@ using namespace std;
 vector<Mat> ParkingSpaceDetector::loadImages(const int sequence) {
     vector<String> fileNames;
     if (sequence == 0)
-        glob("../data/sequence0/frames", fileNames);
+        glob("./data/sequence0/frames", fileNames);
     else if (sequence == 1)
         glob("./data/sequence1/frames", fileNames);
     else if (sequence == 2)
