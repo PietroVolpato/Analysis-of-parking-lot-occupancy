@@ -36,9 +36,12 @@ void updateMinimap(cv::Mat& minimap, const std::vector<cv::RotatedRect>& parking
 void drawRotatedRect(cv::Mat& image, const cv::RotatedRect& rrect, const cv::Scalar& color) {
     cv::Point2f vertices[4];
     rrect.points(vertices);
-    for (int i = 0; i < 4; i++) {
-        cv::line(image, vertices[i], vertices[(i + 1) % 4], color, 2);
-    }
+     // Convert to a polygon and fill it
+     std::vector<cv::Point> contour(vertices, vertices + 4);
+     cv::fillPoly(image, std::vector<std::vector<cv::Point>>{contour}, color);
+     for (int i = 0; i < 4; i++) {
+        cv::line(image, vertices[i], vertices[(i + 1) % 4], cv::Scalar(0, 0, 0), 1);
+     }
 }
 
 cv::Mat createMockMinimap(int width, int height) {
@@ -50,28 +53,19 @@ cv::Mat createMockMinimap(int width, int height) {
     float spaceHeight = 20.0f;  // height of each parking space
     float angle       = - 45.0f; // rotation angle (negative = slanted left)
     int numSpaces;
-    float startX = 500.0f;  // starting X
+    float startX = 400.0f;  // starting X
     float startY = 60.0f;  // row Y
     float deltaX = - spaceHeight / cos(angle * CV_PI / 180.0); 
-    float deltaY = 0;
+    float deltaY = (spaceWidth + spaceHeight) * cos(angle * CV_PI / 180.0); ;
+    float cx;
+    float cy;
 
-    int rows = 4;
-    std::vector<int> parking_spots = {9, 9, 10, 10};
-    for(int i = 0; i < rows; ++i){
-        
-    }
-
-    int numSpaces = 8;
-    float startX = 70.0f;  // starting X
-    float startY = 60.0f;  // row Y
-    float deltaX = spaceHeight / cos(angle * CV_PI / 180.0); 
-    float deltaY = 0;
-
+    // Row 1
+    numSpaces = 8;
+    cy = startY;
     for (int i = 0; i < numSpaces; i++) {
         // Center for this space
-        float cx = startX + i * deltaX;
-        float cy = startY + i * deltaY;
-
+        cx = startX + i * deltaX;
         cv::RotatedRect rrect(cv::Point2f(cx, cy),
                                 cv::Size2f(spaceWidth, spaceHeight),
                                 angle);
@@ -86,15 +80,14 @@ cv::Mat createMockMinimap(int width, int height) {
 
     angle = 45.0f;
     numSpaces = 9;
-    startX = startX - (spaceWidth - spaceHeight) * cos(angle * CV_PI / 180.0);  // starting X
-    startY = startY + (spaceWidth + spaceHeight) * cos(angle * CV_PI / 180.0); // row Y
-
+    float startX2 = startX + 10;
+    startY = startY + deltaY; // row Y
+    cy = startY;
     // Let’s alternate colors: free, occupied, free, occupied, ...
     // Blue (BGR) = (255, 0, 0)
     // Red  (BGR) = (0, 0, 255)
     for (int i = 0; i < numSpaces; i++) {
-        float cx = startX + i * deltaX;
-        float cy = startY + i * deltaY;
+        cx = startX2 + i * deltaX;
 
         cv::RotatedRect rrect(cv::Point2f(cx, cy),
                                 cv::Size2f(spaceWidth, spaceHeight),
@@ -111,13 +104,12 @@ cv::Mat createMockMinimap(int width, int height) {
 
     angle = - 45.0f;
     numSpaces = 10;
-    startX = 70.0f;   // starting X
-    startY = 120.0f;  // row Y
+    startY = 200.0f;  // row Y
+    cy = startY;    
 
     // Example: Mark every 3rd space as occupied
     for (int i = 0; i < numSpaces; i++) {
-        float cx = startX + i * deltaX;
-        float cy = startY + i * deltaY;
+        cx = startX + i * deltaX;
 
         cv::RotatedRect rrect(cv::Point2f(cx, cy),
                                 cv::Size2f(spaceWidth, spaceHeight),
@@ -133,13 +125,12 @@ cv::Mat createMockMinimap(int width, int height) {
     // ------------------------
 
     numSpaces = 10;
-    startX = startX - (spaceWidth - spaceHeight) * cos(angle * CV_PI / 180.0);  // starting X;   // starting X
-    startY = startY + (spaceWidth + spaceHeight) * cos(angle * CV_PI / 180.0);;  // row Y
+    startY = startY + deltaY; // row Y
+    cy = startY;    
 
     // Example: Mark every 3rd space as occupied
     for (int i = 0; i < numSpaces; i++) {
-        float cx = startX + i * deltaX;
-        float cy = startY + i * deltaY;
+        cx = startX + i * deltaX;
 
         cv::RotatedRect rrect(cv::Point2f(cx, cy),
                                 cv::Size2f(spaceWidth, spaceHeight),
