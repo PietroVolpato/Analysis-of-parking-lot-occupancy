@@ -109,15 +109,6 @@ void classifyParkingSpaces(const Mat &parkingLotImage, const Mat &parkingLotEmpt
     imshow("subtracted", subtracted);
     waitKey(0);
 
-
-    //contrastStretching(mask, img_stretched);
-    //cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE(2.0, cv::Size(8, 8));
-    //clahe->apply(img_stretched, img_clahe);
-    // cv::GaussianBlur(img_stretched, img_blur, Size(5, 5), 0);
-    // imshow("blur", img_blur);
-    // waitKey(0);
-    // cv::adaptiveThreshold(img_blur, img_thresh, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY_INV, 25, 16);
-
     occupancyStatus.clear();
 
     Mat classification_input = filledImage;
@@ -140,7 +131,6 @@ void classifyParkingSpaces(const Mat &parkingLotImage, const Mat &parkingLotEmpt
         }
 
 
-        // Classify: If too many foreground pixels, it's occupied
         occupancyStatus.push_back(occupied);
     }
 }
@@ -159,18 +149,15 @@ void drawParkingSpaces(Mat &image, const std::vector<RotatedRect> &parkingSpaces
 }
 
 void contrastStretching(cv::Mat& input, cv::Mat& output) {
-    output = input.clone();  // Clone the input to output
-    // Define the (r1, s1) and (r2, s2) points for contrast stretching
+    output = input.clone();
     int r1 = 70, s1 = 30;
     int r2 = 170, s2 = 220;
-    int L = 256;  // Assuming 8-bit image (0 to 255 intensity levels)
+    int L = 256;  
 
     for (int i = 0; i < input.rows; i++) {
         for (int j = 0; j < input.cols; j++) {
             int r = input.at<uchar>(i, j);
             int s = 0;
-
-            // Apply the piecewise linear transformation
             if (r <= r1) {
                 s = (s1 / (float)r1) * r;
             } else if (r <= r2) {

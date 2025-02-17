@@ -1,38 +1,5 @@
 #include "Visualizer.h"
 
-cv::Mat createMinimap(int width, int height) {
-    cv::Mat minimap = cv::Mat::zeros(height, width, CV_8UC3);
-    minimap.setTo(cv::Scalar(255, 255, 255)); // White background
-    return minimap;
-}
-
-void drawParkingSpace(cv::Mat& minimap, const cv::RotatedRect& space, const cv::Scalar& color) {
-    cv::Point2f vertices[4];
-    space.points(vertices);
-    // Draw lines connecting the vertices (with wrapping)
-    for (int i = 0; i < 4; i++) {
-        cv::line(minimap, vertices[i], vertices[(i + 1) % 4], color, 2);
-    }
-}
-
-void updateMinimap(cv::Mat& minimap, const std::vector<cv::RotatedRect>& parkingSpaces, 
-                   const std::vector<bool>& occupancy) {
-    if (parkingSpaces.size() != occupancy.size()) {
-        std::cerr << "Error: The number of parking spaces does not match the occupancy vector size." << std::endl;
-        return;
-    }
-
-    // Reset the minimap to a white background.
-    minimap.setTo(cv::Scalar(255, 255, 255));
-
-    // For each parking space, draw it in green if occupied, blue if free.
-    for (size_t i = 0; i < parkingSpaces.size(); ++i) {
-        cv::Scalar color = occupancy[i] ? cv::Scalar(0, 255, 0) : cv::Scalar(255, 0, 0);
-        drawParkingSpace(minimap, parkingSpaces[i], color);
-    }
-}
-
-
 void drawRotatedRect(cv::Mat& image, const cv::RotatedRect& rrect, const cv::Scalar& color) {
     cv::Point2f vertices[4];
     rrect.points(vertices);
@@ -144,9 +111,4 @@ cv::Mat createMockMinimap(int width, int height) {
 
 
     return minimap;
-}
-
-void showMinimap(const cv::Mat& minimap, const std::string& windowName) {
-    cv::imshow(windowName, minimap);
-    cv::waitKey(1);
 }
