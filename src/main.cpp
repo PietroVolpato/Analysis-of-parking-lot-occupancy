@@ -1,6 +1,7 @@
 #include "ParkingSpaceClassifier.h"
 #include "ParkingSpaceDetector.h"
 #include "GroundTruthReader.h"
+#include "Visualizer.h"
 #include "tinyxml2.h"
 #include <string>
 #include <list>
@@ -59,6 +60,10 @@ int main() {
 
     // Display the combined result
     cv::imshow("Parking Space Occupancy Comparison", combined);
+    // Create a mock minimap that’s 500x300 pixels
+    cv::Mat minimap = createMockMinimap(500, 300);
+    // Display the minimap.
+    cv::imshow("minimap", minimap);
     cv::waitKey(0);
 
     return 0;
