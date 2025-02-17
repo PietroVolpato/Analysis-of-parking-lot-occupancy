@@ -1,11 +1,12 @@
 #include "ParkingSpaceDetector.h"
 
 using namespace cv;
+using namespace std;
 
-std::vector<Mat> loadImages (int sequence) {
-    std::vector<String> fileNames;
+vector<Mat> ParkingSpaceDetector::loadImages(const int sequence) {
+    vector<String> fileNames;
     if (sequence == 0)
-        glob("./data/sequence0/frames", fileNames);
+        glob("../data/sequence0/frames", fileNames);
     else if (sequence == 1)
         glob("./data/sequence1/frames", fileNames);
     else if (sequence == 2)
@@ -17,180 +18,215 @@ std::vector<Mat> loadImages (int sequence) {
     else if (sequence == 5)
         glob("./data/sequence5/frames", fileNames);
 
-    std::vector<Mat> imgs;
-    for (int i = 0; i < fileNames.size(); i++) {
-        Mat img = imread(fileNames[i]);
+    vector<Mat> imgs;
+    for (const auto& file : fileNames) {
+        Mat img = imread(file);
         if (img.empty()) {
-            std::cerr << "Error loading image: " << fileNames[i] << std::endl;
+            cerr << "Error loading image: " << file << endl;
             continue;
         }
         imgs.push_back(img);
     }
-
     return imgs;
 }
 
-std::vector<Mat> preprocessImages (const std::vector<Mat>& imgs) {
-    std::vector<Mat> processedImages;
-    for (const auto& img: imgs) {
-        Mat binaryImg;
-        cvtColor(img, binaryImg, COLOR_BGR2GRAY);
-        processedImages.push_back(binaryImg);
+vector<LineParams> ParkingSpaceDetector::computeLineParams(const vector<Vec4i>& lines) {
+    vector<LineParams> params;
+    for (const auto& line : lines) {
+        int x1 = line[0], y1 = line[1], x2 = line[2], y2 = line[3];
+        double a = y1 - y2;
+        double b = x2 - x1;
+        double c = x1 * y2 - x2 * y1;
+        // angle in degrees
+        double theta = atan2(b, a) * 180 / CV_PI;
+        theta = std::fmod(theta + 90, 180) - 90;
+        double length = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+        params.push_back({theta, line, length});
     }
-
-    return processedImages;
+    return params;
 }
 
-std::vector<Mat> constrastStretch (const std::vector<Mat>& imgs) {
-    std::vector<Mat> stretchedImages;
-    for (const auto& img: imgs) {
-        Mat stretchedImg;
-        Mat img32f;
-        img.convertTo(img32f, CV_32F);
-        normalize(img32f, img32f, 0, 1, NORM_MINMAX);
-        pow(img32f, 0.5, img32f);
-        normalize(img32f, img32f, 0, 255, NORM_MINMAX);
-        img32f.convertTo(stretchedImg, CV_8U);
-        stretchedImages.push_back(stretchedImg);
-    }
+Mat ParkingSpaceDetector::applyRoi(const Mat& img) {
+    Mat mask = Mat::zeros(img.size(), img.type());
+    vector<vector<Point>> roi;
+    Point pts[4] = {
+        Point(0, 0),
+        Point(img.cols * 0.15, 0),
+        Point(img.cols * 0.47 , img.rows),
+        Point(0, img.rows),
+    };
+    roi.push_back(vector<Point>(pts, pts + 4));
+    fillPoly(mask, roi, Scalar(255));
 
-    return stretchedImages;
+    bitwise_not(mask, mask);
+
+    Mat masked;
+    bitwise_and(img, mask, masked);
+
+    roi.clear();
+    mask = Mat::zeros(img.size(), img.type());
+
+    Point pts2[4] = {
+        Point(img.cols * 0.65, 0),
+        Point(img.cols, 0),
+        Point(img.cols, img.rows * 0.4),
+        Point(img.cols * 0.65, 0)
+    };
+    roi.push_back(vector<Point>(pts2, pts2 + 4));
+    fillPoly(mask, roi, Scalar(255));
+
+    bitwise_not(mask, mask);
+    bitwise_and(masked, mask, masked);
+    return masked;
 }
 
-void showImages (const std::vector<Mat>& imgs) {
-    for (const auto& img: imgs) {
-        imshow("Image", img);
-        waitKey(0);
-    }
+Mat ParkingSpaceDetector::equalization(const Mat& img) {
+    Ptr<CLAHE> clahe = cv::createCLAHE(2.0, Size(8, 8));
+    Mat out;
+    clahe->apply(img, out);
+
+    return out;
 }
 
-std::vector<Mat> detectEdges (const std::vector<Mat>& imgs, double lowThreshold, double highThreshold) {
-    std::vector<Mat> edges;
-    edges.reserve(imgs.size());
-    for (const auto& img: imgs) {
-        Mat edge;
-        Canny(img, edge, lowThreshold, highThreshold);
-        edges.push_back(edge);
+float ParkingSpaceDetector::distance(const Vec4i& line1, const Vec4i& line2) {
+    float mx1 = (line1[0] + line1[2]) / 2.0;
+    float my1 = (line1[1] + line1[3]) / 2.0;
+    float mx2 = (line2[0] + line2[2]) / 2.0;
+    float my2 = (line2[1] + line2[3]) / 2.0;
+
+    return hypot(mx2 - mx1, my2 - my1);
+}
+
+Vec4i ParkingSpaceDetector::mergeLines(const Vec4i line1, const Vec4i& line2) {
+    return Vec4i(min(line1[0], line2[0]), min(line1[1], line2[1]),
+                 max(line1[2], line2[2]), max(line1[3], line2[3]));
+
+}
+
+bool ParkingSpaceDetector::isParallel(const double theta1, const double theta2) {
+    double tollerance = 5;
+    double diff = abs(abs(theta1) - abs(theta2));
+    diff = min(diff, 180 - diff);
+
+    return diff <= tollerance;
+}
+
+vector<Vec4i> ParkingSpaceDetector::mergeLines(const vector<LineParams>& lines) {
+    vector<Vec4i> mergedLines;
+    vector<bool> used(lines.size(), false);
+
+    for (size_t i = 0; i < lines.size(); ++i) {
+        if (used[i]) continue;
+        Vec4i merged = lines[i].endpoints;
+        for (size_t j = i + 1; j < lines.size(); ++j) {
+            if (used[j]) continue;
+            if (distance(lines[i].endpoints, lines[j].endpoints) < 10 && isParallel(lines[i].theta, lines[j].theta)) {
+                merged = mergeLines(merged, lines[j].endpoints);
+                used[j] = true;
+            }
+        }
+        mergedLines.push_back(merged);
     }
 
+    return mergedLines;
+}
+
+Mat ParkingSpaceDetector::preprocessImage(const Mat& img) {
+    Mat gray;
+    cvtColor(img, gray, COLOR_BGR2GRAY);
+    Mat equalized = equalization(gray);
+    // Mat blurred;
+    // GaussianBlur(equalized, blurred, Size(3, 3), 0);
+    // bilateralFilter(gray, blurred, 3, 50, 50);
+    Mat thresh;
+    adaptiveThreshold(gray, thresh, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY_INV, 9, 15);
+    // Mat closed;
+    // Mat kernel = getStructuringElement(MORPH_RECT, Size(7, 7));
+    // morphologyEx(thresh, closed, MORPH_CLOSE, kernel);
+    // Mat thinned;
+    // kernel = getStructuringElement(MORPH_RECT, Size(5, 5));
+    // erode(closed, thinned, kernel);
+    Mat thresh_masked = applyRoi(thresh);
+
+    Mat sobelX, sobelY;
+    Sobel(equalized, sobelX, CV_32F, 1, 0);
+    Sobel(equalized, sobelY, CV_32F, 0, 1);
+    Mat sobel;
+    magnitude(sobelX, sobelY, sobel);
+    normalize(sobel, sobel, 0, 255, NORM_MINMAX);
+    sobel.convertTo(sobel, CV_8U);
+    Mat sobel_masked = applyRoi(sobel);
+
+    Mat out;
+    out = thresh_masked + sobel_masked;
+
+    // morphologyEx(out, out, MORPH_CLOSE, kernel);
+
+    return thresh_masked;
+}
+
+Mat ParkingSpaceDetector::detectEdges(const Mat& img, int threshold1, int threshold2) {
+    Mat edges;
+    Canny(img, edges, threshold1, threshold2);
     return edges;
 }
 
-std::vector<std::vector<Vec4i>> detectLines (const std::vector<Mat>& imgs, int threshold, double minLineLength, double maxLineGap) {
-    std::vector<std::vector<Vec4i>> lines;
-    std::vector<Vec4i> line;
-    for (const auto& img: imgs) {
-        HoughLinesP(img, line, 1, CV_PI/180, threshold, minLineLength, maxLineGap);
-        // HoughLines(img, line, 1, CV_PI/180, threshold);
-        lines.push_back(line);
-    }
+void ParkingSpaceDetector::showImage(const Mat& img) {
+    imshow("Image", img);
+    waitKey(0);
+}
 
+vector<Vec4i> ParkingSpaceDetector::detectLines(const Mat& img, int threshold, double minLineLength, double maxLineGap) {
+    vector<Vec4i> lines;
+    HoughLinesP(img, lines, 1, CV_PI/180, threshold, minLineLength, maxLineGap);
     return lines;
 }
 
-// Filter the lines 
-std::vector<std::vector<Vec4i>> filterLines (const std::vector<std::vector<Vec4i>>& linesVector, const double minAngle, const double maxAngle, const double minLength, const double maxLength, const double minDistance, const double maxDistance) {
-    std::vector<std::vector<Vec4i>> filteredLinesVector;
-
-   for (const auto& lines: linesVector) {
-        std::vector<Vec4i> filteredLines;
-        for (size_t i = 0; i < lines.size(); i++) {
-            Vec4i l = lines[i];
-            double dx = l[2] - l[0];
-            double dy = l[3] - l[1];
-            double angle = atan2(dy, dx) * 180 / CV_PI;
-            double length = sqrt(dx * dx + dy * dy);
-
-            if (abs(abs(angle) - 90) >= minAngle && abs(angle) - 90 <= maxAngle){//&& length >= minLength && length <= maxLength) {
-                filteredLines.push_back(l);
-            }
-        }
-
-        // std::vector<Vec4i> finalLines;
-        // for (size_t i = 0; i < filteredLines.size(); i++) {
-        //     Vec4i l1 = filteredLines[i];
-        //     bool keepLine = true;
-
-        //     for (size_t j = i + 1; j < filteredLines.size(); j++) {
-        //         Vec4i l2 = filteredLines[j];
-        //         double distance = norm(Point(l1[0], l1[1]) - Point(l2[0], l2[1]));
-
-        //         if (distance >= minDistance && distance <= maxDistance) {
-        //             finalLines.push_back(l1);
-        //             finalLines.push_back(l2);
-        //             keepLine = false;
-        //             break;
-        //         }
-        //     }
-
-        //     if (keepLine) {
-        //         finalLines.push_back(l1);
-        //     }
-        // }
-
-        filteredLinesVector.push_back(filteredLines);
-   }
-    return filteredLinesVector;
-}
-
-
-
-void drawLines (std::vector<Mat>& imgs, const std::vector<std::vector<Vec4i>>& lines) {
-    for (const auto& img: imgs) {
-        for (const auto& line: lines) {
-            for (const auto& l: line) {
-                cv::line(img, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0, 0, 255), 3, LINE_AA);
-            }
-        }
+void ParkingSpaceDetector::drawLines(Mat& img, const vector<LineParams>& lines) {
+    for (const auto& line : lines) {
+        Point p1(line.endpoints[0], line.endpoints[1]);
+        Point p2(line.endpoints[2], line.endpoints[3]);
+        cv::line(img, p1, p2, Scalar(0, 0, 255), 2);
     }
 }
 
-void drawBoundingBoxes (std::vector<Mat>& imgs, const std::vector<std::vector<Vec4i>>& linesVector) {
-    for (const auto& img: imgs) {
-        for (const auto& lines: linesVector) {
-            for (size_t i = 0; i < lines.size(); i++) {
-                for (size_t j = 0; j < lines.size(); i++) {
-                    Vec4i l1 = lines[i];
-                    Vec4i l2 = lines[j];
-
-                    double dx1 = l1[2] - l1[0];
-                    double dy1 = l1[3] - l1[1];
-                    double angle1 = atan2(dy1, dx1) * 180 / CV_PI;
-
-                    double dx2 = l2[2] - l2[0];
-                    double dy2 = l2[3] - l2[1];
-                    double angle2 = atan2(dy2, dx2) * 180 / CV_PI;
-
-                    if (abs(angle1 - angle2) < 10.0) {
-                        Point2f p1 (l1[0], l1[1]);
-                        Point2f p2 (l1[2], l1[3]);
-                        Point2f p3 (l2[0], l2[1]);
-                        Point2f p4 (l2[2], l2[3]);
-
-                        std::vector<Point2f> points = {p1, p2, p3, p4};
-                        sort(points.begin(), points.end(), [](const Point2f& p1, const Point2f& p2) {
-                            return p1.x < p2.x;
-                        });
-
-                        Point2f topLeft = points[0];
-                        Point2f topRight = points[1];
-                        Point2f bottomLeft = points[2];
-                        Point2f bottomRight = points[3];
-
-                        Point2f center ((topLeft.x + topRight.x) / 2, (topLeft.y + bottomLeft.y) / 2);
-                        Size2f size (abs(topRight.x - topLeft.x), abs(bottomLeft.y - topLeft.y));
-                        double angle = atan2(dy1, dx1) * 180 / CV_PI;
-
-                        RotatedRect rect (center, size, angle);
-
-                        Point2f vertices[4];
-                        rect.points(vertices);
-                        for (int i = 0; i < 4; i++) {
-                            line(img, vertices[i], vertices[(i + 1) % 4], Scalar(0, 0, 255), 3, LINE_AA);
-                        }
-                    }
-                }
-            }
+vector<LineParams> ParkingSpaceDetector::filterLines(vector<LineParams>& lines) {
+    vector<LineParams> filteredLines;
+    double angleTarget = 75;
+    double tollerance = 10;
+    for (const auto& line: lines) {
+        double angle = line.theta;
+        if (abs(abs(angle) - angleTarget) <= tollerance) {
+            filteredLines.push_back(line);
         }
     }
+
+    vector<Vec4i> mergedLines = mergeLines(filteredLines);
+    filteredLines = computeLineParams(mergedLines);
+
+    return filteredLines;
+}
+
+vector<vector<LineParams>> ParkingSpaceDetector::clusterLinesByTheta(const vector<LineParams>& lines, double thetaThreshold) {
+    vector<vector<LineParams>> clusters;
+    
+    return clusters;
+}
+
+vector<RotatedRect> ParkingSpaceDetector::detectParkingSpaces(const vector<LineParams>& lineParams) {
+    vector<RotatedRect> parkingSpaces;
+    
+    return parkingSpaces;
+}
+
+Mat ParkingSpaceDetector::drawParkingSpaces(const Mat& img, const vector<RotatedRect>& parkingSpaces) {
+    Mat out = img.clone();
+    for (const auto& space : parkingSpaces) {
+        Point2f vertices[4];
+        space.points(vertices);
+        for (int i = 0; i < 4; ++i) {
+            line(out, vertices[i], vertices[(i+1)%4], Scalar(0, 255, 0), 2);
+        }
+    }
+    return out;
 }
