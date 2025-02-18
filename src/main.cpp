@@ -46,7 +46,8 @@ int main(int argc, char** argv) {
     std::vector<bool> occupancyStatus;
     std::vector<cv::RotatedRect> parkingSpaces = extractBoundingBoxesFromXML(xmlFilePath, occupancyStatus);
     
-    classifyParkingSpaces(parkingLotImage,parkingLotEmpty, parkingSpaces, occupancyStatus);  
+    ParkingSpaceClassifier classifier(0.4); // Initialize the classifier with an empty threshold of 0.4
+    classifier.classifyParkingSpaces(parkingLotImage,parkingLotEmpty, parkingSpaces, occupancyStatus);  
     drawParkingSpaces(imageFromDetection, parkingSpaces, occupancyStatus);
 
     // Determine the maximum width and height that can fit on the screen
