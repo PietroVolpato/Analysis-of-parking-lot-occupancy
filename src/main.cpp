@@ -40,7 +40,9 @@ int main(int argc, char** argv) {
     // 1. Draw the parking spaces based on the XML file (using the occupancy status from the XML file)
     std::vector<bool> trueOccupancyStatus;
     std::vector<cv::RotatedRect> trueParkingSpaces = extractBoundingBoxesFromXML(xmlFilePath, trueOccupancyStatus);
-    drawParkingSpaces(imageFromXML, trueParkingSpaces, trueOccupancyStatus);
+    
+    Visualizer visualizer;
+    visualizer.drawParkingSpaces(imageFromXML, trueParkingSpaces, trueOccupancyStatus);
 
     // 2. Draw the parking spaces based on the occupancy detected using the isOccupied function
     std::vector<bool> occupancyStatus;
@@ -48,7 +50,7 @@ int main(int argc, char** argv) {
     
     ParkingSpaceClassifier classifier(0.4); // Initialize the classifier with an empty threshold of 0.4
     classifier.classifyParkingSpaces(parkingLotImage,parkingLotEmpty, parkingSpaces, occupancyStatus);  
-    drawParkingSpaces(imageFromDetection, parkingSpaces, occupancyStatus);
+    visualizer.drawParkingSpaces(imageFromDetection, parkingSpaces, occupancyStatus);
 
     // Determine the maximum width and height that can fit on the screen
     int screenHeight = 400;  // Example screen height
@@ -67,7 +69,7 @@ int main(int argc, char** argv) {
     // Display the combined result
     cv::imshow("Parking Space Occupancy Comparison", combined);
     // Create a mock minimap that’s 500x300 pixels
-    cv::Mat minimap = createMockMinimap(500, 300);
+    cv::Mat minimap = visualizer.createMockMinimap(500, 300);
     // Display the minimap.
     cv::imshow("minimap", minimap);
     cv::waitKey(0);
