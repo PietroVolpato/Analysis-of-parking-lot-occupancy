@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
 
     ParkingSpaceDetector detector;
     // Loading the seq0 image for comparison
-    std::vector<Mat> imgVectorSeq0 = detector.loadImages(0);
+    vector<Mat> imgVectorSeq0 = detector.loadImages(0);
     // Load the images
     int sequence = stoi(argv[1]);
     vector<Mat> imgVector = detector.loadImages(sequence);

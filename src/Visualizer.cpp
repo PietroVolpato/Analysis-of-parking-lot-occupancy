@@ -11,6 +11,19 @@ void drawRotatedRect(cv::Mat& image, const cv::RotatedRect& rrect, const cv::Sca
      }
 }
 
+// Function to draw the parking spaces on the image
+void drawParkingSpaces(cv::Mat &image, const std::vector<cv::RotatedRect> &parkingSpaces, const std::vector<bool> &occupancyStatus) {
+    for (size_t i = 0; i < parkingSpaces.size(); ++i) {
+        cv::Point2f vertices[4];
+        parkingSpaces[i].points(vertices);
+        
+        cv::Scalar color = occupancyStatus[i] ? cv::Scalar(0, 0, 255) : cv::Scalar(0, 255, 0);
+
+        for (int j = 0; j < 4; j++)
+            line(image, vertices[j], vertices[(j+1)%4], color, 2);
+    }
+}
+
 cv::Mat createMockMinimap(int width, int height) {
     // Start with a white background
     cv::Mat minimap(height, width, CV_8UC3, cv::Scalar(255, 255, 255));
@@ -22,8 +35,8 @@ cv::Mat createMockMinimap(int width, int height) {
     int numSpaces;
     float startX = 400.0f;  // starting X
     float startY = 60.0f;  // row Y
-    float deltaX = - spaceHeight / cos(angle * CV_PI / 180.0); 
-    float deltaY = (spaceWidth + spaceHeight) * cos(angle * CV_PI / 180.0); ;
+    float deltaX = - spaceHeight / static_cast<float>(cos(angle * CV_PI / 180.0)); 
+    float deltaY = (spaceWidth + spaceHeight) * static_cast<float>(cos(angle * CV_PI / 180.0)); ;
     float cx;
     float cy;
 

@@ -47,22 +47,20 @@ void classifyParkingSpaces(const Mat &parkingLotImage, const Mat &parkingLotEmpt
     double empty = 0.4;
     // Frame processing
     cv::Mat img_gray, img_stretched, img_clahe, img_blur, img_thresh, img_edge;
-
     cv::cvtColor(parkingLotImage, img_gray, cv::COLOR_BGR2GRAY);
-    cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE(2.0, cv::Size(8, 8));
-    //clahe->apply(img_gray, img_clahe);
     cv::GaussianBlur(img_gray, img_blur, cv::Size(5, 5), 0);
+
+    // edge detection
     cv::Canny(img_blur, img_edge, 50, 150);
     cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
     cv::Mat dilated;
     cv::dilate(img_edge, dilated, kernel, cv::Point(-1, -1), 1);  // Expand regions
-    //cv::morphologyEx(img_thresh, img_stretched, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5)));
     
     // Thresholding
     adaptiveThreshold(img_blur, img_thresh, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY_INV, 25, 16);
 
 
-    // edge image
+    // edge image on HSV channel
     Mat hsv, channels[3], edges, dilated2;
     cvtColor(parkingLotImage, hsv, COLOR_BGR2HSV);
     split(hsv, channels);
@@ -94,19 +92,9 @@ void classifyParkingSpaces(const Mat &parkingLotImage, const Mat &parkingLotEmpt
     cv::drawContours(filledImage, contours, -1, cv::Scalar(255), cv::FILLED);
 
     Mat morph_final;
-    morphologyEx(result, morph_final, cv::MORPH_CLOSE, kernel);
+    morphologyEx(filledImage, morph_final, cv::MORPH_CLOSE, kernel);
 
-    // Apply dilation to enlarge regions
-    cv::Mat dilated_final;
-    cv::erode(morph_final, dilated_final, kernel);
-
-    // Apply closing (dilation followed by erosion) to connect regions
-    cv::Mat closed;
-    cv::morphologyEx(dilated_final, closed, cv::MORPH_CLOSE, kernel);
-
-    imshow("dilated_final", dilated_final);
     imshow("filledImage", filledImage);
-    imshow("subtracted", subtracted);
     waitKey(0);
 
     occupancyStatus.clear();
@@ -135,39 +123,5 @@ void classifyParkingSpaces(const Mat &parkingLotImage, const Mat &parkingLotEmpt
     }
 }
 
-// Function to draw the parking spaces on the image
-void drawParkingSpaces(Mat &image, const std::vector<RotatedRect> &parkingSpaces, const std::vector<bool> &occupancyStatus) {
-    for (size_t i = 0; i < parkingSpaces.size(); ++i) {
-        Point2f vertices[4];
-        parkingSpaces[i].points(vertices);
-        
-        Scalar color = occupancyStatus[i] ? Scalar(0, 0, 255) : Scalar(0, 255, 0);
 
-        for (int j = 0; j < 4; j++)
-            line(image, vertices[j], vertices[(j+1)%4], color, 2);
-    }
-}
-
-void contrastStretching(cv::Mat& input, cv::Mat& output) {
-    output = input.clone();
-    int r1 = 70, s1 = 30;
-    int r2 = 170, s2 = 220;
-    int L = 256;  
-
-    for (int i = 0; i < input.rows; i++) {
-        for (int j = 0; j < input.cols; j++) {
-            int r = input.at<uchar>(i, j);
-            int s = 0;
-            if (r <= r1) {
-                s = (s1 / (float)r1) * r;
-            } else if (r <= r2) {
-                s = ((s2 - s1) / (float)(r2 - r1)) * (r - r1) + s1;
-            } else {
-                s = ((L - 1 - s2) / (float)(L - 1 - r2)) * (r - r2) + s2;
-            }
-
-            output.at<uchar>(i, j) = cv::saturate_cast<uchar>(s);
-        }
-    }
-}
 
