@@ -4,21 +4,8 @@ using namespace std;
 using namespace cv;
 
 // Constructor
-Visualizer::Visualizer() {}
+Visualizer::Visualizer(int width , int height): minimap_width(width), minimap_height(height) {} // Default values , Constructor
 
-void Visualizer::drawRotatedRect(Mat& image, const float &center_x, const float &center_y, const Scalar &color, const bool &occupancyStatus) {
-    RotatedRect rrect(Point2f(center_x, center_y), Size2f(Visualizer::spaceWidth, Visualizer::spaceHeight), Visualizer::angle);
-    Point2f vertices[4];
-    rrect.points(vertices);
-    
-    // Convert to a polygon and fill it
-    vector<Point> contour(vertices, vertices + 4);
-    fillPoly(image, vector<vector<Point>>{contour}, color);
-    
-    for (int i = 0; i < 4; i++) {
-        line(image, vertices[i], vertices[(i + 1) % 4], Scalar(0, 0, 0), 1);
-    }
-}
 
 void Visualizer::drawParkingSpaces(Mat &image, const vector<RotatedRect> &parkingSpaces, const vector<bool> &occupancyStatus) {
     for (size_t i = 0; i < parkingSpaces.size(); ++i) {
@@ -34,58 +21,45 @@ void Visualizer::drawParkingSpaces(Mat &image, const vector<RotatedRect> &parkin
     }
 }
 
-Mat Visualizer::createMockMinimap(int width, int height) {
-    Mat minimap(height, width, CV_8UC3, Scalar(255, 255, 255));
+void Visualizer::drawRotatedRect(Mat& image, float center_x, float center_y, float angle, Scalar color) {
+    RotatedRect rrect(Point2f(center_x, center_y), Size2f(Visualizer::spaceWidth, Visualizer::spaceHeight), angle);
+    Point2f vertices[4];
+    rrect.points(vertices);
 
-    // Parking space parameters
-    int numSpaces;
-    float cx, cy;
+    // Convert to a polygon and fill it
+    vector<Point> contour(vertices, vertices + 4);
+    fillPoly(image, vector<vector<Point>>{contour}, color);
 
-    // Row 1
-    numSpaces = 8;
-    cy = Visualizer::startY;
-    for (int i = 0; i < numSpaces; i++) {
-        cx = Visualizer::startX + i * deltaX;
-        drawRotatedRect(minimap, cx, cy, Scalar(0, 0, 255), rand() % 2); // Red
+    for (int i = 0; i < 4; i++) {
+        line(image, vertices[i], vertices[(i + 1) % 4], Scalar(0, 0, 0), 1);
     }
+}
 
-    // Row 2
-    angle = 45.0f;
-    numSpaces = 9;
-    float startX2 = startX + 10;
-    startY += deltaY;
-    cy = startY;
+void Visualizer::drawParkingRow(Mat& image, int numSpaces, float startX, float startY, float angle, vector<bool>& occupancy, int& index) {
+    float cx, cy = startY;
+    
     for (int i = 0; i < numSpaces; i++) {
-        cx = startX2 + i * deltaX;
-        RotatedRect rrect(Point2f(cx, cy), Size2f(spaceWidth, spaceHeight), angle);
-        Scalar color = (i % 2 == 0) ? Scalar(255, 0, 0) : Scalar(0, 0, 255); // Blue & Red alternating
-        drawRotatedRect(minimap, cx, cy, color, rand() % 2);
-    }
+        cx = startX - i * Visualizer::deltaX;
+        
+        // Assign color based on occupancy vector
+        bool occupied = occupancy[index++];
+        Scalar color = occupied ? Scalar(0, 0, 255) : Scalar(255, 0, 0); // Red for occupied, Blue for free
 
-    // Row 3
-    angle = -45.0f;
-    numSpaces = 10;
-    startY = 200.0f;
-    cy = startY;
-    for (int i = 0; i < numSpaces; i++) {
-        cx = startX + i * deltaX;
-        RotatedRect rrect(Point2f(cx, cy), Size2f(spaceWidth, spaceHeight), angle);
-        bool occupied = ((i + 1) % 3 == 0);
-        Scalar color = occupied ? Scalar(0, 0, 255) : Scalar(255, 0, 0);
-        drawRotatedRect(minimap, cx, cy, color, rand() % 2);
+        drawRotatedRect(image, cx, cy, angle, color);
     }
+}
 
-    // Row 4
-    numSpaces = 10;
-    startY += deltaY;
-    cy = startY;
-    for (int i = 0; i < numSpaces; i++) {
-        cx = startX + i * deltaX;
-        RotatedRect rrect(Point2f(cx, cy), Size2f(spaceWidth, spaceHeight), angle);
-        bool occupied = ((i + 1) % 3 == 0);
-        Scalar color = occupied ? Scalar(0, 0, 255) : Scalar(255, 0, 0);
-        drawRotatedRect(minimap, cx, cy, color, rand() % 2);
-    }
+
+
+
+Mat Visualizer::createMockMinimap(vector<bool> &occupancy) {
+    Mat minimap(Visualizer::minimap_height, Visualizer::minimap_width, CV_8UC3, Scalar(255, 255, 255));
+
+    int index = 0; // Track occupancy vector position
+    drawParkingRow(minimap, 9, Visualizer::startX,  Visualizer::startY, -45.0f, occupancy, index);
+    drawParkingRow(minimap, 9, Visualizer::startX + 10,  Visualizer::startY + Visualizer::deltaY, 45.0f, occupancy, index);
+    drawParkingRow(minimap, 10, Visualizer::startX,  Visualizer::startY + 3 * Visualizer::deltaY, -45.0f, occupancy, index);
+    drawParkingRow(minimap, 10, Visualizer::startX,  Visualizer::startY + 4 * Visualizer::deltaY, -45.0f, occupancy, index);
 
     return minimap;
 }

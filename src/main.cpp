@@ -68,9 +68,15 @@ int main(int argc, char** argv) {
 
     // Display the combined result
     cv::imshow("Parking Space Occupancy Comparison", combined);
-    // Create a mock minimap that’s 500x300 pixels
-    cv::Mat minimap = visualizer.createMockMinimap(500, 300);
-    // Display the minimap.
+
+    
+    if (occupancyStatus.size() < 38) {
+        cerr << "Error: Occupancy vector size must be 38!" << endl;
+        cout << occupancyStatus.size() << endl;
+        return -1;
+    }
+    // Create the minimap with occupancy data
+    Mat minimap = visualizer.createMockMinimap(occupancyStatus);
     cv::imshow("minimap", minimap);
     cv::waitKey(0);
 
