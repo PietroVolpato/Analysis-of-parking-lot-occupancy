@@ -77,7 +77,8 @@ int main(int argc, char** argv) {
     }
     // Create the minimap with occupancy data
     Mat minimap = visualizer.createMockMinimap(occupancyStatus);
-    cv::imshow("minimap", minimap);
+    cv::Mat outputImage = visualizer.overlaySmallOnLarge(imageFromDetection, minimap);
+    cv::imshow("result", outputImage);
     cv::waitKey(0);
 
     return 0;

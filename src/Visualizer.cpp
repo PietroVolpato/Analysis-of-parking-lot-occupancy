@@ -49,6 +49,27 @@ void Visualizer::drawParkingRow(Mat& image, int numSpaces, float startX, float s
     }
 }
 
+Mat Visualizer::overlaySmallOnLarge(const Mat& parkingSapaceClassified, const Mat& visual2D) {
+
+    // Clone the large image to keep the original unchanged
+    Mat outputImage = parkingSapaceClassified.clone();
+
+    // The size for the small image (1/4 width of the large image)
+    int newWidth = parkingSapaceClassified.cols / 4;
+    int newHeight = (visual2D.rows * newWidth) / visual2D.cols;  // Maintain aspect ratio
+
+   // Resize the small image
+   Mat resizedSmallImage;
+   resize(visual2D, resizedSmallImage, cv::Size(newWidth, newHeight));
+
+   // Define the ROI (bottom-left corner)
+   Rect roi(0, outputImage.rows - newHeight, newWidth, newHeight);
+
+   // Copy small image into the ROI
+   resizedSmallImage.copyTo(outputImage(roi));
+
+   return outputImage;
+}
 
 
 

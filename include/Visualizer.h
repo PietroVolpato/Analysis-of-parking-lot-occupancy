@@ -10,6 +10,7 @@ public:
 
     cv::Mat createMockMinimap(std::vector<bool> &occupancy);
     void drawParkingSpaces(cv::Mat &image, const std::vector<cv::RotatedRect> &parkingSpaces, const std::vector<bool> &occupancyStatus);
+    cv::Mat overlaySmallOnLarge(const cv::Mat& parkingSapaceClassified, const cv::Mat& visual2D);
 
 private:
     int minimap_width = 400;
