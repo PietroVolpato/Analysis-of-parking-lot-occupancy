@@ -8,9 +8,11 @@ Visualizer::Visualizer(int width , int height): minimap_width(width), minimap_he
 
 
 void Visualizer::drawParkingSpaces(Mat &image, const vector<RotatedRect> &parkingSpaces, const vector<bool> &occupancyStatus) {
+    Point center;
     for (size_t i = 0; i < parkingSpaces.size(); ++i) {
         Point2f vertices[4];
         parkingSpaces[i].points(vertices);
+        center = static_cast<Point>(parkingSpaces[i].center);
         
         // Set color based on occupancy status (Red for occupied, Green for free)
         Scalar color = occupancyStatus[i] ? Scalar(0, 0, 255) : Scalar(0, 255, 0);
@@ -18,6 +20,10 @@ void Visualizer::drawParkingSpaces(Mat &image, const vector<RotatedRect> &parkin
         for (int j = 0; j < 4; j++) {
             line(image, vertices[j], vertices[(j + 1) % 4], color, 2);
         }
+
+       // Draw the index at the center
+        string indexText = to_string(i);
+        putText(image, indexText, center, FONT_HERSHEY_SIMPLEX, 0.6, Scalar(0, 0, 0), 2);
     }
 }
 
@@ -30,6 +36,7 @@ void Visualizer::drawRotatedRect(Mat& image, float center_x, float center_y, flo
     vector<Point> contour(vertices, vertices + 4);
     fillPoly(image, vector<vector<Point>>{contour}, color);
 
+    // Draw border line
     for (int i = 0; i < 4; i++) {
         line(image, vertices[i], vertices[(i + 1) % 4], Scalar(0, 0, 0), 1);
     }

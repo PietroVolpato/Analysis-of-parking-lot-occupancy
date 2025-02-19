@@ -6,6 +6,9 @@
 #include <string>
 #include <list>
 
+#include <algorithm>
+#include <random>
+
 using namespace cv;
 using namespace std;
 
@@ -40,6 +43,7 @@ int main(int argc, char** argv) {
     // 1. Draw the parking spaces based on the XML file (using the occupancy status from the XML file)
     std::vector<bool> trueOccupancyStatus;
     std::vector<cv::RotatedRect> trueParkingSpaces = extractBoundingBoxesFromXML(xmlFilePath, trueOccupancyStatus);
+     
     
     Visualizer visualizer;
     visualizer.drawParkingSpaces(imageFromXML, trueParkingSpaces, trueOccupancyStatus);
@@ -47,6 +51,11 @@ int main(int argc, char** argv) {
     // 2. Draw the parking spaces based on the occupancy detected using the isOccupied function
     std::vector<bool> occupancyStatus;
     std::vector<cv::RotatedRect> parkingSpaces = extractBoundingBoxesFromXML(xmlFilePath, occupancyStatus);
+
+    // Shuffle the vector
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(parkingSpaces.begin(), parkingSpaces.end(), g);
     
     ParkingSpaceClassifier classifier(0.4); // Initialize the classifier with an empty threshold of 0.4
     classifier.classifyParkingSpaces(parkingLotImage,parkingLotEmpty, parkingSpaces, occupancyStatus);  
@@ -67,7 +76,7 @@ int main(int argc, char** argv) {
     cv::hconcat(imageFromXML, imageFromDetection, combined);
 
     // Display the combined result
-    cv::imshow("Parking Space Occupancy Comparison", combined);
+    //cv::imshow("Parking Space Occupancy Comparison", combined);
 
     
     if (occupancyStatus.size() < 38) {
