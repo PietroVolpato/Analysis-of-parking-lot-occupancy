@@ -3,6 +3,8 @@
 #include "GroundTruthReader.h"
 #include "Visualizer.h"
 #include "tinyxml2.h"
+#include "BboxSorter.h"
+
 #include <string>
 #include <list>
 
@@ -43,7 +45,11 @@ int main(int argc, char** argv) {
     // 1. Draw the parking spaces based on the XML file (using the occupancy status from the XML file)
     std::vector<bool> trueOccupancyStatus;
     std::vector<cv::RotatedRect> trueParkingSpaces = extractBoundingBoxesFromXML(xmlFilePath, trueOccupancyStatus);
-     
+    
+    for(int i=0; i<3; i++){
+        trueOccupancyStatus.pop_back();
+        trueParkingSpaces.pop_back();
+    }
     
     Visualizer visualizer;
     visualizer.drawParkingSpaces(imageFromXML, trueParkingSpaces, trueOccupancyStatus);
@@ -52,14 +58,28 @@ int main(int argc, char** argv) {
     std::vector<bool> occupancyStatus;
     std::vector<cv::RotatedRect> parkingSpaces = extractBoundingBoxesFromXML(xmlFilePath, occupancyStatus);
 
+    for(int i=0; i<3; i++){
+        occupancyStatus.pop_back();
+        parkingSpaces.pop_back();
+    }
+
+    vector<RotatedRect> shuffledRrect = parkingSpaces;
     // Shuffle the vector
     std::random_device rd;
     std::mt19937 g(rd());
-    std::shuffle(parkingSpaces.begin(), parkingSpaces.end(), g);
+    std::shuffle(shuffledRrect.begin(), shuffledRrect.end(), g);
+
+    BboxSorter sorter(shuffledRrect);
+    std::vector<cv::RotatedRect> sortedRects = sorter.sort();
+
+    std::cout << "Sorted bounding boxes:\n";
+    for (int i =0; i < sortedRects.size(); i++) {
+        std::cout << "Center: (" << sortedRects[i].center << ", " << parkingSpaces[i].center << std::endl;
+    }
     
     ParkingSpaceClassifier classifier(0.4); // Initialize the classifier with an empty threshold of 0.4
-    classifier.classifyParkingSpaces(parkingLotImage,parkingLotEmpty, parkingSpaces, occupancyStatus);  
-    visualizer.drawParkingSpaces(imageFromDetection, parkingSpaces, occupancyStatus);
+    classifier.classifyParkingSpaces(parkingLotImage,parkingLotEmpty, shuffledRrect, occupancyStatus);  
+    visualizer.drawParkingSpaces(imageFromDetection, shuffledRrect, occupancyStatus);
 
     // Determine the maximum width and height that can fit on the screen
     int screenHeight = 400;  // Example screen height
@@ -79,7 +99,7 @@ int main(int argc, char** argv) {
     //cv::imshow("Parking Space Occupancy Comparison", combined);
 
     
-    if (occupancyStatus.size() < 38) {
+    if (occupancyStatus.size() < 37) {
         cerr << "Error: Occupancy vector size must be 38!" << endl;
         cout << occupancyStatus.size() << endl;
         return -1;

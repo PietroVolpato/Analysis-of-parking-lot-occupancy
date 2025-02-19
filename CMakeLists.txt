@@ -17,6 +17,7 @@ add_executable(${PROJECT_NAME}
     src/GroundTruthReader.cpp
     src/ParkingSpaceDetector.cpp 
     src/ParkingSpaceClassifier.cpp 
+    src/BboxSorter.cpp
     # src/CarSegmenter.cpp 
     src/Visualizer.cpp
 )

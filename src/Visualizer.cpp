@@ -84,7 +84,7 @@ Mat Visualizer::createMockMinimap(vector<bool> &occupancy) {
     Mat minimap(Visualizer::minimap_height, Visualizer::minimap_width, CV_8UC3, Scalar(255, 255, 255));
 
     int index = 0; // Track occupancy vector position
-    drawParkingRow(minimap, 9, Visualizer::startX,  Visualizer::startY, -45.0f, occupancy, index);
+    drawParkingRow(minimap, 8, Visualizer::startX,  Visualizer::startY, -45.0f, occupancy, index);
     drawParkingRow(minimap, 9, Visualizer::startX + 10,  Visualizer::startY + Visualizer::deltaY, 45.0f, occupancy, index);
     drawParkingRow(minimap, 10, Visualizer::startX,  Visualizer::startY + 3 * Visualizer::deltaY, -45.0f, occupancy, index);
     drawParkingRow(minimap, 10, Visualizer::startX,  Visualizer::startY + 4 * Visualizer::deltaY, -45.0f, occupancy, index);
