@@ -10,11 +10,11 @@ vector<Mat> ParkingSpaceDetector::loadImages(const int sequence) {
     string basePath;
     switch(sequence) {
         case 0: basePath = "../data/sequence0/frames"; break;
-        case 1: basePath = "./data/sequence1/frames"; break;
-        case 2: basePath = "./data/sequence2/frames"; break;
-        case 3: basePath = "./data/sequence3/frames"; break;
-        case 4: basePath = "./data/sequence4/frames"; break;
-        case 5: basePath = "./data/sequence5/frames"; break;
+        case 1: basePath = "../data/sequence1/frames"; break;
+        case 2: basePath = "../data/sequence2/frames"; break;
+        case 3: basePath = "../data/sequence3/frames"; break;
+        case 4: basePath = "../data/sequence4/frames"; break;
+        case 5: basePath = "../data/sequence5/frames"; break;
         default:
             cerr << "Invalid sequence number: " << sequence << endl;
             return {};
