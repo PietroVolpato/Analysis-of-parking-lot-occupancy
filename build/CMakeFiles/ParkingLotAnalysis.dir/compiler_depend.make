@@ -318,6 +318,39 @@ CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o: ../src/Parking
   /usr/local/include/opencv4/opencv2/imgproc/types_c.h \
   /usr/local/include/opencv4/opencv2/core/core_c.h \
   /usr/local/include/opencv4/opencv2/core/types_c.h \
+  /usr/local/include/opencv4/opencv2/ximgproc.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/edge_filter.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/disparity_filter.hpp \
+  /usr/local/include/opencv4/opencv2/calib3d.hpp \
+  /usr/local/include/opencv4/opencv2/features2d.hpp \
+  /usr/local/include/opencv4/opencv2/flann/miniflann.hpp \
+  /usr/local/include/opencv4/opencv2/flann/defines.h \
+  /usr/local/include/opencv4/opencv2/flann/config.h \
+  /usr/local/include/opencv4/opencv2/core/affine.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/sparse_match_interpolator.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/structured_edge_detection.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/edgeboxes.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/edge_drawing.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/scansegment.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/seeds.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/segmentation.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/fast_hough_transform.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/estimated_covariance.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/weighted_median_filter.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/slic.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/lsc.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/paillou_filter.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/fast_line_detector.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/deriche_filter.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/peilin.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/fourier_descriptors.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/ridgefilter.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/brightedges.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/run_length_morphology.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/edgepreserving_filter.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/color_match.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/radon_transform.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/find_ellipses.hpp \
   /usr/include/c++/11/iostream
 
 CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: ../src/main.cpp \
@@ -637,10 +670,104 @@ CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: ../src/main.cpp \
   /usr/local/include/opencv4/opencv2/imgproc/types_c.h \
   /usr/local/include/opencv4/opencv2/core/core_c.h \
   /usr/local/include/opencv4/opencv2/core/types_c.h \
-  /usr/include/c++/11/iostream
+  /usr/local/include/opencv4/opencv2/ximgproc.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/edge_filter.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/disparity_filter.hpp \
+  /usr/local/include/opencv4/opencv2/calib3d.hpp \
+  /usr/local/include/opencv4/opencv2/features2d.hpp \
+  /usr/local/include/opencv4/opencv2/flann/miniflann.hpp \
+  /usr/local/include/opencv4/opencv2/flann/defines.h \
+  /usr/local/include/opencv4/opencv2/flann/config.h \
+  /usr/local/include/opencv4/opencv2/core/affine.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/sparse_match_interpolator.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/structured_edge_detection.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/edgeboxes.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/edge_drawing.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/scansegment.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/seeds.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/segmentation.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/fast_hough_transform.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/estimated_covariance.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/weighted_median_filter.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/slic.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/lsc.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/paillou_filter.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/fast_line_detector.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/deriche_filter.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/peilin.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/fourier_descriptors.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/ridgefilter.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/brightedges.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/run_length_morphology.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/edgepreserving_filter.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/color_match.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/radon_transform.hpp \
+  /usr/local/include/opencv4/opencv2/ximgproc/find_ellipses.hpp \
+  /usr/include/c++/11/iostream \
+  /usr/include/c++/11/fstream \
+  /usr/include/c++/11/bits/codecvt.h \
+  /usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h \
+  /usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h \
+  /usr/include/c++/11/bits/fstream.tcc
 
+
+/usr/include/c++/11/bits/fstream.tcc:
+
+/usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h:
+
+/usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h:
+
+/usr/include/c++/11/fstream:
 
 ../src/main.cpp:
+
+/usr/local/include/opencv4/opencv2/ximgproc/find_ellipses.hpp:
+
+/usr/local/include/opencv4/opencv2/ximgproc/edgepreserving_filter.hpp:
+
+/usr/local/include/opencv4/opencv2/ximgproc/run_length_morphology.hpp:
+
+/usr/local/include/opencv4/opencv2/ximgproc/ridgefilter.hpp:
+
+/usr/local/include/opencv4/opencv2/ximgproc/fourier_descriptors.hpp:
+
+/usr/local/include/opencv4/opencv2/ximgproc/deriche_filter.hpp:
+
+/usr/local/include/opencv4/opencv2/ximgproc/fast_line_detector.hpp:
+
+/usr/local/include/opencv4/opencv2/ximgproc/paillou_filter.hpp:
+
+/usr/local/include/opencv4/opencv2/ximgproc/lsc.hpp:
+
+/usr/local/include/opencv4/opencv2/ximgproc/slic.hpp:
+
+/usr/local/include/opencv4/opencv2/ximgproc/fast_hough_transform.hpp:
+
+/usr/local/include/opencv4/opencv2/ximgproc/estimated_covariance.hpp:
+
+/usr/local/include/opencv4/opencv2/ximgproc/segmentation.hpp:
+
+/usr/local/include/opencv4/opencv2/ximgproc/seeds.hpp:
+
+/usr/local/include/opencv4/opencv2/ximgproc/edgeboxes.hpp:
+
+/usr/local/include/opencv4/opencv2/ximgproc/structured_edge_detection.hpp:
+
+/usr/local/include/opencv4/opencv2/ximgproc/sparse_match_interpolator.hpp:
+
+/usr/local/include/opencv4/opencv2/flann/config.h:
+
+/usr/local/include/opencv4/opencv2/flann/defines.h:
+
+/usr/local/include/opencv4/opencv2/flann/miniflann.hpp:
+
+/usr/local/include/opencv4/opencv2/calib3d.hpp:
+
+/usr/local/include/opencv4/opencv2/ximgproc/disparity_filter.hpp:
+
+/usr/local/include/opencv4/opencv2/ximgproc/edge_filter.hpp:
+
+/usr/local/include/opencv4/opencv2/ximgproc.hpp:
 
 /usr/local/include/opencv4/opencv2/core/types_c.h:
 
@@ -661,6 +788,10 @@ CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: ../src/main.cpp \
 /usr/include/c++/11/bits/parse_numbers.h:
 
 /usr/include/c++/11/ctime:
+
+/usr/local/include/opencv4/opencv2/ximgproc/radon_transform.hpp:
+
+/usr/local/include/opencv4/opencv2/ximgproc/color_match.hpp:
 
 /usr/include/c++/11/ratio:
 
@@ -687,6 +818,8 @@ CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: ../src/main.cpp \
 /usr/include/c++/11/streambuf:
 
 /usr/include/c++/11/bits/locale_classes.tcc:
+
+/usr/local/include/opencv4/opencv2/features2d.hpp:
 
 /usr/include/c++/11/bits/locale_classes.h:
 
@@ -721,6 +854,8 @@ CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: ../src/main.cpp \
 /usr/include/c++/11/algorithm:
 
 /usr/include/c++/11/tr1/exp_integral.tcc:
+
+/usr/local/include/opencv4/opencv2/ximgproc/scansegment.hpp:
 
 /usr/include/c++/11/ext/type_traits.h:
 
@@ -938,6 +1073,8 @@ CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: ../src/main.cpp \
 
 /usr/include/features.h:
 
+/usr/local/include/opencv4/opencv2/ximgproc/edge_drawing.hpp:
+
 /usr/include/c++/11/functional:
 
 /usr/include/linux/errno.h:
@@ -985,6 +1122,10 @@ CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: ../src/main.cpp \
 /usr/include/x86_64-linux-gnu/bits/types/locale_t.h:
 
 /usr/include/x86_64-linux-gnu/bits/time64.h:
+
+/usr/local/include/opencv4/opencv2/ximgproc/brightedges.hpp:
+
+/usr/local/include/opencv4/opencv2/core/affine.hpp:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/emmintrin.h:
 
@@ -1067,6 +1208,8 @@ CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: ../src/main.cpp \
 /usr/include/c++/11/bits/hashtable_policy.h:
 
 /usr/local/include/opencv4/opencv2/core/cvstd.hpp:
+
+/usr/include/c++/11/bits/codecvt.h:
 
 /usr/include/c++/11/bits/basic_ios.tcc:
 
@@ -1235,6 +1378,10 @@ CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: ../src/main.cpp \
 /usr/include/x86_64-linux-gnu/bits/iscanonical.h:
 
 /usr/include/c++/11/bits/specfun.h:
+
+/usr/local/include/opencv4/opencv2/ximgproc/peilin.hpp:
+
+/usr/local/include/opencv4/opencv2/ximgproc/weighted_median_filter.hpp:
 
 /usr/local/include/opencv4/opencv2/core/fast_math.hpp:
 
