@@ -208,6 +208,9 @@ CMAKE_STRIP:FILEPATH=/usr/bin/strip
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
+//The directory containing a CMake configuration file for OpecCV.
+OpecCV_DIR:PATH=OpecCV_DIR-NOTFOUND
+
 //The directory containing a CMake configuration file for OpenCV.
 OpenCV_DIR:PATH=/usr/local/lib/cmake/opencv4
 
@@ -219,6 +222,9 @@ ParkingLotAnalysis_IS_TOP_LEVEL:STATIC=ON
 
 //Value Computed by CMake
 ParkingLotAnalysis_SOURCE_DIR:STATIC=/home/pietro/Analysis-of-parking-lot-occupancy
+
+//The directory containing a CMake configuration file for pugixml.
+pugixml_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/pugixml
 
 
 ########################

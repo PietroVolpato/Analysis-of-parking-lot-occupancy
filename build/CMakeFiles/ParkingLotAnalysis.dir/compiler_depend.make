@@ -351,7 +351,15 @@ CMakeFiles/ParkingLotAnalysis.dir/src/CarSegmenter.cpp.o: ../src/CarSegmenter.cp
   /usr/local/include/opencv4/opencv2/ximgproc/color_match.hpp \
   /usr/local/include/opencv4/opencv2/ximgproc/radon_transform.hpp \
   /usr/local/include/opencv4/opencv2/ximgproc/find_ellipses.hpp \
-  /usr/include/c++/11/iostream
+  /usr/local/include/opencv4/opencv2/bgsegm.hpp \
+  /usr/local/include/opencv4/opencv2/video.hpp \
+  /usr/local/include/opencv4/opencv2/video/tracking.hpp \
+  /usr/local/include/opencv4/opencv2/video/background_segm.hpp \
+  /usr/include/c++/11/iostream \
+  /usr/include/pugixml.hpp \
+  /usr/include/pugiconfig.hpp \
+  /usr/include/c++/11/iterator \
+  /usr/include/c++/11/bits/stream_iterator.h
 
 CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o: ../src/ParkingSpaceDetector.cpp \
   /usr/include/stdc-predef.h \
@@ -1057,6 +1065,14 @@ CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: ../src/main.cpp \
   /usr/local/include/opencv4/opencv2/ximgproc/find_ellipses.hpp \
   /usr/include/c++/11/iostream \
   ../include/CarSegmenter.h \
+  /usr/local/include/opencv4/opencv2/bgsegm.hpp \
+  /usr/local/include/opencv4/opencv2/video.hpp \
+  /usr/local/include/opencv4/opencv2/video/tracking.hpp \
+  /usr/local/include/opencv4/opencv2/video/background_segm.hpp \
+  /usr/include/pugixml.hpp \
+  /usr/include/pugiconfig.hpp \
+  /usr/include/c++/11/iterator \
+  /usr/include/c++/11/bits/stream_iterator.h \
   /usr/include/c++/11/fstream \
   /usr/include/c++/11/bits/codecvt.h \
   /usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h \
@@ -1078,6 +1094,14 @@ CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: ../src/main.cpp \
 
 ../src/ParkingSpaceDetector.cpp:
 
+/usr/include/pugiconfig.hpp:
+
+/usr/include/pugixml.hpp:
+
+/usr/local/include/opencv4/opencv2/video/tracking.hpp:
+
+/usr/local/include/opencv4/opencv2/bgsegm.hpp:
+
 /usr/local/include/opencv4/opencv2/ximgproc/find_ellipses.hpp:
 
 /usr/local/include/opencv4/opencv2/ximgproc/edgepreserving_filter.hpp:
@@ -1091,6 +1115,8 @@ CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: ../src/main.cpp \
 /usr/local/include/opencv4/opencv2/ximgproc/deriche_filter.hpp:
 
 /usr/local/include/opencv4/opencv2/ximgproc/fast_line_detector.hpp:
+
+/usr/include/c++/11/bits/stream_iterator.h:
 
 /usr/local/include/opencv4/opencv2/ximgproc/paillou_filter.hpp:
 
@@ -1192,11 +1218,15 @@ CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: ../src/main.cpp \
 
 /usr/local/include/opencv4/opencv2/core/types.hpp:
 
+/usr/local/include/opencv4/opencv2/video.hpp:
+
 /usr/local/include/opencv4/opencv2/core/matx.inl.hpp:
 
 /usr/local/include/opencv4/opencv2/core/check.hpp:
 
 /usr/include/assert.h:
+
+/usr/local/include/opencv4/opencv2/video/background_segm.hpp:
 
 /usr/include/c++/11/bits/string_view.tcc:
 
@@ -1513,6 +1543,8 @@ CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: ../src/main.cpp \
 /usr/include/c++/11/bits/shared_ptr_base.h:
 
 /usr/include/x86_64-linux-gnu/bits/waitflags.h:
+
+/usr/include/c++/11/iterator:
 
 /usr/include/c++/11/bits/range_access.h:
 

@@ -5,6 +5,7 @@ project(ParkingLotAnalysis)
 
 # Add OpenCV package
 find_package(OpenCV REQUIRED)
+find_package(pugixml REQUIRED)
 
 # Include directories
 include_directories(${OpenCV_INCLUDE_DIRS})
@@ -22,3 +23,4 @@ add_executable(${PROJECT_NAME}
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
+target_link_libraries(${PROJECT_NAME} pugixml::pugixml)

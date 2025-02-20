@@ -300,4 +300,10 @@ CMakeFiles/ParkingLotAnalysis.dir/src/CarSegmenter.cpp.o: \
  /usr/local/include/opencv4/opencv2/ximgproc/color_match.hpp \
  /usr/local/include/opencv4/opencv2/ximgproc/radon_transform.hpp \
  /usr/local/include/opencv4/opencv2/ximgproc/find_ellipses.hpp \
- /usr/include/c++/11/iostream
+ /usr/local/include/opencv4/opencv2/bgsegm.hpp \
+ /usr/local/include/opencv4/opencv2/video.hpp \
+ /usr/local/include/opencv4/opencv2/video/tracking.hpp \
+ /usr/local/include/opencv4/opencv2/video/background_segm.hpp \
+ /usr/include/c++/11/iostream /usr/include/pugixml.hpp \
+ /usr/include/pugiconfig.hpp /usr/include/c++/11/iterator \
+ /usr/include/c++/11/bits/stream_iterator.h

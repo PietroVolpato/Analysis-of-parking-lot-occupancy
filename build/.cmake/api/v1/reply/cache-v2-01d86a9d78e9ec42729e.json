@@ -1130,6 +1130,18 @@
 			"value" : "[/usr/local][v4.9.0()]"
 		},
 		{
+			"name" : "OpecCV_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for OpecCV."
+				}
+			],
+			"type" : "PATH",
+			"value" : "OpecCV_DIR-NOTFOUND"
+		},
+		{
 			"name" : "OpenCV_DIR",
 			"properties" : 
 			[
@@ -1176,6 +1188,18 @@
 			],
 			"type" : "STATIC",
 			"value" : "/home/pietro/Analysis-of-parking-lot-occupancy"
+		},
+		{
+			"name" : "pugixml_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for pugixml."
+				}
+			],
+			"type" : "PATH",
+			"value" : "/usr/lib/x86_64-linux-gnu/cmake/pugixml"
 		}
 	],
 	"kind" : "cache",
