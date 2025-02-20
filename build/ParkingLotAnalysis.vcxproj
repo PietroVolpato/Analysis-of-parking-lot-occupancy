@@ -330,7 +330,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\Noji\Cpp\CV\Analysis-of-parking-lot-occupancy\src\GroundTruthReader.cpp" />
     <ClCompile Include="C:\Users\Noji\Cpp\CV\Analysis-of-parking-lot-occupancy\src\ParkingSpaceDetector.cpp" />
     <ClCompile Include="C:\Users\Noji\Cpp\CV\Analysis-of-parking-lot-occupancy\src\ParkingSpaceClassifier.cpp" />
-    <ClCompile Include="C:\Users\Noji\Cpp\CV\Analysis-of-parking-lot-occupancy\src\BboxSorter.cpp" />
     <ClCompile Include="C:\Users\Noji\Cpp\CV\Analysis-of-parking-lot-occupancy\src\Visualizer.cpp" />
   </ItemGroup>
   <ItemGroup>

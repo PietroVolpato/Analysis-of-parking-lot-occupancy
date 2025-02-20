@@ -3,16 +3,19 @@
 using namespace std;
 using namespace cv;
 
-// Constructor
-Visualizer::Visualizer(int width , int height): minimap_width(width), minimap_height(height) {} // Default values , Constructor
+// Constructor definition
+Visualizer::Visualizer(int width, int height, std::vector<cv::RotatedRect>& parkingSpaces) 
+    : minimap_width(width), minimap_height(height), rectangles(parkingSpaces) {}
 
 
-void Visualizer::drawParkingSpaces(Mat &image, const vector<RotatedRect> &parkingSpaces, const vector<bool> &occupancyStatus) {
+
+void Visualizer::drawParkingSpaces(Mat &image, const vector<bool> &occupancyStatus) {
     Point center;
-    for (size_t i = 0; i < parkingSpaces.size(); ++i) {
+    
+    for (size_t i = 0; i < rectangles.size(); ++i) {
         Point2f vertices[4];
-        parkingSpaces[i].points(vertices);
-        center = static_cast<Point>(parkingSpaces[i].center);
+        rectangles[i].points(vertices);
+        center = static_cast<Point>(rectangles[i].center);
         
         // Set color based on occupancy status (Red for occupied, Green for free)
         Scalar color = occupancyStatus[i] ? Scalar(0, 0, 255) : Scalar(0, 255, 0);
@@ -27,8 +30,10 @@ void Visualizer::drawParkingSpaces(Mat &image, const vector<RotatedRect> &parkin
     }
 }
 
-void Visualizer::drawRotatedRect(Mat& image, float center_x, float center_y, float angle, Scalar color) {
-    RotatedRect rrect(Point2f(center_x, center_y), Size2f(Visualizer::spaceWidth, Visualizer::spaceHeight), angle);
+void Visualizer::drawRotatedRect(Mat& image, Point2f center, float angle, Scalar color) {
+
+    
+    RotatedRect rrect(center, Size2f(Visualizer::spaceWidth, Visualizer::spaceHeight), angle);
     Point2f vertices[4];
     rrect.points(vertices);
 
@@ -42,17 +47,23 @@ void Visualizer::drawRotatedRect(Mat& image, float center_x, float center_y, flo
     }
 }
 
-void Visualizer::drawParkingRow(Mat& image, int numSpaces, float startX, float startY, float angle, vector<bool>& occupancy, int& index) {
-    float cx, cy = startY;
+void Visualizer::drawParkingRow(Mat& image, const Mat &H, vector<bool>& occupancy, int& index) {
     
-    for (int i = 0; i < numSpaces; i++) {
-        cx = startX - i * Visualizer::deltaX;
+    // Get transformed centers
+    vector<Point2f> transformedCenters = Visualizer::applyHomography(H);
+    int angle;
+    for (int i = 0; i < rectangles.size(); i++) {
+        // assigning angle
+        if (rectangles[i].size.width > rectangles[i].size.height)
+            angle = 45;
+        else
+            angle = - 45;
         
         // Assign color based on occupancy vector
         bool occupied = occupancy[index++];
         Scalar color = occupied ? Scalar(0, 0, 255) : Scalar(255, 0, 0); // Red for occupied, Blue for free
 
-        drawRotatedRect(image, cx, cy, angle, color);
+        drawRotatedRect(image, transformedCenters[i], angle, color);
     }
 }
 
@@ -82,12 +93,77 @@ Mat Visualizer::overlaySmallOnLarge(const Mat& parkingSapaceClassified, const Ma
 
 Mat Visualizer::createMockMinimap(vector<bool> &occupancy) {
     Mat minimap(Visualizer::minimap_height, Visualizer::minimap_width, CV_8UC3, Scalar(255, 255, 255));
+    // Step 1: Find four extreme points
+    vector<Point2f> srcPoints = findExtremePoints();
+
+    // Step 2: Compute Homography Matrix
+    Mat H = computeHomography(srcPoints);
 
     int index = 0; // Track occupancy vector position
-    drawParkingRow(minimap, 8, Visualizer::startX,  Visualizer::startY, -45.0f, occupancy, index);
-    drawParkingRow(minimap, 9, Visualizer::startX + 10,  Visualizer::startY + Visualizer::deltaY, 45.0f, occupancy, index);
-    drawParkingRow(minimap, 10, Visualizer::startX,  Visualizer::startY + 3 * Visualizer::deltaY, -45.0f, occupancy, index);
-    drawParkingRow(minimap, 10, Visualizer::startX,  Visualizer::startY + 4 * Visualizer::deltaY, -45.0f, occupancy, index);
+    drawParkingRow(minimap, H, occupancy, index);
+    imshow("minimap", minimap);
+    waitKey(0);
 
     return minimap;
+}
+
+vector<Point2f> Visualizer::findExtremePoints() {
+    Point2f bottomLeft = {FLT_MAX, -FLT_MAX};
+    Point2f topLeft = {FLT_MAX, FLT_MAX};
+    Point2f bottomRight = {-FLT_MAX, -FLT_MAX};
+    Point2f topRight = {-FLT_MAX, FLT_MAX};
+    int bl = 0;
+    int tl = 0;
+    int br = 0;
+    int tr = 0;
+    int i =0;
+
+    for (const auto& rect : rectangles) {
+        Point2f center = rect.center;
+
+        if (center.y > bottomLeft.y) {
+            bottomLeft = center;
+            bl =i;
+        }
+        if (center.x < topLeft.x) {
+            topLeft = center;
+            tl = i;
+        }
+        if (center.x > bottomRight.x ) {
+            bottomRight = center;
+            br = i;
+        }
+        if (center.y < topRight.y) {
+            topRight = center;
+            tr = i;
+        }
+        i++;
+    }
+
+    return {bottomLeft, topLeft, bottomRight, topRight};
+}
+
+// Compute the homography matrix using the given source and destination points
+Mat Visualizer::computeHomography(const vector<Point2f>& srcPoints) {
+    vector<Point2f> dstPoints = {
+        {380, 280},  // Bottom-left (mapped to new coordinate space)
+        {50, 280},    // Top-left
+        {380, 50},    // Bottom-right
+        {50, 50}       // Top-right
+    };
+
+    return getPerspectiveTransform(srcPoints, dstPoints);
+}
+
+// Apply homography transformation to all bounding box centers
+vector<Point2f> Visualizer::applyHomography(const Mat& H) {
+    vector<Point2f> transformedCenters;
+    vector<Point2f> originalCenters;
+
+    for (const auto& rect : rectangles) {
+        originalCenters.push_back(rect.center);
+    }
+
+    perspectiveTransform(originalCenters, transformedCenters, H);
+    return transformedCenters;
 }

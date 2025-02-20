@@ -3,7 +3,6 @@
 #include "GroundTruthReader.h"
 #include "Visualizer.h"
 #include "tinyxml2.h"
-#include "BboxSorter.h"
 
 #include <string>
 #include <list>
@@ -51,8 +50,8 @@ int main(int argc, char** argv) {
         trueParkingSpaces.pop_back();
     }
     
-    Visualizer visualizer;
-    visualizer.drawParkingSpaces(imageFromXML, trueParkingSpaces, trueOccupancyStatus);
+    Visualizer visualizer(450, 350, trueParkingSpaces);
+    visualizer.drawParkingSpaces(imageFromXML, trueOccupancyStatus);
 
     // 2. Draw the parking spaces based on the occupancy detected using the isOccupied function
     std::vector<bool> occupancyStatus;
@@ -63,23 +62,10 @@ int main(int argc, char** argv) {
         parkingSpaces.pop_back();
     }
 
-    vector<RotatedRect> shuffledRrect = parkingSpaces;
-    // Shuffle the vector
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::shuffle(shuffledRrect.begin(), shuffledRrect.end(), g);
-
-    BboxSorter sorter(shuffledRrect);
-    std::vector<cv::RotatedRect> sortedRects = sorter.sort();
-
-    std::cout << "Sorted bounding boxes:\n";
-    for (int i =0; i < sortedRects.size(); i++) {
-        std::cout << "Center: (" << sortedRects[i].center << ", " << parkingSpaces[i].center << std::endl;
-    }
     
     ParkingSpaceClassifier classifier(0.4); // Initialize the classifier with an empty threshold of 0.4
-    classifier.classifyParkingSpaces(parkingLotImage,parkingLotEmpty, shuffledRrect, occupancyStatus);  
-    visualizer.drawParkingSpaces(imageFromDetection, shuffledRrect, occupancyStatus);
+    classifier.classifyParkingSpaces(parkingLotImage,parkingLotEmpty, parkingSpaces, occupancyStatus);  
+    visualizer.drawParkingSpaces(imageFromDetection, occupancyStatus);
 
     // Determine the maximum width and height that can fit on the screen
     int screenHeight = 400;  // Example screen height
