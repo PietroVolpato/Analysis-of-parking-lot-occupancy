@@ -15,7 +15,7 @@ add_executable(${PROJECT_NAME}
     src/main.cpp 
     src/ParkingSpaceDetector.cpp 
     # src/ParkingSpaceClassifier.cpp 
-    # src/CarSegmenter.cpp 
+    src/CarSegmenter.cpp 
     # src/Visualizer.cpp
     # src/prova.cpp
 )

@@ -129,6 +129,30 @@ ParkingLotAnalysis/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ParkingLotAnalysis.dir/build.make CMakeFiles/ParkingLotAnalysis.dir/build
 .PHONY : ParkingLotAnalysis/fast
 
+src/CarSegmenter.o: src/CarSegmenter.cpp.o
+.PHONY : src/CarSegmenter.o
+
+# target to build an object file
+src/CarSegmenter.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ParkingLotAnalysis.dir/build.make CMakeFiles/ParkingLotAnalysis.dir/src/CarSegmenter.cpp.o
+.PHONY : src/CarSegmenter.cpp.o
+
+src/CarSegmenter.i: src/CarSegmenter.cpp.i
+.PHONY : src/CarSegmenter.i
+
+# target to preprocess a source file
+src/CarSegmenter.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ParkingLotAnalysis.dir/build.make CMakeFiles/ParkingLotAnalysis.dir/src/CarSegmenter.cpp.i
+.PHONY : src/CarSegmenter.cpp.i
+
+src/CarSegmenter.s: src/CarSegmenter.cpp.s
+.PHONY : src/CarSegmenter.s
+
+# target to generate assembly for a file
+src/CarSegmenter.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ParkingLotAnalysis.dir/build.make CMakeFiles/ParkingLotAnalysis.dir/src/CarSegmenter.cpp.s
+.PHONY : src/CarSegmenter.cpp.s
+
 src/ParkingSpaceDetector.o: src/ParkingSpaceDetector.cpp.o
 .PHONY : src/ParkingSpaceDetector.o
 
@@ -186,6 +210,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... ParkingLotAnalysis"
+	@echo "... src/CarSegmenter.o"
+	@echo "... src/CarSegmenter.i"
+	@echo "... src/CarSegmenter.s"
 	@echo "... src/ParkingSpaceDetector.o"
 	@echo "... src/ParkingSpaceDetector.i"
 	@echo "... src/ParkingSpaceDetector.s"

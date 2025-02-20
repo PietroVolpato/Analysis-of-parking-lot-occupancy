@@ -1,7 +1,7 @@
-CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: \
- /home/pietro/Analysis-of-parking-lot-occupancy/src/main.cpp \
+CMakeFiles/ParkingLotAnalysis.dir/src/CarSegmenter.cpp.o: \
+ /home/pietro/Analysis-of-parking-lot-occupancy/src/CarSegmenter.cpp \
  /usr/include/stdc-predef.h \
- /home/pietro/Analysis-of-parking-lot-occupancy/include/ParkingSpaceDetector.h \
+ /home/pietro/Analysis-of-parking-lot-occupancy/include/CarSegmenter.h \
  /usr/local/include/opencv4/opencv2/highgui.hpp \
  /usr/local/include/opencv4/opencv2/core.hpp \
  /usr/local/include/opencv4/opencv2/core/cvdef.h \
@@ -300,9 +300,4 @@ CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: \
  /usr/local/include/opencv4/opencv2/ximgproc/color_match.hpp \
  /usr/local/include/opencv4/opencv2/ximgproc/radon_transform.hpp \
  /usr/local/include/opencv4/opencv2/ximgproc/find_ellipses.hpp \
- /usr/include/c++/11/iostream \
- /home/pietro/Analysis-of-parking-lot-occupancy/include/CarSegmenter.h \
- /usr/include/c++/11/fstream /usr/include/c++/11/bits/codecvt.h \
- /usr/include/x86_64-linux-gnu/c++/11/bits/basic_file.h \
- /usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h \
- /usr/include/c++/11/bits/fstream.tcc
+ /usr/include/c++/11/iostream

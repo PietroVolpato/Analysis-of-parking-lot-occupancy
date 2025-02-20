@@ -38,6 +38,7 @@ public:
 private:
     cv::Mat applyRoi(const cv::Mat& img);
     cv::Mat equalization(const cv::Mat& img);
+    cv::Mat gammaCorrection(const cv::Mat& img, const double gamma);
     double distanceBetweenLines(const cv::Vec4i& line1, const cv::Vec4i& line2);
     // cv::Vec4i mergeTwoLines(const cv::Vec4i line1, const cv::Vec4i& line2);
     cv::Vec4i mergeCloseLines(const std::vector<cv::Vec4i>& lines);
