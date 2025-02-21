@@ -1,6 +1,7 @@
 #include "ParkingSpaceClassifier.h"
 #include "ParkingSpaceDetector.h"
 #include "GroundTruthReader.h"
+#include "CarSegmenter.h"
 #include "Visualizer.h"
 #include "tinyxml2.h"
 
@@ -15,9 +16,6 @@ using namespace std;
 
 int main(int argc, char** argv) {
     ParkingSpaceDetector detector;
-using namespace std;
-
-int main(int argc, char** argv) {
 
     if (argc < 2) {
         cout << "Please provide sequence and image number." << endl;

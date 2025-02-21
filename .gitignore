@@ -2,3 +2,4 @@
 build_and_run.sh
 /build
 /build/ParkingLotAnalysis.dir/Debug
+build/
