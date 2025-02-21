@@ -109,8 +109,8 @@ int main(int argc, char** argv) {
         preprocessedImgVector.push_back(segmenter.preprocessImage(img, "gray"));
     }
 
-    // String filePath = "../data/sequence0/bounding_boxes/2013-02-24_10_05_04.xml";
-    // vector<RotatedRect> bboxes = segmenter.getBBoxes(filePath);
+    String filePath = "../data/sequence0/bounding_boxes/2013-02-24_10_05_04.xml";
+    vector<RotatedRect> groundtruthBBoxes = segmenter.getBBoxes(filePath);
     // segmenter.drawBBoxes(imgVector[1], bboxes);
     // segmenter.showImages(imgVector[1]);
 
@@ -136,19 +136,16 @@ int main(int argc, char** argv) {
 
     // Find the contours in the images
     vector<vector<vector<Point>>> contoursVector;
-    vector<vector<Vec4i>> hierarchyVector;
     for (const auto& mask : enhancedMaskVector) {
-        auto [contours, hierarchy] = segmenter.findContoursImg(mask);
+        auto contours = segmenter.findContoursSimple(mask);
         contoursVector.push_back(contours);
-        hierarchyVector.push_back(hierarchy);
     }
 
     // // Draw the contours
     // for (size_t i = 0; i < imgVector.size(); ++i) {
     //     Mat img = imgVector[i];
     //     const auto& contours = contoursVector[i];
-    //     const auto& hierarchy = hierarchyVector[i];
-    //     segmenter.drawContoursImg(img, contours, hierarchy);
+    //     segmenter.drawContourSimple(img, contours);
     //     segmenter.showImages(img);
     // }
 
@@ -160,25 +157,27 @@ int main(int argc, char** argv) {
     }
 
     // Filter the bounding boxes
+    vector<vector<RotatedRect>> filteredBBoxesVector;
     for (auto& bboxes : bboxesVector) {
-        bboxes = segmenter.filterBBoxes(bboxes);
+        filteredBBoxesVector.push_back(segmenter.filterBBoxes(bboxes));
     }
 
     // Draw the bounding boxes
-    // for (size_t i = 0; i < imgVector.size(); ++i) {
-    //     Mat img = imgVector[i];
-    //     const auto& bboxes = bboxesVector[i];
-    //     segmenter.drawBBoxes(img, bboxes);
-    //     segmenter.showImages(img);
-    // }
-
+    for (size_t i = 0; i < imgVector.size(); ++i) {
+        Mat img = imgVector[i];
+        // const auto& bboxes = bboxesVector[i];
+        const auto& bboxes = filteredBBoxesVector[i];
+        segmenter.drawBBoxes(img, bboxes);
+        segmenter.showImages(img);
+    }
+    
     // Segment the cars
     vector<Mat> segmentedCarsVector;
     for (size_t i = 0; i < imgVector.size(); ++i) {
-        const auto& bboxes = bboxesVector[i];
-        const auto& mask = enhancedMaskVector[i];
-        const auto& img = imgVector[i];
-        segmentedCarsVector.push_back(segmenter.segmentCar(bboxes, mask, img));
+        const auto& bboxes = filteredBBoxesVector[i];
+        const auto& mask = maskVector[i];
+        auto& img = imgVector[i];
+        segmentedCarsVector.push_back(segmenter.segmentCar(bboxes, groundtruthBBoxes, mask, img));
     }
 
     // Show the images

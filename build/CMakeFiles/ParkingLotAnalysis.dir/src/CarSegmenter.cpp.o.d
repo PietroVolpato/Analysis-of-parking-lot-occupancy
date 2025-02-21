@@ -304,6 +304,8 @@ CMakeFiles/ParkingLotAnalysis.dir/src/CarSegmenter.cpp.o: \
  /usr/local/include/opencv4/opencv2/video.hpp \
  /usr/local/include/opencv4/opencv2/video/tracking.hpp \
  /usr/local/include/opencv4/opencv2/video/background_segm.hpp \
- /usr/include/c++/11/iostream /usr/include/pugixml.hpp \
- /usr/include/pugiconfig.hpp /usr/include/c++/11/iterator \
- /usr/include/c++/11/bits/stream_iterator.h
+ /usr/include/c++/11/iostream /usr/include/c++/11/queue \
+ /usr/include/c++/11/deque /usr/include/c++/11/bits/stl_deque.h \
+ /usr/include/c++/11/bits/deque.tcc /usr/include/c++/11/bits/stl_queue.h \
+ /usr/include/pugixml.hpp /usr/include/pugiconfig.hpp \
+ /usr/include/c++/11/iterator /usr/include/c++/11/bits/stream_iterator.h

@@ -113,12 +113,17 @@ Mat CarSegmenter::preprocessImage (const Mat& img, String type) {
     else return gray;
 }
 
-pair<vector<vector<Point>>, vector<Vec4i>> CarSegmenter::findContoursImg(const Mat& img) {
+vector<vector<Point>> CarSegmenter::findContoursSimple(const Mat& img) {
     vector<vector<Point>> contours;
-    vector<Vec4i> hierarchy;
-    findContours(img, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
+    findContours(img, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
 
-    return {contours, hierarchy};
+    return contours;
+}
+
+void CarSegmenter::drawContourSimple(Mat& img, const vector<vector<Point>>& contours) {
+    for (const auto& contour : contours) {
+        drawContours(img, vector<vector<Point>>{contour}, -1, Scalar(0, 255, 0), 2);
+    }
 }
 
 vector<RotatedRect> CarSegmenter::findBBoxes(const vector<vector<Point>>& contours) {
@@ -140,75 +145,102 @@ float CarSegmenter::rotatedRectIntersectionArea(const RotatedRect& rect1, const 
     return 0.0;
 }
 
-vector<RotatedRect> CarSegmenter::mergeRotatedBBoxes(const vector<RotatedRect>& inputBoxes) {
-    const float overlapThreshold = 0.3;
-    vector<RotatedRect> mergedBoxes;
-    vector<bool> merged(inputBoxes.size(), false);
-
-    for (size_t i = 0; i < inputBoxes.size(); i++) {
-        if (merged[i]) continue; // Already merged
-        RotatedRect mergedRect = inputBoxes[i];
-
-        for (size_t j = i + 1; j < inputBoxes.size(); j++) {
-            if (merged[j]) continue;
-
-            float interArea = rotatedRectIntersectionArea(mergedRect, inputBoxes[j]);
-            float area1 = mergedRect.size.area();
-            float area2 = inputBoxes[j].size.area();
-
-            float overlap = interArea / min(area1, area2); // Percentage of overlap
-            float dist = norm(mergedRect.center - inputBoxes[j].center);
-
-            if (overlap > overlapThreshold || dist < 50) { // Merge if there is overlap or if centers are close
-                mergedRect = RotatedRect(
-                    (mergedRect.center + inputBoxes[j].center) * 0.5, // New average center
-                    Size2f(max(mergedRect.size.width, inputBoxes[j].size.width),   // Maximum width
-                           max(mergedRect.size.height, inputBoxes[j].size.height)),  // Maximum height
-                    (mergedRect.angle + inputBoxes[j].angle) / 2 // Average of angles
-                );
-                merged[j] = true; // Mark as merged
-            }
-        }
-
-        mergedBoxes.push_back(mergedRect);
-    }
-
-    return mergedBoxes;
-}
-
 vector<RotatedRect> CarSegmenter::filterBBoxes(const vector<RotatedRect>& bboxes) {
-    vector<RotatedRect> filtered;
+    const double minSize = 1000;
+    const double maxDist = 50;
+    const float minOverlap = 0.01f;
+    
+    // Use a flag in the pair: true for originally large boxes, false for small ones.
+    vector<pair<RotatedRect, bool>> largeBoxes;
+    vector<pair<RotatedRect, bool>> smallBoxes;
+    
+    // Separate bounding boxes into large (true) and small (false)
     for (const auto& box : bboxes) {
-        double area = box.size.area();
-        if (area > 500) {
-            // To avoid division by zero, check height
-            if (box.size.height != 0) {
-                double ratio = box.size.width / box.size.height;
-                if (ratio > 1.0 && ratio < 3.5) {
-                    filtered.push_back(box);
+        if (box.size.area() >= minSize)
+            largeBoxes.push_back({box, true});
+        else
+            smallBoxes.push_back({box, false});
+    }
+    
+    // Iterative merge for large boxes among themselves (phase 1).
+    bool mergedLarge = true;
+    while (mergedLarge) {
+        mergedLarge = false;
+        for (size_t i = 0; i < largeBoxes.size(); i++) {
+            for (size_t j = i + 1; j < largeBoxes.size(); j++) {
+                RotatedRect& box1 = largeBoxes[i].first;
+                RotatedRect& box2 = largeBoxes[j].first;
+                if (norm(box1.center - box2.center) < maxDist) {
+                    float intersectionArea = rotatedRectIntersectionArea(box1, box2);
+                    float unionArea = box1.size.area() + box2.size.area() - intersectionArea;
+                    float overlapRatio = intersectionArea / unionArea;
+                    if (overlapRatio >= minOverlap) {
+                        // Merge box1 and box2 into a new rotated rectangle.
+                        vector<Point2f> points(8);
+                        Point2f pts1[4], pts2[4];
+                        box1.points(pts1);
+                        box2.points(pts2);
+                        for (int k = 0; k < 4; k++) {
+                            points[k] = pts1[k];
+                            points[k + 4] = pts2[k];
+                        }
+                        box1 = minAreaRect(points);
+                        // Keep the flag as true for large boxes.
+                        largeBoxes.erase(largeBoxes.begin() + j);
+                        mergedLarge = true;
+                        break;
+                    }
+                }
+            }
+            if (mergedLarge)
+                break;
+        }
+    }
+    
+    // Phase 2: Merge small boxes (flag false) with large boxes only if the large box’s flag is false.
+    // This avoids merging between large boxes.
+    for (const auto& smallBox : smallBoxes) {
+        bool merged = false;
+        // Only merge a small box with a large box that wasn’t originally large.
+        for (auto& largeBox : largeBoxes) {
+            if (largeBox.second == false) {
+                if (norm(smallBox.first.center - largeBox.first.center) < maxDist) {
+                    double intersectionArea = rotatedRectIntersectionArea(smallBox.first, largeBox.first);
+                    double unionArea = smallBox.first.size.area() + largeBox.first.size.area() - intersectionArea;
+                    double overlapRatio = intersectionArea / unionArea;
+                    vector<Point2f> points(8);
+                    Point2f pts1[4], pts2[4];
+                    smallBox.first.points(pts1);
+                    largeBox.first.points(pts2);
+                    for (int k = 0; k < 4; k++) {
+                        points[k] = pts1[k];
+                        points[k + 4] = pts2[k];
+                    }
+                    largeBox.first = minAreaRect(points);
+                    merged = true;
+                    break;
                 }
             }
         }
+        // If the small box was not merged, you could choose to add it.
+        // Uncomment the line below if you need to include unmerged small boxes.
+        // if (!merged) largeBoxes.push_back(smallBox);
     }
-    return filtered;
-
-}
-
-void CarSegmenter::drawContoursImg(Mat& img, const vector<vector<Point>>& contours, const vector<Vec4i>& hierarchy) {
-    for (size_t i = 0; i < contours.size(); i++) {
-        if (hierarchy[i][3] == -1) {
-            drawContours(img, contours, i, Scalar(0, 255, 0), 2, LINE_8, hierarchy);
-        }
+    
+    // Extract the RotatedRect objects from the pairs.
+    vector<RotatedRect> result;
+    for (const auto& item : largeBoxes) {
+        result.push_back(item.first);
     }
+    
+    return result;
 }
 
 void CarSegmenter::drawBBoxes(Mat& img, const vector<RotatedRect>& bboxes) {
     for (const auto& bbox : bboxes) {
         Point2f vertices[4];
         bbox.points(vertices);
-        for (int i = 0; i < 4; i++) {
-            line(img, vertices[i], vertices[(i + 1) % 4], Scalar(0, 255, 0), 2);
-        }
+        for (int i = 0; i < 4; i++) line(img, vertices[i], vertices[(i + 1) % 4], Scalar(0, 255, 0), 2);
     }
 }
 
@@ -239,10 +271,45 @@ Mat CarSegmenter::enhanceMask(const Mat& mask) {
     return mask;
 }
 
-Mat CarSegmenter::segmentCar (const vector<RotatedRect>& bboxes, const Mat& mask, const Mat& img) {
-   // For each bbox take the correspondence portion of the mask and apply it to the image
-    Mat segmentedImg = Mat::zeros(img.size(), img.type());
-    
+bool CarSegmenter::isCarInParking(const RotatedRect& carBox, const vector<RotatedRect>& parkingSpots) {
+    Point2f center = carBox.center;
+    const double tolerance = 5.0; // tolerance in pixels
 
-    return segmentedImg;
+    for (const auto &spot : parkingSpots) {
+        Point2f vertices[4];
+        spot.points(vertices);
+        vector<Point2f> poly(vertices, vertices + 4);
+        double distance = pointPolygonTest(poly, center, true);
+        // Accept if within the tolerance (distance can be negative if slightly outside)
+        if (distance >= -tolerance)
+            return true;
+    }
+    return false;
+}
+
+Mat CarSegmenter::segmentCar (const vector<RotatedRect>& bboxes, const vector<RotatedRect>& groundtruthBBoxes, const Mat& mask, Mat& img) {
+   // For each bbox take the correspondence portion of the mask and apply it to the image
+    for (const auto& bbox: bboxes) {
+        Point2f vertices[4];
+        bbox.points(vertices);
+
+        Mat carMask = Mat::zeros(mask.size(), CV_8UC1);
+        vector<Point> carContour(vertices, vertices + 4);
+        fillPoly(carMask, vector<vector<Point>>{carContour}, Scalar(255));
+
+        Mat carSegment;
+        bitwise_and(mask, mask, carSegment, carMask);
+
+        Mat colorMask;
+        cvtColor(carSegment, colorMask, COLOR_GRAY2BGR);
+
+        Scalar color = isCarInParking(bbox, groundtruthBBoxes) ? Scalar(0, 0, 255) : Scalar(0, 255, 0);
+
+        colorMask.setTo(color, carSegment > 0);
+
+        img.setTo(color, carSegment > 0);
+    }
+
+
+    return img;
 }

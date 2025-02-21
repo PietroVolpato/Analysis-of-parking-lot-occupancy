@@ -13,6 +13,7 @@
 #include <cmath>
 #include <vector>
 #include <algorithm>
+#include <queue>
 #include <pugixml.hpp>
 
 class CarSegmenter {
@@ -23,6 +24,7 @@ class CarSegmenter {
     cv::Mat convertToGrayscale(const cv::Mat& img);
     cv::Mat equalization (const cv::Mat& img);
     float rotatedRectIntersectionArea(const cv::RotatedRect& rect1, const cv::RotatedRect& rect2);
+    bool isCarInParking (const cv::RotatedRect& car, const std::vector<cv::RotatedRect>& parkingSpaces);
 
     public:
         CarSegmenter() {
@@ -33,17 +35,16 @@ class CarSegmenter {
         std::vector<cv::Mat> loadImages(const int sequence);
         std::vector<cv::RotatedRect> getBBoxes (cv::String filePath);
         cv::Mat preprocessImage(const cv::Mat& img, cv::String type);
-        std::pair<std::vector<std::vector<cv::Point>>, std::vector<cv::Vec4i>> findContoursImg(const cv::Mat& img);
+        std::vector<std::vector<cv::Point>> findContoursSimple(const cv::Mat& img);
+        void drawContourSimple (cv::Mat& img, const std::vector<std::vector<cv::Point>>& contours);
         std::vector<cv::RotatedRect> findBBoxes(const std::vector<std::vector<cv::Point>>& contours);
         std::vector<cv::RotatedRect> filterBBoxes(const std::vector<cv::RotatedRect>& bboxes);
-        void drawContoursImg(cv::Mat& img, const std::vector<std::vector<cv::Point>>& contours, const std::vector<cv::Vec4i>& hierarchy);
         void drawBBoxes(cv::Mat& img, const std::vector<cv::RotatedRect>& bboxes);
         void showImages(const cv::Mat& img);
         void trainBg(const std::vector<cv::Mat>& trainingVector);
         cv::Mat applyBg(const cv::Mat& img);
         cv::Mat enhanceMask(const cv::Mat& mask);
-        std::vector<cv::RotatedRect> mergeRotatedBBoxes(const std::vector<cv::RotatedRect>& bboxes);
-        cv::Mat segmentCar (const std::vector<cv::RotatedRect>& bboxes,const cv::Mat& mask, const cv::Mat& img);
+        cv::Mat segmentCar (const std::vector<cv::RotatedRect>& bboxes, const std::vector<cv::RotatedRect>& groundtruthBBoxes, const cv::Mat& mask, cv::Mat& img);
 };
 
 #endif
