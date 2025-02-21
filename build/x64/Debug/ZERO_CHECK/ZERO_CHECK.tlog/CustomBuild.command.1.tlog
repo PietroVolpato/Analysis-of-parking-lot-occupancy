@@ -1,0 +1,10 @@
+^C:\USERS\NOJI\CPP\CV\ANALYSIS-OF-PARKING-LOT-OCCUPANCY\BUILD\CMAKEFILES\0BC33BBBD42262EB7BB0665E48F97284\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Noji/Cpp/CV/Analysis-of-parking-lot-occupancy -BC:/Users/Noji/Cpp/CV/Analysis-of-parking-lot-occupancy/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/Noji/Cpp/CV/Analysis-of-parking-lot-occupancy/build/ParkingLotAnalysis.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

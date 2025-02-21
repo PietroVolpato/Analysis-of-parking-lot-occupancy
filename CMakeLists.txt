@@ -14,11 +14,12 @@ include_directories((${PROJECT_SOURCE_DIR}/include))
 # Add the executable
 add_executable(${PROJECT_NAME} 
     src/main.cpp 
+    src/tinyxml2.cpp
+    src/GroundTruthReader.cpp
     src/ParkingSpaceDetector.cpp 
     # src/ParkingSpaceClassifier.cpp 
-    src/CarSegmenter.cpp 
+    # src/CarSegmenter.cpp 
     # src/Visualizer.cpp
-    src/Evaluator.cpp
 )
 
 # Link libraries

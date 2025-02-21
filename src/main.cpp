@@ -1,14 +1,35 @@
+#include "ParkingSpaceClassifier.h"
 #include "ParkingSpaceDetector.h"
-#include "CarSegmenter.h"
-#include <fstream>
+#include "GroundTruthReader.h"
+#include "Visualizer.h"
+#include "tinyxml2.h"
+
+#include <string>
+#include <list>
+
+#include <algorithm>
+#include <random>
 
 using namespace cv;
 using namespace std;
 
 int main(int argc, char** argv) {
     ParkingSpaceDetector detector;
+using namespace std;
 
+int main(int argc, char** argv) {
+
+    if (argc < 2) {
+        cout << "Please provide sequence and image number." << endl;
+        return 1;
+    }
+
+    ParkingSpaceDetector detector;
+    // Loading the seq0 image for comparison
+    vector<Mat> imgVectorSeq0 = detector.loadImages(0);
     // Load the images
+    int sequence = stoi(argv[1]);
+    vector<Mat> imgVector = detector.loadImages(sequence);
     int sequence = 0;
     vector<Mat> emptyImgVector = detector.loadImages(sequence);
 
