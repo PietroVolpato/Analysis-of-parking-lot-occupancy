@@ -4,6 +4,7 @@
 #include "Visualizer.h"
 #include "tinyxml2.h"
 
+#include <fstream>
 #include <string>
 #include <list>
 
