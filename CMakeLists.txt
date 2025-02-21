@@ -18,7 +18,7 @@ add_executable(${PROJECT_NAME}
     # src/ParkingSpaceClassifier.cpp 
     src/CarSegmenter.cpp 
     # src/Visualizer.cpp
-    # src/prova.cpp
+    src/Evaluator.cpp
 )
 
 # Link libraries
