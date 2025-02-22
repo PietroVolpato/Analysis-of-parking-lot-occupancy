@@ -51,6 +51,7 @@ void Visualizer::drawParkingRow(Mat& image, const Mat &H, vector<bool>& occupanc
     
     // Get transformed centers
     vector<Point2f> transformedCenters = Visualizer::applyHomography(H);
+    Visualizer::clusterParkingSpaces(transformedCenters);
     int angle;
     for (int i = 0; i < rectangles.size(); i++) {
         // assigning angle
@@ -166,4 +167,45 @@ vector<Point2f> Visualizer::applyHomography(const Mat& H) {
 
     perspectiveTransform(originalCenters, transformedCenters, H);
     return transformedCenters;
+}
+
+void Visualizer::clusterParkingSpaces(vector<Point2f> centers) {
+    if (centers.empty()) return;
+
+    int K = 4; // Number of clusters
+    int N = centers.size();
+
+    // Prepare data for k-means clustering
+    cv::Mat data(N, 1, CV_32F);
+    for (int i = 0; i < N; i++) {
+        data.at<float>(i, 0) = centers[i].y;
+    }
+
+    // Run k-means clustering
+    cv::Mat labels, centersMat;
+    cv::kmeans(data, K, labels, cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 100, 1.0),
+               10, cv::KMEANS_PP_CENTERS, centersMat);
+
+    // Resize vector for 4 clusters
+    clusteredCenters.resize(K);
+
+    // Assign centers to clusters
+    for (int i = 0; i < N; i++) {
+        int clusterIdx = labels.at<int>(i, 0);
+        clusteredCenters[clusterIdx].push_back(centers[i]);
+    }
+
+    // Sort clusters based on increasing y-values of their centers
+    std::sort(clusteredCenters.begin(), clusteredCenters.end(),
+              [](const std::vector<cv::Point2f>& a, const std::vector<cv::Point2f>& b) {
+                  return a.front().y < b.front().y;
+              });
+
+    // Print the clusters
+    for (int i = 0; i < clusteredCenters.size(); i++) {
+        std::cout << "Cluster " << i << ":\n";
+        for (const auto& p : clusteredCenters[i]) {
+            std::cout << "  Center: (" << p.x << ", " << p.y << ")\n";
+        }
+    }
 }

@@ -23,13 +23,15 @@ private:
     float startX = static_cast<float>(minimap_width * 0.5 + deltaX * 5); // 5 parking space to the right from the middle of the image
     float startY = 60.0f;
     std::vector<cv::RotatedRect> rectangles;
-
+    std::vector<std::vector<cv::Point2f>> clusteredCenters; // Stores clustered centers
 
     void drawRotatedRect(cv::Mat &image, cv::Point2f center, float angle, cv::Scalar color);
     void drawParkingRow(cv::Mat& image, const cv::Mat &H, std::vector<bool>& occupancy, int& index);
     std::vector<cv::Point2f> findExtremePoints();
     cv::Mat computeHomography(const std::vector<cv::Point2f>& srcPoints);
     std::vector<cv::Point2f> applyHomography(const cv::Mat& H);
+
+    void clusterParkingSpaces(std::vector<cv::Point2f> center_tran); // New method to cluster rectangles
 };
 
 #endif // VISUALIZER_H
