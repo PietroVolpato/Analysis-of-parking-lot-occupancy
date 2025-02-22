@@ -6,7 +6,7 @@
 
 class Visualizer {
 public:
-    Visualizer(int width, int height, std::vector<cv::RotatedRect>& parkingSpaces); // Default values , Constructor
+    Visualizer(int width, int height, std::vector<cv::RotatedRect>& parkingSpaces, std::vector<bool>& occupancyStatus); // Constructor
 
     cv::Mat createMockMinimap(std::vector<bool> &occupancy);
     void drawParkingSpaces(cv::Mat &image, const std::vector<bool> &occupancyStatus);
@@ -23,7 +23,11 @@ private:
     float startX = static_cast<float>(minimap_width * 0.5 + deltaX * 5); // 5 parking space to the right from the middle of the image
     float startY = 60.0f;
     std::vector<cv::RotatedRect> rectangles;
-    std::vector<std::vector<cv::Point2f>> clusteredCenters; // Stores clustered centers
+    std::vector<cv::Point2f> originalCenters;
+    std::vector<cv::Point2f> transformedCenters;
+    // Store (center, occupancy) as a pair
+    std::vector<std::pair<cv::Point2f, bool>> centersWithOccupancy;
+    std::vector<std::vector<std::pair<cv::Point2f, bool>>> clusteredCenters; // Clustered results
 
     void drawRotatedRect(cv::Mat &image, cv::Point2f center, float angle, cv::Scalar color);
     void drawParkingRow(cv::Mat& image, const cv::Mat &H, std::vector<bool>& occupancy, int& index);
@@ -31,7 +35,7 @@ private:
     cv::Mat computeHomography(const std::vector<cv::Point2f>& srcPoints);
     std::vector<cv::Point2f> applyHomography(const cv::Mat& H);
 
-    void clusterParkingSpaces(std::vector<cv::Point2f> center_tran); // New method to cluster rectangles
+    void clusterParkingSpaces(); // New method to cluster rectangles
 };
 
 #endif // VISUALIZER_H

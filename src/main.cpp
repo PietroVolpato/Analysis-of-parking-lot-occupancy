@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
         trueParkingSpaces.pop_back();
     }
     
-    Visualizer visualizer(450, 350, trueParkingSpaces);
+    Visualizer visualizer(450, 350, trueParkingSpaces, trueOccupancyStatus);
     visualizer.drawParkingSpaces(imageFromXML, trueOccupancyStatus);
 
     // 2. Draw the parking spaces based on the occupancy detected using the isOccupied function

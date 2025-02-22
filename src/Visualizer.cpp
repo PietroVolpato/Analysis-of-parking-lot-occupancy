@@ -4,8 +4,27 @@ using namespace std;
 using namespace cv;
 
 // Constructor definition
-Visualizer::Visualizer(int width, int height, std::vector<cv::RotatedRect>& parkingSpaces) 
-    : minimap_width(width), minimap_height(height), rectangles(parkingSpaces) {}
+Visualizer::Visualizer(int width, int height, vector<RotatedRect>& parkingSpaces, vector<bool>& occupancyStatus) 
+    : minimap_width(width), minimap_height(height), rectangles(parkingSpaces) {
+        
+        for (const auto& rect : rectangles) {
+            originalCenters.push_back(rect.center);
+        }
+        Mat H = computeHomography(findExtremePoints());
+        transformedCenters = applyHomography(H);
+
+        if (originalCenters.size() != occupancyStatus.size()) {
+            std::cerr << "Error: Parking centers and occupancy vectors must have the same size!\n";
+            return;
+        }
+    
+        // Store paired data
+        for (size_t i = 0; i < originalCenters.size(); i++) {
+            centersWithOccupancy.emplace_back(originalCenters[i], occupancyStatus[i]);
+        }
+
+
+    }
 
 
 
@@ -50,8 +69,7 @@ void Visualizer::drawRotatedRect(Mat& image, Point2f center, float angle, Scalar
 void Visualizer::drawParkingRow(Mat& image, const Mat &H, vector<bool>& occupancy, int& index) {
     
     // Get transformed centers
-    vector<Point2f> transformedCenters = Visualizer::applyHomography(H);
-    Visualizer::clusterParkingSpaces(transformedCenters);
+    Visualizer::clusterParkingSpaces();
     int angle;
     for (int i = 0; i < rectangles.size(); i++) {
         // assigning angle
@@ -158,27 +176,22 @@ Mat Visualizer::computeHomography(const vector<Point2f>& srcPoints) {
 
 // Apply homography transformation to all bounding box centers
 vector<Point2f> Visualizer::applyHomography(const Mat& H) {
-    vector<Point2f> transformedCenters;
-    vector<Point2f> originalCenters;
+    vector<Point2f> transformedCentersP;
 
-    for (const auto& rect : rectangles) {
-        originalCenters.push_back(rect.center);
-    }
-
-    perspectiveTransform(originalCenters, transformedCenters, H);
-    return transformedCenters;
+    perspectiveTransform(originalCenters, transformedCentersP, H);
+    return transformedCentersP;
 }
 
-void Visualizer::clusterParkingSpaces(vector<Point2f> centers) {
-    if (centers.empty()) return;
+void Visualizer::clusterParkingSpaces() {
+    if (centersWithOccupancy.empty()) return;
 
     int K = 4; // Number of clusters
-    int N = centers.size();
+    int N = centersWithOccupancy.size();
 
     // Prepare data for k-means clustering
     cv::Mat data(N, 1, CV_32F);
     for (int i = 0; i < N; i++) {
-        data.at<float>(i, 0) = centers[i].y;
+        data.at<float>(i, 0) = centersWithOccupancy[i].first.y;
     }
 
     // Run k-means clustering
@@ -189,23 +202,23 @@ void Visualizer::clusterParkingSpaces(vector<Point2f> centers) {
     // Resize vector for 4 clusters
     clusteredCenters.resize(K);
 
-    // Assign centers to clusters
+    // Assign centers & occupancy to clusters
     for (int i = 0; i < N; i++) {
         int clusterIdx = labels.at<int>(i, 0);
-        clusteredCenters[clusterIdx].push_back(centers[i]);
+        clusteredCenters[clusterIdx].push_back(centersWithOccupancy[i]); // Keeps occupancy linked
     }
 
     // Sort clusters based on increasing y-values of their centers
     std::sort(clusteredCenters.begin(), clusteredCenters.end(),
-              [](const std::vector<cv::Point2f>& a, const std::vector<cv::Point2f>& b) {
-                  return a.front().y < b.front().y;
+              [](const std::vector<std::pair<cv::Point2f, bool>>& a, const std::vector<std::pair<cv::Point2f, bool>>& b) {
+                  return a.front().first.y < b.front().first.y;
               });
 
     // Print the clusters
     for (int i = 0; i < clusteredCenters.size(); i++) {
         std::cout << "Cluster " << i << ":\n";
         for (const auto& p : clusteredCenters[i]) {
-            std::cout << "  Center: (" << p.x << ", " << p.y << ")\n";
+            std::cout << "  Center: (" << p.first.x << ", " << p.first.y << ") - Occupied: " << p.second << "\n";
         }
     }
 }
