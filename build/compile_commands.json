@@ -16,6 +16,11 @@
 },
 {
   "directory": "/home/pietro/Analysis-of-parking-lot-occupancy/build",
+  "command": "/usr/bin/c++  -I\"/home/pietro/Analysis-of-parking-lot-occupancy/(\" -I/home/pietro/Analysis-of-parking-lot-occupancy/include -I\"/home/pietro/Analysis-of-parking-lot-occupancy/)\" -isystem /usr/local/include/opencv4 -g -o CMakeFiles/ParkingLotAnalysis.dir/src/Loader.cpp.o -c /home/pietro/Analysis-of-parking-lot-occupancy/src/Loader.cpp",
+  "file": "/home/pietro/Analysis-of-parking-lot-occupancy/src/Loader.cpp"
+},
+{
+  "directory": "/home/pietro/Analysis-of-parking-lot-occupancy/build",
   "command": "/usr/bin/c++  -I\"/home/pietro/Analysis-of-parking-lot-occupancy/(\" -I/home/pietro/Analysis-of-parking-lot-occupancy/include -I\"/home/pietro/Analysis-of-parking-lot-occupancy/)\" -isystem /usr/local/include/opencv4 -g -o CMakeFiles/ParkingLotAnalysis.dir/src/Evaluator.cpp.o -c /home/pietro/Analysis-of-parking-lot-occupancy/src/Evaluator.cpp",
   "file": "/home/pietro/Analysis-of-parking-lot-occupancy/src/Evaluator.cpp"
 }

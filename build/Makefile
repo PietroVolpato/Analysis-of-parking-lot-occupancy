@@ -177,6 +177,30 @@ src/Evaluator.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ParkingLotAnalysis.dir/build.make CMakeFiles/ParkingLotAnalysis.dir/src/Evaluator.cpp.s
 .PHONY : src/Evaluator.cpp.s
 
+src/Loader.o: src/Loader.cpp.o
+.PHONY : src/Loader.o
+
+# target to build an object file
+src/Loader.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ParkingLotAnalysis.dir/build.make CMakeFiles/ParkingLotAnalysis.dir/src/Loader.cpp.o
+.PHONY : src/Loader.cpp.o
+
+src/Loader.i: src/Loader.cpp.i
+.PHONY : src/Loader.i
+
+# target to preprocess a source file
+src/Loader.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ParkingLotAnalysis.dir/build.make CMakeFiles/ParkingLotAnalysis.dir/src/Loader.cpp.i
+.PHONY : src/Loader.cpp.i
+
+src/Loader.s: src/Loader.cpp.s
+.PHONY : src/Loader.s
+
+# target to generate assembly for a file
+src/Loader.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ParkingLotAnalysis.dir/build.make CMakeFiles/ParkingLotAnalysis.dir/src/Loader.cpp.s
+.PHONY : src/Loader.cpp.s
+
 src/ParkingSpaceDetector.o: src/ParkingSpaceDetector.cpp.o
 .PHONY : src/ParkingSpaceDetector.o
 
@@ -240,6 +264,9 @@ help:
 	@echo "... src/Evaluator.o"
 	@echo "... src/Evaluator.i"
 	@echo "... src/Evaluator.s"
+	@echo "... src/Loader.o"
+	@echo "... src/Loader.i"
+	@echo "... src/Loader.s"
 	@echo "... src/ParkingSpaceDetector.o"
 	@echo "... src/ParkingSpaceDetector.i"
 	@echo "... src/ParkingSpaceDetector.s"

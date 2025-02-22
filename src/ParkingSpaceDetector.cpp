@@ -1,37 +1,9 @@
+// PIETRO VOLPATO
+
 #include "ParkingSpaceDetector.h"
 
 using namespace cv;
 using namespace std;
-
-//-------------------------------------------------------------
-// Load images from the specified sequence folder using a switch-case.
-vector<Mat> ParkingSpaceDetector::loadImages(const int sequence) {
-    vector<String> fileNames;
-    string basePath;
-    switch(sequence) {
-        case 0: basePath = "../data/sequence0/frames"; break;
-        case 1: basePath = "../data/sequence1/frames"; break;
-        case 2: basePath = "../data/sequence2/frames"; break;
-        case 3: basePath = "../data/sequence3/frames"; break;
-        case 4: basePath = "../data/sequence4/frames"; break;
-        case 5: basePath = "../data/sequence5/frames"; break;
-        default:
-            cerr << "Invalid sequence number: " << sequence << endl;
-            return {};
-    }
-    glob(basePath, fileNames);
-
-    vector<Mat> imgs;
-    for (const auto& file : fileNames) {
-        Mat img = imread(file);
-        if (img.empty()) {
-            cerr << "Error loading image: " << file << endl;
-            continue;
-        }
-        imgs.push_back(img);
-    }
-    return imgs;
-}
 
 //-------------------------------------------------------------
 // Compute line parameters (angle, endpoints, and length) for each detected line.
@@ -201,7 +173,8 @@ vector<Vec4i> ParkingSpaceDetector::mergeLines(const vector<LineParams>& lines) 
         for (size_t j = i + 1; j < lines.size(); ++j) {
             if (used[j])
                 continue;
-            if (distanceBetweenLines(lines[i].endpoints, lines[j].endpoints) < 15.0) {
+            if (distanceBetweenLines(lines[i].endpoints, lines[j].endpoints) < 15.0 &&
+                isParallel(lines[i].angle, lines[j].angle)) {
                 closeLines.push_back(lines[j].endpoints);
                 used[j] = true;
             }
@@ -236,7 +209,7 @@ Mat ParkingSpaceDetector::preprocessImage(const Mat& img) {
     Mat gammaCorrected = gammaCorrection(gray, 1.5);
     
     // Here, we use gamma-corrected image; you can experiment with equalized as well.
-    Mat masked = applyRoi(equalized);
+    Mat masked = applyRoi(gray);
     
     return masked;
 }
@@ -258,7 +231,7 @@ void ParkingSpaceDetector::showImage(const Mat& img) {
 
 //-------------------------------------------------------------
 // Detect lines using OpenCV's LineSegmentDetector.
-vector<Vec4i> ParkingSpaceDetector::detectLines(const Mat& img, int threshold, double minLineLength, double maxLineGap) {
+vector<Vec4i> ParkingSpaceDetector::detectLines(const Mat& img) {
     vector<Vec4i> lines;
     Ptr<LineSegmentDetector> lsd = createLineSegmentDetector(LSD_REFINE_NONE);
     vector<Vec4f> linesFloat;
@@ -296,7 +269,7 @@ vector<LineParams> ParkingSpaceDetector::filterLines(vector<LineParams>& lines) 
             filteredLines.push_back(line);
         }
     }
-    
+
     // Refine using local PCA to remove lines with inconsistent orientation.
     vector<LineParams> refinedLines;
     for (size_t i = 0; i < filteredLines.size(); ++i) {
@@ -324,83 +297,105 @@ vector<LineParams> ParkingSpaceDetector::filterLines(vector<LineParams>& lines) 
     
     // Merge nearby lines and recompute parameters.
     vector<Vec4i> merged = mergeLines(refinedLines);
+
     return computeLineParams(merged);
 }
 
 //-------------------------------------------------------------
 // Cluster lines based on their angles using a simple k-means approach.
-pair<vector<LineParams>, vector<LineParams>> ParkingSpaceDetector::clusterLines(const vector<LineParams>& lines) {
+// pair<vector<LineParams>, vector<LineParams>> ParkingSpaceDetector::clusterLines(const vector<LineParams>& lines) {
+//     if (lines.empty())
+//         return {{}, {}};
+    
+//     // double cluster1Mean = 15.0;
+//     // double cluster2Mean = 105.0;
+//     // vector<LineParams> cluster1, cluster2;
+//     // bool converged = false;
+//     // int iterations = 0;
+    
+//     // while (!converged && iterations < 100) {
+//     //     vector<LineParams> newCluster1, newCluster2;
+//     //     for (const auto& line : lines) {
+//     //         double dist1 = fabs(line.angle - cluster1Mean);
+//     //         double dist2 = fabs(line.angle - cluster2Mean);
+//     //         if (dist1 < dist2)
+//     //             newCluster1.push_back(line);
+//     //         else
+//     //             newCluster2.push_back(line);
+//     //     }
+        
+//     //     double newCluster1Mean = newCluster1.empty() ? cluster1Mean : 0.0;
+//     //     for (const auto& line : newCluster1)
+//     //         newCluster1Mean += line.angle;
+//     //     if (!newCluster1.empty())
+//     //         newCluster1Mean /= newCluster1.size();
+        
+//     //     double newCluster2Mean = newCluster2.empty() ? cluster2Mean : 0.0;
+//     //     for (const auto& line : newCluster2)
+//     //         newCluster2Mean += line.angle;
+//     //     if (!newCluster2.empty())
+//     //         newCluster2Mean /= newCluster2.size();
+        
+//     //     if (fabs(newCluster1Mean - cluster1Mean) < 0.1 && fabs(newCluster2Mean - cluster2Mean) < 0.1)
+//     //         converged = true;
+        
+//     //     cluster1Mean = newCluster1Mean;
+//     //     cluster2Mean = newCluster2Mean;
+//     //     cluster1 = newCluster1;
+//     //     cluster2 = newCluster2;
+//     //     iterations++;
+//     // }
+    
+//     // return {cluster1, cluster2};
+//     vector<LineParams> cluster1, cluster2;
+//     for (const auto& line: lines) {
+//         if (fabs(line.angle - 15.0) < 10.0)
+//             cluster1.push_back(line);
+//         else
+//             cluster2.push_back(line);
+//     }
+
+//     return {cluster1, cluster2};
+// }
+pair<vector<pair<LineParams, LineParams>>, vector<pair<LineParams, LineParams>>> ParkingSpaceDetector::clusterLines(const vector<LineParams>& lines) {
     if (lines.empty())
         return {{}, {}};
     
-    double cluster1Mean = 15.0;
-    double cluster2Mean = 105.0;
-    vector<LineParams> cluster1, cluster2;
-    bool converged = false;
-    int iterations = 0;
-    
-    while (!converged && iterations < 100) {
-        vector<LineParams> newCluster1, newCluster2;
-        for (const auto& line : lines) {
-            double dist1 = fabs(line.angle - cluster1Mean);
-            double dist2 = fabs(line.angle - cluster2Mean);
-            if (dist1 < dist2)
-                newCluster1.push_back(line);
-            else
-                newCluster2.push_back(line);
+    vector<pair<LineParams, LineParams>> cluster1, cluster2;
+    for (size_t i = 0; i < lines.size(); ++i) {
+        for (size_t j = i + 1; j < lines.size(); ++j) {
+            if (fabs(lines[i].angle - 15.0) < 10.0 && fabs(lines[j].angle - 15.0) < 10.0)
+                cluster1.push_back({lines[i], lines[j]});
+            else if (fabs(lines[i].angle - 105.0) < 10.0 && fabs(lines[j].angle - 105.0) < 10.0)
+                cluster2.push_back({lines[i], lines[j]});
         }
-        
-        double newCluster1Mean = newCluster1.empty() ? cluster1Mean : 0.0;
-        for (const auto& line : newCluster1)
-            newCluster1Mean += line.angle;
-        if (!newCluster1.empty())
-            newCluster1Mean /= newCluster1.size();
-        
-        double newCluster2Mean = newCluster2.empty() ? cluster2Mean : 0.0;
-        for (const auto& line : newCluster2)
-            newCluster2Mean += line.angle;
-        if (!newCluster2.empty())
-            newCluster2Mean /= newCluster2.size();
-        
-        if (fabs(newCluster1Mean - cluster1Mean) < 0.1 && fabs(newCluster2Mean - cluster2Mean) < 0.1)
-            converged = true;
-        
-        cluster1Mean = newCluster1Mean;
-        cluster2Mean = newCluster2Mean;
-        cluster1 = newCluster1;
-        cluster2 = newCluster2;
-        iterations++;
     }
-    
     return {cluster1, cluster2};
 }
 
 //-------------------------------------------------------------
 // Detect parking spaces by pairing parallel lines from each cluster,
 // creating bounding boxes, and filtering by geometric criteria.
-vector<RotatedRect> ParkingSpaceDetector::detectParkingSpaces(const pair<vector<LineParams>, vector<LineParams>>& clusteredLines) {
+vector<RotatedRect> ParkingSpaceDetector::detectParkingSpaces(const pair<vector<pair<LineParams, LineParams>>, vector<pair<LineParams, LineParams>>>& clusteredLines) {
     vector<RotatedRect> parkingSpaces;
-    const vector<LineParams>& cluster1 = clusteredLines.first;
-    const vector<LineParams>& cluster2 = clusteredLines.second;
     
-    // Process each cluster: pair lines that are parallel and at an appropriate distance.
-    auto processCluster = [&](const vector<LineParams>& cluster) {
-        for (size_t i = 0; i < cluster.size(); ++i) {
-            for (size_t j = i + 1; j < cluster.size(); ++j) {
-                if (isParallel(cluster[i].angle, cluster[j].angle)) {
-                    double dist = distanceBetweenLines(cluster[i].endpoints, cluster[j].endpoints);
-                    if (dist > 40.0 && dist < 100.0) {
-                        parkingSpaces.push_back(createBoundingBox(cluster[i], cluster[j]));
-                    }
+    // Lambda per processare un cluster di coppie di linee
+    auto processClusterPairs = [&](const vector<pair<LineParams, LineParams>>& clusterPairs) {
+        for (const auto& linePair : clusterPairs) {
+            // Verifica che le due linee siano parallele
+            if (isParallel(linePair.first.angle, linePair.second.angle)) {
+                double dist = distanceBetweenLines(linePair.first.endpoints, linePair.second.endpoints);
+                if (dist > 40.0 && dist < 100.0) {
+                    parkingSpaces.push_back(createBoundingBox(linePair.first, linePair.second));
                 }
             }
         }
     };
     
-    processCluster(cluster1);
-    processCluster(cluster2);
+    processClusterPairs(clusteredLines.first);
+    processClusterPairs(clusteredLines.second);
     
-    // Further filter parking spaces based on angle criteria.
+    // Filtro ulteriore in base ai criteri di angolo
     vector<RotatedRect> filtered;
     const double angleThreshold1 = 15.0;
     const double angleThreshold2Low = 90.0;
@@ -417,7 +412,23 @@ vector<RotatedRect> ParkingSpaceDetector::detectParkingSpaces(const pair<vector<
             filtered.push_back(rect);
         }
     }
+    
     return filtered;
+}
+
+vector<RotatedRect> ParkingSpaceDetector::detectParkingSpacesSimple (const vector<LineParams>& lines) {
+    vector<RotatedRect> parkingSpaces;
+    for (size_t i = 0; i < lines.size(); ++i) {
+        for (size_t j = i + 1; j < lines.size(); ++j) {
+            if (isParallel(lines[i].angle, lines[j].angle)) {
+                double dist = distanceBetweenLines(lines[i].endpoints, lines[j].endpoints);
+                if (dist > 40.0 && dist < 100.0) {
+                    parkingSpaces.push_back(createBoundingBox(lines[i], lines[j]));
+                }
+            }
+        }
+    }
+    return parkingSpaces;
 }
 
 //-------------------------------------------------------------

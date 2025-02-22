@@ -10,6 +10,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/pietro/Analysis-of-parking-lot-occupancy/src/CarSegmenter.cpp" "CMakeFiles/ParkingLotAnalysis.dir/src/CarSegmenter.cpp.o" "gcc" "CMakeFiles/ParkingLotAnalysis.dir/src/CarSegmenter.cpp.o.d"
   "/home/pietro/Analysis-of-parking-lot-occupancy/src/Evaluator.cpp" "CMakeFiles/ParkingLotAnalysis.dir/src/Evaluator.cpp.o" "gcc" "CMakeFiles/ParkingLotAnalysis.dir/src/Evaluator.cpp.o.d"
+  "/home/pietro/Analysis-of-parking-lot-occupancy/src/Loader.cpp" "CMakeFiles/ParkingLotAnalysis.dir/src/Loader.cpp.o" "gcc" "CMakeFiles/ParkingLotAnalysis.dir/src/Loader.cpp.o.d"
   "/home/pietro/Analysis-of-parking-lot-occupancy/src/ParkingSpaceDetector.cpp" "CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o" "gcc" "CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o.d"
   "/home/pietro/Analysis-of-parking-lot-occupancy/src/main.cpp" "CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o" "gcc" "CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o.d"
   )

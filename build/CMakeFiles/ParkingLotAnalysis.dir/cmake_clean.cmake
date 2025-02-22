@@ -3,6 +3,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/ParkingLotAnalysis.dir/src/CarSegmenter.cpp.o.d"
   "CMakeFiles/ParkingLotAnalysis.dir/src/Evaluator.cpp.o"
   "CMakeFiles/ParkingLotAnalysis.dir/src/Evaluator.cpp.o.d"
+  "CMakeFiles/ParkingLotAnalysis.dir/src/Loader.cpp.o"
+  "CMakeFiles/ParkingLotAnalysis.dir/src/Loader.cpp.o.d"
   "CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o"
   "CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o.d"
   "CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o"
