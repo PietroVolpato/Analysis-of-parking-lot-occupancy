@@ -13,6 +13,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/ParkingLotAnalysis.dir/src/Visualizer.cpp.o.d"
   "CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o"
   "CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o.d"
+  "CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.o"
+  "CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.o.d"
   "ParkingLotAnalysis"
   "ParkingLotAnalysis.pdb"
 )

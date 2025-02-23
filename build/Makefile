@@ -297,6 +297,30 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ParkingLotAnalysis.dir/build.make CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/tinyxml2.o: src/tinyxml2.cpp.o
+.PHONY : src/tinyxml2.o
+
+# target to build an object file
+src/tinyxml2.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ParkingLotAnalysis.dir/build.make CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.o
+.PHONY : src/tinyxml2.cpp.o
+
+src/tinyxml2.i: src/tinyxml2.cpp.i
+.PHONY : src/tinyxml2.i
+
+# target to preprocess a source file
+src/tinyxml2.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ParkingLotAnalysis.dir/build.make CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.i
+.PHONY : src/tinyxml2.cpp.i
+
+src/tinyxml2.s: src/tinyxml2.cpp.s
+.PHONY : src/tinyxml2.s
+
+# target to generate assembly for a file
+src/tinyxml2.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ParkingLotAnalysis.dir/build.make CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.s
+.PHONY : src/tinyxml2.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -327,6 +351,9 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/tinyxml2.o"
+	@echo "... src/tinyxml2.i"
+	@echo "... src/tinyxml2.s"
 .PHONY : help
 
 

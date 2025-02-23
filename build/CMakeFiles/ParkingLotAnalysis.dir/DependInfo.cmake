@@ -15,6 +15,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/pietro/Analysis-of-parking-lot-occupancy/src/ParkingSpaceDetector.cpp" "CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o" "gcc" "CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o.d"
   "/home/pietro/Analysis-of-parking-lot-occupancy/src/Visualizer.cpp" "CMakeFiles/ParkingLotAnalysis.dir/src/Visualizer.cpp.o" "gcc" "CMakeFiles/ParkingLotAnalysis.dir/src/Visualizer.cpp.o.d"
   "/home/pietro/Analysis-of-parking-lot-occupancy/src/main.cpp" "CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o" "gcc" "CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o.d"
+  "/home/pietro/Analysis-of-parking-lot-occupancy/src/tinyxml2.cpp" "CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.o" "gcc" "CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.o.d"
   )
 
 # Targets to which this target links.

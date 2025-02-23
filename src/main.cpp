@@ -37,7 +37,11 @@ int main(int argc, char** argv) {
     }
 
     // Load the ground truth bounding boxes
-    vector<RotatedRect> groundtruthBBoxes = loader.getBBoxes("../data/sequence0/bounding_boxes/2013-02-24_10_05_04.xml");
+    String path = loader.loadXmlAddress(0)[0];
+    cout << path << endl;
+    vector<bool> occupancyStatusGroundTruth;
+    vector<RotatedRect> groundtruthBBoxes = loader.extractBoundingBoxesFromXML(path, occupancyStatusGroundTruth);
+    cout << groundtruthBBoxes.size() << endl;
 
     // Load all the masks for the evaluation
     vector<Mat> evaluationMaskVector;
@@ -108,105 +112,105 @@ int main(int argc, char** argv) {
         // parkingSpacesVector.push_back(detector.detectParkingSpacesSimple(lines));
     }
 
-    // Draw the parking spaces
-    vector<Mat> imgWithParkingSpacesVector;
-    for (size_t i = 0; i < emptyImgVector.size(); ++i) {
-        Mat img = emptyImgVector[i];
-        const auto& parkingSpaces = parkingSpacesVector[i];
-        Mat imgWithParkingSpaces = detector.drawParkingSpaces(img, parkingSpaces);
-        imgWithParkingSpacesVector.push_back(imgWithParkingSpaces);
-    }
+    // // Draw the parking spaces
+    // vector<Mat> imgWithParkingSpacesVector;
+    // for (size_t i = 0; i < emptyImgVector.size(); ++i) {
+    //     Mat img = emptyImgVector[i];
+    //     const auto& parkingSpaces = parkingSpacesVector[i];
+    //     Mat imgWithParkingSpaces = detector.drawParkingSpaces(img, parkingSpaces);
+    //     imgWithParkingSpacesVector.push_back(imgWithParkingSpaces);
+    // }
 
     // Show the images
     // for (const auto& img: imgWithLinesVector) {
-    for (const auto& img: imgWithParkingSpacesVector) {
-        detector.showImage(img);
+    // for (const auto& img: imgWithParkingSpacesVector) {
+        // detector.showImage(img);
+    // }
+
+    CarSegmenter segmenter;
+
+    // Preprocess the images
+    vector<Mat> preprocessedImgVector;
+    for (const auto& img : imgVector) {
+        preprocessedImgVector.push_back(segmenter.preprocessImage(img, "gray"));
     }
 
-    // CarSegmenter segmenter;
+    // Use the background subtraction method
+    vector<Mat> trainingVector;
+    for (const auto& img: emptyImgVector) {
+        trainingVector.push_back(segmenter.preprocessImage(img, "gray"));
+        trainingVector.push_back(segmenter.preprocessImage(img, "gamma"));
+        trainingVector.push_back(segmenter.preprocessImage(img, "equalize"));
+    }
 
-    // // Preprocess the images
-    // vector<Mat> preprocessedImgVector;
-    // for (const auto& img : imgVector) {
-    //     preprocessedImgVector.push_back(segmenter.preprocessImage(img, "gray"));
-    // }
+    segmenter.trainBg(trainingVector);
 
-    // // Use the background subtraction method
-    // vector<Mat> trainingVector;
-    // for (const auto& img: emptyImgVector) {
-    //     trainingVector.push_back(segmenter.preprocessImage(img, "gray"));
-    //     trainingVector.push_back(segmenter.preprocessImage(img, "gamma"));
-    //     trainingVector.push_back(segmenter.preprocessImage(img, "equalize"));
-    // }
+    vector<Mat> maskVector;
+    for (const auto& img : preprocessedImgVector) {
+        maskVector.push_back(segmenter.applyBg(img));
+    }
 
-    // segmenter.trainBg(trainingVector);
+    vector<Mat> enhancedMaskVector;
+    for (const auto& mask : maskVector) {
+        enhancedMaskVector.push_back(segmenter.enhanceMask(mask));
+    }
 
-    // vector<Mat> maskVector;
-    // for (const auto& img : preprocessedImgVector) {
-    //     maskVector.push_back(segmenter.applyBg(img));
-    // }
+    // Find the contours in the images
+    vector<vector<vector<Point>>> contoursVector;
+    for (const auto& mask : enhancedMaskVector) {
+        auto contours = segmenter.findContoursSimple(mask);
+        contoursVector.push_back(contours);
+    }
 
-    // vector<Mat> enhancedMaskVector;
-    // for (const auto& mask : maskVector) {
-    //     enhancedMaskVector.push_back(segmenter.enhanceMask(mask));
-    // }
-
-    // // Find the contours in the images
-    // vector<vector<vector<Point>>> contoursVector;
-    // for (const auto& mask : enhancedMaskVector) {
-    //     auto contours = segmenter.findContoursSimple(mask);
-    //     contoursVector.push_back(contours);
-    // }
-
-    // // // Draw the contours
-    // // for (size_t i = 0; i < imgVector.size(); ++i) {
-    // //     Mat img = imgVector[i];
-    // //     const auto& contours = contoursVector[i];
-    // //     // segmenter.drawContourSimple(img, contours);
-    // //     // segmenter.showImages(img);
-    // // }
-
-    // // Find the bounding boxes
-    // vector<vector<RotatedRect>> bboxesVector;
+    // // Draw the contours
     // for (size_t i = 0; i < imgVector.size(); ++i) {
+    //     Mat img = imgVector[i];
     //     const auto& contours = contoursVector[i];
-    //     bboxesVector.push_back(segmenter.findBBoxes(contours));
-    // }
-
-    // // Filter the bounding boxes
-    // vector<vector<RotatedRect>> filteredBBoxesVector;
-    // for (auto& bboxes : bboxesVector) {
-    //     // filteredBBoxesVector.push_back(segmenter.filterBBoxes(bboxes));
-    // }
-
-    // // // Draw the bounding boxes
-    // // for (size_t i = 0; i < imgVector.size(); ++i) {
-    // //     Mat img = imgVector[i];
-    // //     const auto& bboxes = bboxesVector[i];
-    // //     const auto& bboxes = filteredBBoxesVector[i];
-    // //     segmenter.drawBBoxes(img, bboxes);
-    // //     segmenter.showImages(img);
-    // // }
-    
-    // // Segment the cars
-    // vector<Mat> segmentedCarsVector;
-    // for (size_t i = 0; i < imgVector.size(); ++i) {
-    //     const auto& bboxes = bboxesVector[i];
-    //     const auto& mask = enhancedMaskVector[i];
-    //     Mat img = Mat::zeros(imgVector[i].size(), CV_8UC3);
-    //     segmentedCarsVector.push_back(segmenter.segmentCar(bboxes, groundtruthBBoxes, mask, img));
-    // }
-
-    // // Create the mask for the evaluation
-    // vector<Mat> segmentedMaskVector;
-    // for (const auto& img : segmentedCarsVector) {
-    //     segmentedMaskVector.push_back(segmenter.createSegmentMask(img));
-    // }
-
-    // // Show the images
-    // for (const auto& img: segmentedMaskVector) {
+    //     // segmenter.drawContourSimple(img, contours);
     //     // segmenter.showImages(img);
     // }
+
+    // Find the bounding boxes
+    vector<vector<RotatedRect>> bboxesVector;
+    for (size_t i = 0; i < imgVector.size(); ++i) {
+        const auto& contours = contoursVector[i];
+        bboxesVector.push_back(segmenter.findBBoxes(contours));
+    }
+
+    // Filter the bounding boxes
+    vector<vector<RotatedRect>> filteredBBoxesVector;
+    for (auto& bboxes : bboxesVector) {
+        // filteredBBoxesVector.push_back(segmenter.filterBBoxes(bboxes));
+    }
+
+    // Draw the bounding boxes
+    for (size_t i = 0; i < imgVector.size(); ++i) {
+        Mat img = imgVector[i];
+        // const auto& bboxes = bboxesVector[i];
+        const auto& bboxes = filteredBBoxesVector[i];
+        segmenter.drawBBoxes(img, bboxes);
+        segmenter.showImages(img);
+    }
+    
+    // Segment the cars
+    vector<Mat> segmentedCarsVector;
+    for (size_t i = 0; i < imgVector.size(); ++i) {
+        const auto& bboxes = bboxesVector[i];
+        const auto& mask = enhancedMaskVector[i];
+        Mat img = Mat::zeros(imgVector[i].size(), CV_8UC3);
+        segmentedCarsVector.push_back(segmenter.segmentCar(bboxes, groundtruthBBoxes, mask, img));
+    }
+
+    // Create the mask for the evaluation
+    vector<Mat> segmentedMaskVector;
+    for (const auto& img : segmentedCarsVector) {
+        segmentedMaskVector.push_back(segmenter.createSegmentMask(img));
+    }
+
+    // Show the images
+    for (const auto& img: segmentedMaskVector) {
+        // segmenter.showImages(img);
+    }
 
     // // Evaluate the segmentation
     // mIoU miou;

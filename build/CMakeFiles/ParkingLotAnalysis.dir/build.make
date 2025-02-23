@@ -83,10 +83,24 @@ CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/pietro/Analysis-of-parking-lot-occupancy/src/main.cpp -o CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.s
 
+CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.o: CMakeFiles/ParkingLotAnalysis.dir/flags.make
+CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.o: ../src/tinyxml2.cpp
+CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.o: CMakeFiles/ParkingLotAnalysis.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pietro/Analysis-of-parking-lot-occupancy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.o -MF CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.o.d -o CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.o -c /home/pietro/Analysis-of-parking-lot-occupancy/src/tinyxml2.cpp
+
+CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/pietro/Analysis-of-parking-lot-occupancy/src/tinyxml2.cpp > CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.i
+
+CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/pietro/Analysis-of-parking-lot-occupancy/src/tinyxml2.cpp -o CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.s
+
 CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o: CMakeFiles/ParkingLotAnalysis.dir/flags.make
 CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o: ../src/ParkingSpaceDetector.cpp
 CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o: CMakeFiles/ParkingLotAnalysis.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pietro/Analysis-of-parking-lot-occupancy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pietro/Analysis-of-parking-lot-occupancy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o -MF CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o.d -o CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o -c /home/pietro/Analysis-of-parking-lot-occupancy/src/ParkingSpaceDetector.cpp
 
 CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.i: cmake_force
@@ -100,7 +114,7 @@ CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.s: cmake_force
 CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceClassifier.cpp.o: CMakeFiles/ParkingLotAnalysis.dir/flags.make
 CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceClassifier.cpp.o: ../src/ParkingSpaceClassifier.cpp
 CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceClassifier.cpp.o: CMakeFiles/ParkingLotAnalysis.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pietro/Analysis-of-parking-lot-occupancy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceClassifier.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pietro/Analysis-of-parking-lot-occupancy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceClassifier.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceClassifier.cpp.o -MF CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceClassifier.cpp.o.d -o CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceClassifier.cpp.o -c /home/pietro/Analysis-of-parking-lot-occupancy/src/ParkingSpaceClassifier.cpp
 
 CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceClassifier.cpp.i: cmake_force
@@ -114,7 +128,7 @@ CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceClassifier.cpp.s: cmake_force
 CMakeFiles/ParkingLotAnalysis.dir/src/CarSegmenter.cpp.o: CMakeFiles/ParkingLotAnalysis.dir/flags.make
 CMakeFiles/ParkingLotAnalysis.dir/src/CarSegmenter.cpp.o: ../src/CarSegmenter.cpp
 CMakeFiles/ParkingLotAnalysis.dir/src/CarSegmenter.cpp.o: CMakeFiles/ParkingLotAnalysis.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pietro/Analysis-of-parking-lot-occupancy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/ParkingLotAnalysis.dir/src/CarSegmenter.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pietro/Analysis-of-parking-lot-occupancy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/ParkingLotAnalysis.dir/src/CarSegmenter.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ParkingLotAnalysis.dir/src/CarSegmenter.cpp.o -MF CMakeFiles/ParkingLotAnalysis.dir/src/CarSegmenter.cpp.o.d -o CMakeFiles/ParkingLotAnalysis.dir/src/CarSegmenter.cpp.o -c /home/pietro/Analysis-of-parking-lot-occupancy/src/CarSegmenter.cpp
 
 CMakeFiles/ParkingLotAnalysis.dir/src/CarSegmenter.cpp.i: cmake_force
@@ -128,7 +142,7 @@ CMakeFiles/ParkingLotAnalysis.dir/src/CarSegmenter.cpp.s: cmake_force
 CMakeFiles/ParkingLotAnalysis.dir/src/Visualizer.cpp.o: CMakeFiles/ParkingLotAnalysis.dir/flags.make
 CMakeFiles/ParkingLotAnalysis.dir/src/Visualizer.cpp.o: ../src/Visualizer.cpp
 CMakeFiles/ParkingLotAnalysis.dir/src/Visualizer.cpp.o: CMakeFiles/ParkingLotAnalysis.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pietro/Analysis-of-parking-lot-occupancy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/ParkingLotAnalysis.dir/src/Visualizer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pietro/Analysis-of-parking-lot-occupancy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/ParkingLotAnalysis.dir/src/Visualizer.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ParkingLotAnalysis.dir/src/Visualizer.cpp.o -MF CMakeFiles/ParkingLotAnalysis.dir/src/Visualizer.cpp.o.d -o CMakeFiles/ParkingLotAnalysis.dir/src/Visualizer.cpp.o -c /home/pietro/Analysis-of-parking-lot-occupancy/src/Visualizer.cpp
 
 CMakeFiles/ParkingLotAnalysis.dir/src/Visualizer.cpp.i: cmake_force
@@ -142,7 +156,7 @@ CMakeFiles/ParkingLotAnalysis.dir/src/Visualizer.cpp.s: cmake_force
 CMakeFiles/ParkingLotAnalysis.dir/src/Loader.cpp.o: CMakeFiles/ParkingLotAnalysis.dir/flags.make
 CMakeFiles/ParkingLotAnalysis.dir/src/Loader.cpp.o: ../src/Loader.cpp
 CMakeFiles/ParkingLotAnalysis.dir/src/Loader.cpp.o: CMakeFiles/ParkingLotAnalysis.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pietro/Analysis-of-parking-lot-occupancy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/ParkingLotAnalysis.dir/src/Loader.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pietro/Analysis-of-parking-lot-occupancy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/ParkingLotAnalysis.dir/src/Loader.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ParkingLotAnalysis.dir/src/Loader.cpp.o -MF CMakeFiles/ParkingLotAnalysis.dir/src/Loader.cpp.o.d -o CMakeFiles/ParkingLotAnalysis.dir/src/Loader.cpp.o -c /home/pietro/Analysis-of-parking-lot-occupancy/src/Loader.cpp
 
 CMakeFiles/ParkingLotAnalysis.dir/src/Loader.cpp.i: cmake_force
@@ -156,7 +170,7 @@ CMakeFiles/ParkingLotAnalysis.dir/src/Loader.cpp.s: cmake_force
 CMakeFiles/ParkingLotAnalysis.dir/src/Evaluator.cpp.o: CMakeFiles/ParkingLotAnalysis.dir/flags.make
 CMakeFiles/ParkingLotAnalysis.dir/src/Evaluator.cpp.o: ../src/Evaluator.cpp
 CMakeFiles/ParkingLotAnalysis.dir/src/Evaluator.cpp.o: CMakeFiles/ParkingLotAnalysis.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pietro/Analysis-of-parking-lot-occupancy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/ParkingLotAnalysis.dir/src/Evaluator.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pietro/Analysis-of-parking-lot-occupancy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/ParkingLotAnalysis.dir/src/Evaluator.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ParkingLotAnalysis.dir/src/Evaluator.cpp.o -MF CMakeFiles/ParkingLotAnalysis.dir/src/Evaluator.cpp.o.d -o CMakeFiles/ParkingLotAnalysis.dir/src/Evaluator.cpp.o -c /home/pietro/Analysis-of-parking-lot-occupancy/src/Evaluator.cpp
 
 CMakeFiles/ParkingLotAnalysis.dir/src/Evaluator.cpp.i: cmake_force
@@ -170,6 +184,7 @@ CMakeFiles/ParkingLotAnalysis.dir/src/Evaluator.cpp.s: cmake_force
 # Object files for target ParkingLotAnalysis
 ParkingLotAnalysis_OBJECTS = \
 "CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o" \
+"CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.o" \
 "CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o" \
 "CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceClassifier.cpp.o" \
 "CMakeFiles/ParkingLotAnalysis.dir/src/CarSegmenter.cpp.o" \
@@ -181,6 +196,7 @@ ParkingLotAnalysis_OBJECTS = \
 ParkingLotAnalysis_EXTERNAL_OBJECTS =
 
 ParkingLotAnalysis: CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o
+ParkingLotAnalysis: CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.o
 ParkingLotAnalysis: CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.o
 ParkingLotAnalysis: CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceClassifier.cpp.o
 ParkingLotAnalysis: CMakeFiles/ParkingLotAnalysis.dir/src/CarSegmenter.cpp.o
@@ -203,9 +219,8 @@ ParkingLotAnalysis: /usr/local/lib/libopencv_features2d.so.4.9.0
 ParkingLotAnalysis: /usr/local/lib/libopencv_flann.so.4.9.0
 ParkingLotAnalysis: /usr/local/lib/libopencv_imgproc.so.4.9.0
 ParkingLotAnalysis: /usr/local/lib/libopencv_core.so.4.9.0
-ParkingLotAnalysis: /usr/lib/x86_64-linux-gnu/libpugixml.so.1.12
 ParkingLotAnalysis: CMakeFiles/ParkingLotAnalysis.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/pietro/Analysis-of-parking-lot-occupancy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX executable ParkingLotAnalysis"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/pietro/Analysis-of-parking-lot-occupancy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CXX executable ParkingLotAnalysis"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ParkingLotAnalysis.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
