@@ -15,8 +15,8 @@ public:
     cv::Mat Visualizer::updateMinimap(const std::vector<bool>& occupancyStatus);
 
 private:
-    int minimap_width = 400;
-    int minimap_height = 300;
+    int minimap_width;
+    int minimap_height;
     float spaceWidth  = 40.0f;
     float spaceHeight = 20.0f;
     float angle = -45.0f;
@@ -30,8 +30,9 @@ private:
     std::vector<cv::RotatedRect> transformedRectangles;  // RotatedRects bassed on transformedCenters
     std::vector<cv::Point2f> originalCenters;
     std::vector<cv::Point2f> transformedCenters;        // Store te center after applting Honography
-    std::vector<std::pair<cv::Point2f, bool>> centersWithOccupancy;     // Store (center, occupancy) as a pair
-    std::vector<std::vector<std::pair<cv::Point2f, bool>>> clusteredCenters;    // Clustered results
+    std::vector<std::vector<cv::Point2f>> clusteredCenters;    // Clustered results
+
+    cv::Mat minimap;
 
     void drawRotatedRect(cv::Mat &image, cv::Point2f center, float angle, cv::Scalar color);
     void rectParkingRow();

@@ -11,7 +11,7 @@ Visualizer::Visualizer(int width, int height, vector<RotatedRect>& parkingSpaces
         for (const auto& rect : rectangles) {
             originalCenters.push_back(rect.center);
         }
-        Mat H = computeHomography(findExtremePoints());
+        Mat H = computeHomography(findExtremePoints());  //Computing Homography Matrix "H"
         transformedCenters = applyHomography(H);
 
         if (originalCenters.size() != occupancyStatus.size()) {
@@ -19,10 +19,6 @@ Visualizer::Visualizer(int width, int height, vector<RotatedRect>& parkingSpaces
             return;
         }
 
-        // Store paired data
-        for (size_t i = 0; i < originalCenters.size(); i++) {
-            centersWithOccupancy.emplace_back(transformedCenters[i], occupancyStatus[i]);
-        }
         rectParkingRow();
 
 
@@ -66,20 +62,19 @@ void Visualizer::drawRotatedRect(Mat& image, Point2f center, float angle, Scalar
 
 void Visualizer::rectParkingRow() {
     
-    // Get transformed centers
     clusterParkingSpaces();
     
     
-    int angle;
+    float angleP;
     int index =0;
     vector<float> avgY_row;
     for (const auto& cluster : clusteredCenters) {
-        angle = (index == 2) ? 45 : -45;
+        angleP = (index == 2) ? 45.0f : -45.0f;
 
         // Calculate average y-value for the row
         float avgY = 0.0f;
         for (const auto& p : cluster) {
-            avgY += p.first.y;
+            avgY += p.y;
         }
 
         avgY /= cluster.size();
@@ -123,8 +118,6 @@ Mat Visualizer::overlaySmallOnLarge(const Mat& parkingSapaceClassified, const Ma
 
 
 Mat Visualizer::updateMinimap(const vector<bool>& occupancyStatus) {
-    // Create a white minimap
-    Mat minimap(Visualizer::minimap_height, Visualizer::minimap_width, CV_8UC3, Scalar(255, 255, 255));
     
     if (occupancyStatus.size() != transformedRectangles.size()) {
         cerr << "Error: Occupancy vector size mismatch!\n";
@@ -133,17 +126,15 @@ Mat Visualizer::updateMinimap(const vector<bool>& occupancyStatus) {
     
     for (size_t i = 0; i < transformedRectangles.size(); ++i) {
 
-        Scalar color = occupancyStatus[sort_indices[i]] ? Scalar(0, 0, 255) : Scalar(0, 255, 0); // Red for occupied, Green for free
+        Scalar color = occupancyStatus[sort_indices[i]] ? Scalar(0, 0, 255) : Scalar(255, 0, 0); // Red for occupied, Blue for free
         drawRotatedRect(minimap, transformedRectangles[i].center, transformedRectangles[i].angle, color);
     }
-    imshow("mini", minimap);
 
     return minimap;
 }
 
 Mat Visualizer::createMockMinimap() {
     Mat emptyminimap(Visualizer::minimap_height, Visualizer::minimap_width, CV_8UC3, Scalar(255, 255, 255));
-
     // Draw only rectangle borders
     for (const auto& rect : transformedRectangles) {
         Point2f vertices[4];
@@ -153,8 +144,7 @@ Mat Visualizer::createMockMinimap() {
         }
     }
 
-    imshow("Mock Minimap", emptyminimap);
-    waitKey(0);
+    minimap = emptyminimap;
 
     return emptyminimap;
 }
@@ -198,9 +188,9 @@ vector<Point2f> Visualizer::findExtremePoints() {
 // Compute the homography matrix using the given source and destination points
 Mat Visualizer::computeHomography(const vector<Point2f>& srcPoints) {
     vector<Point2f> dstPoints = {
-        {minimap_width - 20, minimap_height - 20},  // Bottom-left (mapped to new coordinate space)
-        {50, minimap_height - 20},    // Top-left
-        {minimap_width - 20 , 50},    // Bottom-right
+        {400 - 20, 300 - 20},  // Bottom-left (mapped to new coordinate space)
+        {50, 300 - 20},    // Top-left
+        {400 - 20 , 50},    // Bottom-right
         {50, 50}       // Top-right
     };
 
@@ -216,15 +206,15 @@ vector<Point2f> Visualizer::applyHomography(const Mat& H) {
 }
 
 void Visualizer::clusterParkingSpaces() {
-    if (centersWithOccupancy.empty()) return;
+    if (transformedCenters.empty()) return;
 
     int K = 4; // Number of clusters (rows)
-    int N = centersWithOccupancy.size();
+    int N = transformedCenters.size();
 
     // Prepare data for k-means clustering
     cv::Mat data(N, 1, CV_32F);
     for (int i = 0; i < N; i++) {
-        data.at<float>(i, 0) = centersWithOccupancy[i].first.y;
+        data.at<float>(i, 0) = transformedCenters[i].y;
     }
 
     // Run k-means clustering
@@ -238,18 +228,18 @@ void Visualizer::clusterParkingSpaces() {
     // Assign centers & occupancy to clusters
     for (int i = 0; i < N; i++) {
         int clusterIdx = labels.at<int>(i, 0);
-        clusteredCenters[clusterIdx].push_back(centersWithOccupancy[i]); // Keeps occupancy linked
+        clusteredCenters[clusterIdx].push_back(transformedCenters[i]); // Keeps occupancy linked
     }
 
     // Sort clusters based on increasing y-values of their centers
     std::sort(clusteredCenters.begin(), clusteredCenters.end(),
-              [](const std::vector<std::pair<cv::Point2f, bool>>& a, const std::vector<std::pair<cv::Point2f, bool>>& b) {
-                  return a.front().first.y > b.front().first.y;
+              [](const std::vector<cv::Point2f>& a, const std::vector<cv::Point2f>& b) {
+                  return a.front().y > b.front().y;
               });
     // Sort each cluster by x-value
     for(auto& cluster : clusteredCenters){
         sort(cluster.begin(), cluster.end(), [](const auto& a, const auto& b) {
-            return a.first.x > b.first.x; 
+            return a.x > b.x; 
         });
     }
 
@@ -258,7 +248,7 @@ void Visualizer::clusterParkingSpaces() {
         for (const auto& pointPair : cluster) {
             // Find the index of the point in transformedCenters where both x and y coordinates match
             auto it = find_if(transformedCenters.begin(), transformedCenters.end(),
-                            [&](const Point2f& p) { return p.x == pointPair.first.x && p.y == pointPair.first.y; });
+                            [&](const Point2f& p) { return p.x == pointPair.x && p.y == pointPair.y; });
 
             if (it != transformedCenters.end()) {
                 sort_indices.push_back(distance(transformedCenters.begin(), it));
