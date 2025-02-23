@@ -398,20 +398,20 @@ vector<RotatedRect> ParkingSpaceDetector::detectParkingSpaces(const pair<vector<
     processClusterPairs(clusteredLines.first);
     processClusterPairs(clusteredLines.second);
     
-    // Filtro ulteriore in base ai criteri di angolo
     vector<RotatedRect> filtered;
     const double angleThreshold1 = 15.0;
     const double angleThreshold2Low = 90.0;
     const double angleThreshold2High = 125.0;
     const double angleTolerance = 10.0;
     
+    // Not working at all
     for (const auto& rect : parkingSpaces) {
         double angle = fmod(rect.angle, 180.0);
         if (angle < 0)
             angle += 180.0;
         
-        if ((fabs(angle - angleThreshold1) < angleTolerance) ||
-            (angle > angleThreshold2Low && angle < angleThreshold2High)) {
+            if (((fabs(angle - angleThreshold1) < 10.0) ||
+            (angle > angleThreshold2Low && angle < angleThreshold2High)) && rect.size.area() > 10000 && rect.size.area() < 20000) {
             filtered.push_back(rect);
         }
     }
@@ -419,10 +419,12 @@ vector<RotatedRect> ParkingSpaceDetector::detectParkingSpaces(const pair<vector<
     return filtered;
 }
 
+//-------------------------------------------------------------
+// Detect parking spaces by pairing parallel lines and filtering by distance.
 vector<RotatedRect> ParkingSpaceDetector::detectParkingSpacesSimple (const vector<LineParams>& lines) {
     vector<RotatedRect> parkingSpaces;
-    for (size_t i = 0; i < lines.size(); ++i) {
-        for (size_t j = i + 1; j < lines.size(); ++j) {
+    for (size_t i = 0; i < lines.size(); i++) {
+        for (size_t j = i + 1; j < lines.size(); j++) {
             if (isParallel(lines[i].angle, lines[j].angle)) {
                 double dist = distanceBetweenLines(lines[i].endpoints, lines[j].endpoints);
                 if (dist > 40.0 && dist < 100.0) {
@@ -431,7 +433,25 @@ vector<RotatedRect> ParkingSpaceDetector::detectParkingSpacesSimple (const vecto
             }
         }
     }
-    return parkingSpaces;
+
+    // Filter the parking spaces based on angle and distance
+    vector<RotatedRect> filtered;
+    const double angleThreshold1 = 15.0;
+    const double angleThreshold2Low = 90.0;
+    const double angleThreshold2High = 125.0;
+
+    for (const auto& rect : parkingSpaces) {
+        double angle = fmod(rect.angle, 180.0);
+        if (angle < 0)
+            angle += 180.0;
+
+        if (((fabs(angle - angleThreshold1) < 10.0) ||
+            (angle > angleThreshold2Low && angle < angleThreshold2High)) && rect.size.area() > 500 && rect.size.area() < 1000) {
+            filtered.push_back(rect);
+        }
+    }
+
+    return filtered;
 }
 
 //-------------------------------------------------------------

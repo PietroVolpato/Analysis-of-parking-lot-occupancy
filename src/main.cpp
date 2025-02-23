@@ -80,7 +80,7 @@ int main(int argc, char** argv) {
         Mat img = emptyImgVector[i];
         // const auto& lines = lineParamsVector[i];
         const auto& lines = filteredLinesVector[i];
-        detector.drawLines(img, lines);
+        // detector.drawLines(img, lines);
         imgWithLinesVector.push_back(img);
     }
 
@@ -118,8 +118,8 @@ int main(int argc, char** argv) {
     }
 
     // Show the images
-    for (const auto& img: imgWithLinesVector) {
-    // for (const auto& img: imgWithParkingSpacesVector) {
+    // for (const auto& img: imgWithLinesVector) {
+    for (const auto& img: imgWithParkingSpacesVector) {
         detector.showImage(img);
     }
 

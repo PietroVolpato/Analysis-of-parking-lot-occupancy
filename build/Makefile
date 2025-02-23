@@ -201,6 +201,30 @@ src/Loader.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ParkingLotAnalysis.dir/build.make CMakeFiles/ParkingLotAnalysis.dir/src/Loader.cpp.s
 .PHONY : src/Loader.cpp.s
 
+src/ParkingSpaceClassifier.o: src/ParkingSpaceClassifier.cpp.o
+.PHONY : src/ParkingSpaceClassifier.o
+
+# target to build an object file
+src/ParkingSpaceClassifier.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ParkingLotAnalysis.dir/build.make CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceClassifier.cpp.o
+.PHONY : src/ParkingSpaceClassifier.cpp.o
+
+src/ParkingSpaceClassifier.i: src/ParkingSpaceClassifier.cpp.i
+.PHONY : src/ParkingSpaceClassifier.i
+
+# target to preprocess a source file
+src/ParkingSpaceClassifier.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ParkingLotAnalysis.dir/build.make CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceClassifier.cpp.i
+.PHONY : src/ParkingSpaceClassifier.cpp.i
+
+src/ParkingSpaceClassifier.s: src/ParkingSpaceClassifier.cpp.s
+.PHONY : src/ParkingSpaceClassifier.s
+
+# target to generate assembly for a file
+src/ParkingSpaceClassifier.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ParkingLotAnalysis.dir/build.make CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceClassifier.cpp.s
+.PHONY : src/ParkingSpaceClassifier.cpp.s
+
 src/ParkingSpaceDetector.o: src/ParkingSpaceDetector.cpp.o
 .PHONY : src/ParkingSpaceDetector.o
 
@@ -224,6 +248,30 @@ src/ParkingSpaceDetector.s: src/ParkingSpaceDetector.cpp.s
 src/ParkingSpaceDetector.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ParkingLotAnalysis.dir/build.make CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceDetector.cpp.s
 .PHONY : src/ParkingSpaceDetector.cpp.s
+
+src/Visualizer.o: src/Visualizer.cpp.o
+.PHONY : src/Visualizer.o
+
+# target to build an object file
+src/Visualizer.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ParkingLotAnalysis.dir/build.make CMakeFiles/ParkingLotAnalysis.dir/src/Visualizer.cpp.o
+.PHONY : src/Visualizer.cpp.o
+
+src/Visualizer.i: src/Visualizer.cpp.i
+.PHONY : src/Visualizer.i
+
+# target to preprocess a source file
+src/Visualizer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ParkingLotAnalysis.dir/build.make CMakeFiles/ParkingLotAnalysis.dir/src/Visualizer.cpp.i
+.PHONY : src/Visualizer.cpp.i
+
+src/Visualizer.s: src/Visualizer.cpp.s
+.PHONY : src/Visualizer.s
+
+# target to generate assembly for a file
+src/Visualizer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ParkingLotAnalysis.dir/build.make CMakeFiles/ParkingLotAnalysis.dir/src/Visualizer.cpp.s
+.PHONY : src/Visualizer.cpp.s
 
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
@@ -267,9 +315,15 @@ help:
 	@echo "... src/Loader.o"
 	@echo "... src/Loader.i"
 	@echo "... src/Loader.s"
+	@echo "... src/ParkingSpaceClassifier.o"
+	@echo "... src/ParkingSpaceClassifier.i"
+	@echo "... src/ParkingSpaceClassifier.s"
 	@echo "... src/ParkingSpaceDetector.o"
 	@echo "... src/ParkingSpaceDetector.i"
 	@echo "... src/ParkingSpaceDetector.s"
+	@echo "... src/Visualizer.o"
+	@echo "... src/Visualizer.i"
+	@echo "... src/Visualizer.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
