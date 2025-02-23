@@ -219,9 +219,6 @@ vector<RotatedRect> CarSegmenter::filterBBoxes(const vector<RotatedRect>& bboxes
                 }
             }
         }
-        // If the small box was not merged, you can choose to add it.
-        // Uncomment the following line if you want to include unmerged small boxes.
-        // if (!merged) largeBoxes.push_back(smallBox);
     }
     
     // Extract the merged bounding boxes
@@ -358,16 +355,7 @@ vector<Rect> CarSegmenter::newmethod(Mat& mask, Mat& img) {
 
     vector<Rect> bboxes;
 
-    for (int i = 1; i < numComponents; i++) { // Skip the background component (i = 0)
-        // Create a mask for the current component
-        Mat compMask = (labels == i);
-
-        // For simplicity, color every valid component red.
-        Scalar color(0, 0, 255); // Red in BGR format
-
-        // Color the pixels in the original image corresponding to this blob
-        img.setTo(color, compMask);
-
+    for (int i = 0; i < numComponents; i++) {
         // Get bounding box stats for this component
         int left   = stats.at<int>(i, CC_STAT_LEFT);
         int top    = stats.at<int>(i, CC_STAT_TOP);
@@ -375,11 +363,9 @@ vector<Rect> CarSegmenter::newmethod(Mat& mask, Mat& img) {
         int height = stats.at<int>(i, CC_STAT_HEIGHT);
 
         Rect bbox(left, top, width, height);
-        if (bbox.area() > minArea && bbox.area() < maxArea) {
+        if (bbox.area() > minArea && bbox.area() < maxArea) 
             bboxes.push_back(bbox);
-            // Optionally, draw the rectangle on the image:
-            // rectangle(img, bbox, Scalar(255, 0, 0), 2);
-        }
+        
     }
     return bboxes;
 }
@@ -395,9 +381,9 @@ Mat CarSegmenter::createSegmentMask(const Mat& img) {
         for (int j = 0; j < img.cols; j++) {
             Vec3b pixel = img.at<Vec3b>(i, j);
             if (pixel == Vec3b(0, 0, 255))
-                mask.at<uchar>(i, j) = 100;
-            else
-                mask.at<uchar>(i, j) = 200;
+                mask.at<uchar>(i, j) = 1;
+            else if (pixel == Vec3b(0, 255, 0))
+                mask.at<uchar>(i, j) = 2;
         }
     }
     return mask;

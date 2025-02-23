@@ -261,10 +261,10 @@ vector<LineParams> ParkingSpaceDetector::filterLines(vector<LineParams>& lines) 
     const double angleTarget2High = 125.0;
     const double tolerance = 10.0;
     
-    // Initial filtering based on angle and length.
+    // Initial filtering based on angle and length using tolerance for both targets.
     for (const auto& line : lines) {
         double angle = line.angle;
-        if (((fabs(angle - angleTarget1) < tolerance) || (angle > angleTarget2Low && angle < angleTarget2High)) && 
+        if ((fabs(angle - angleTarget1) < tolerance) || (angle > angleTarget2Low && angle < angleTarget2High) &&
              line.length > 25.0) {
             filteredLines.push_back(line);
         }
@@ -357,6 +357,9 @@ vector<LineParams> ParkingSpaceDetector::filterLines(vector<LineParams>& lines) 
 
 //     return {cluster1, cluster2};
 // }
+
+//-------------------------------------------------------------
+// Cluster lines based on their angles
 pair<vector<pair<LineParams, LineParams>>, vector<pair<LineParams, LineParams>>> ParkingSpaceDetector::clusterLines(const vector<LineParams>& lines) {
     if (lines.empty())
         return {{}, {}};

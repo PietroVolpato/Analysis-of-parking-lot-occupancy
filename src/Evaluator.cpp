@@ -109,7 +109,7 @@ double mIoU::computeMeanIoU(const cv::Mat& gt, const cv::Mat& pred, const std::v
         sumIoU += iou;
         validClasses++;
 
-        std::cout << "IoU for class " << classID << " : " << iou << std::endl;
+        // std::cout << "IoU for class " << classID << " : " << iou << std::endl;
     }
 
     return validClasses > 0 ? sumIoU / validClasses : 0.0;
