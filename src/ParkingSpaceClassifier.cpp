@@ -3,6 +3,8 @@
 using namespace cv;
 using namespace std;
 
+// Written by Ali Esmaeili nasab
+
 ParkingSpaceClassifier::ParkingSpaceClassifier(double emptyThreshold) : emptyThreshold(emptyThreshold) {}
 
 Mat ParkingSpaceClassifier::createBoundingBox(const Mat &parkingLotImage, const RotatedRect &rotated_rect) {
