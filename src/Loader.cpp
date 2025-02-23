@@ -60,50 +60,50 @@ vector<Mat> Loader::loadImagesFromPath (String path) {
 // Get Bounding Boxes from XML
 //------------------------------
 // Loads parking space bounding boxes from an XML file using pugixml.
-// vector<RotatedRect> Loader::getBBoxes(String filePath) {
-//     // Load the XML file
-//     pugi::xml_document doc;
-//     pugi::xml_parse_result result = doc.load_file(filePath.c_str());
-//     if (!result) {
-//         cout << "Error loading XML file." << endl;
-//         return {};
-//     }
+vector<RotatedRect> Loader::getBBoxes(String filePath) {
+    // Load the XML file
+    pugi::xml_document doc;
+    pugi::xml_parse_result result = doc.load_file(filePath.c_str());
+    if (!result) {
+        cout << "Error loading XML file." << endl;
+        return {};
+    }
 
-//     // Get the root element "parking"
-//     pugi::xml_node parking = doc.child("parking");
-//     if (!parking) {
-//         cout << "Root element not found." << endl;
-//         return { RotatedRect(Point2f(0, 0), Size2f(0, 0), 0) };
-//     }
+    // Get the root element "parking"
+    pugi::xml_node parking = doc.child("parking");
+    if (!parking) {
+        cout << "Root element not found." << endl;
+        return { RotatedRect(Point2f(0, 0), Size2f(0, 0), 0) };
+    }
 
-//     vector<RotatedRect> boundingBoxes;  // Vector to store bounding boxes
+    vector<RotatedRect> boundingBoxes;  // Vector to store bounding boxes
 
-//     // Iterate over each <space> element
-//     for (pugi::xml_node space = parking.child("space"); space; space = space.next_sibling("space"))
-//     {
-//         // Find the <contour> element containing the points
-//         pugi::xml_node contour = space.child("contour");
-//         if (!contour)
-//             continue;
+    // Iterate over each <space> element
+    for (pugi::xml_node space = parking.child("space"); space; space = space.next_sibling("space"))
+    {
+        // Find the <contour> element containing the points
+        pugi::xml_node contour = space.child("contour");
+        if (!contour)
+            continue;
 
-//         // Extract all points from the contour
-//         vector<Point> points;
-//         for (pugi::xml_node point = contour.child("point"); point; point = point.next_sibling("point"))
-//         {
-//             int x = point.attribute("x").as_int();
-//             int y = point.attribute("y").as_int();
-//             points.push_back(Point(x, y));
-//         }
+        // Extract all points from the contour
+        vector<Point> points;
+        for (pugi::xml_node point = contour.child("point"); point; point = point.next_sibling("point"))
+        {
+            int x = point.attribute("x").as_int();
+            int y = point.attribute("y").as_int();
+            points.push_back(Point(x, y));
+        }
 
-//         if (points.empty())
-//             continue;
+        if (points.empty())
+            continue;
 
-//         // Compute the rotated bounding box (minAreaRect) and store it
-//         boundingBoxes.push_back(minAreaRect(points));
-//     }
+        // Compute the rotated bounding box (minAreaRect) and store it
+        boundingBoxes.push_back(minAreaRect(points));
+    }
 
-//     return boundingBoxes;
-// }
+    return boundingBoxes;
+}
 
 // Function to load the address of the XML files given the sequence number
 std::vector<String> Loader::loadXmlAddress(int sequence) {

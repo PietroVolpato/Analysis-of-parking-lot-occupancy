@@ -219,6 +219,7 @@ ParkingLotAnalysis: /usr/local/lib/libopencv_features2d.so.4.9.0
 ParkingLotAnalysis: /usr/local/lib/libopencv_flann.so.4.9.0
 ParkingLotAnalysis: /usr/local/lib/libopencv_imgproc.so.4.9.0
 ParkingLotAnalysis: /usr/local/lib/libopencv_core.so.4.9.0
+ParkingLotAnalysis: /usr/lib/x86_64-linux-gnu/libpugixml.so.1.12
 ParkingLotAnalysis: CMakeFiles/ParkingLotAnalysis.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/pietro/Analysis-of-parking-lot-occupancy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CXX executable ParkingLotAnalysis"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ParkingLotAnalysis.dir/link.txt --verbose=$(VERBOSE)
