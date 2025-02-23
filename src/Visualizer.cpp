@@ -86,7 +86,7 @@ void Visualizer::rectParkingRow() {
 
         for (int i = 0; i < cluster.size(); i++) {
             cx = startX_row - i * Visualizer::deltaX;
-            RotatedRect rect = RotatedRect(Point2f(cx, cy), Size2f(spaceWidth, spaceHeight), angle);
+            RotatedRect rect = RotatedRect(Point2f(cx, cy), Size2f(spaceWidth, spaceHeight), angleP);
             transformedRectangles.push_back(rect);
         }
         index++;

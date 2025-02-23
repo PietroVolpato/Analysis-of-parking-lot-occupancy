@@ -51,21 +51,26 @@ int main(int argc, char** argv) {
         trueParkingSpaces.pop_back();
     }
     
-    Visualizer visualizer(450, 350, trueParkingSpaces, trueOccupancyStatus);
-    visualizer.drawParkingSpaces(imageFromXML, trueOccupancyStatus);
 
     // 2. Draw the parking spaces based on the occupancy detected using the isOccupied function
     std::vector<bool> occupancyStatus;
     std::vector<cv::RotatedRect> parkingSpaces = extractBoundingBoxesFromXML(xmlFilePath, occupancyStatus);
 
     for(int i=0; i<3; i++){
-        occupancyStatus.pop_back();
         parkingSpaces.pop_back();
     }
-
     
-    ParkingSpaceClassifier classifier(0.4); // Initialize the classifier with an empty threshold of 0.4
-    classifier.classifyParkingSpaces(parkingLotImage,parkingLotEmpty, parkingSpaces, occupancyStatus);  
+    // Shuffle the vector
+    // std::random_device rd;
+    // std::mt19937 g(rd());
+    // std::shuffle(parkingSpaces.begin(), parkingSpaces.end(), g);
+    
+    ParkingSpaceClassifier classifier(0.3); // Initialize the classifier with an empty threshold of 0.4
+    classifier.classifyParkingSpaces(parkingLotImage,parkingLotEmpty, parkingSpaces, occupancyStatus); 
+    
+    classifier.calculateMetrics(trueOccupancyStatus, occupancyStatus);
+    
+    Visualizer visualizer(450, 350, parkingSpaces, occupancyStatus);
     visualizer.drawParkingSpaces(imageFromDetection, occupancyStatus);
 
     // Determine the maximum width and height that can fit on the screen
@@ -75,27 +80,33 @@ int main(int argc, char** argv) {
     // Resize images to fit within the screen height
     double scaleFactor = static_cast<double>(maxImageHeight) / imageFromXML.rows;
 
-    cv::resize(imageFromXML, imageFromXML, cv::Size(), scaleFactor, scaleFactor);
     cv::resize(imageFromDetection, imageFromDetection, cv::Size(), scaleFactor, scaleFactor);
-
-    // Combine the two images side by side for comparison
-    cv::Mat combined;
-    cv::hconcat(imageFromXML, imageFromDetection, combined);
-
-    // Display the combined result
-    //cv::imshow("Parking Space Occupancy Comparison", combined);
 
     
     if (occupancyStatus.size() < 37) {
         cerr << "Error: Occupancy vector size must be 38!" << endl;
-        cout << occupancyStatus.size() << endl;
         return -1;
     }
     // Create the minimap with occupancy data
-    Mat minimap = visualizer.createMockMinimap(occupancyStatus);
+    Mat empty_minimap = visualizer.createMockMinimap();
+    Mat minimap = visualizer.updateMinimap(occupancyStatus);
     cv::Mat outputImage = visualizer.overlaySmallOnLarge(imageFromDetection, minimap);
-    cv::imshow("result", outputImage);
-    cv::waitKey(0);
+
+    // Generate the output filename using stringstream
+    std::string outputDir = "out";
+    std::ostringstream filename;
+    filename  << outputDir << "/outputS" << sequence << "F" << img_num << ".jpg";
+
+    // Save the image with the generated filename
+    bool success = cv::imwrite(filename.str(), outputImage);
+
+    // Check if saving was successful
+    if (!success) {
+        std::cerr << "Failed to save the image" << std::endl;
+        return 1;
+    }
+
+    std::cout << "Image saved successfully as " << filename.str() << std::endl;
 
     return 0;
 }
