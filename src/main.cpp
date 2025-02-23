@@ -35,7 +35,13 @@ int main(int argc, char** argv) {
         vector<Mat> imgs = loader.loadImagesFromSequence(seq);
         imgVector.insert(imgVector.end(), imgs.begin(), imgs.end());
     }
-
+    // Load images as new shape
+    vector<vector<Mat>> ParkingSpaceAll;
+    for (const int seq: sequences) {
+        vector<Mat> seqImg = loader.loadImagesFromSequence(seq);
+        ParkingSpaceAll.push_back(seqImg);
+    }
+    cout<< ParkingSpaceAll[4].size() << endl;
     // Load the ground truth bounding boxes
     String path = loader.loadXmlAddress(0)[0];
     cout << path << endl;
@@ -127,6 +133,7 @@ int main(int argc, char** argv) {
         // detector.showImage(img);
     // }
 
+    //-----------------------------------------------------------------------------------------------------
     vector<cv::RotatedRect> parkingSpaces = groundtruthBBoxes;
     
     // Removing the last 3 parking spaces representing the ones in the corner
@@ -146,25 +153,53 @@ int main(int argc, char** argv) {
     Mat empty_minimap = visualizer.createMockMinimap();
 
 
-    // Determine the maximum width and height that can fit on the screen
-    int screenHeight = 400;  // Example screen height
-    int maxImageHeight = min(imgVector[0].rows, screenHeight);
-
     vector<bool> occupancyStatus;
-
+    // Generate the output filename using stringstream
+    string outputDir = "out";
+    ostringstream filename;
+    
     int index = 0;
-    for (const Mat& parkingLotImage: imgVector) {
-        Mat parkingLotEmpty = emptyImgVector[index % 5];
+    for (const Mat& emptyParkingLot: emptyImgVector) {
         
-        classifier.classifyParkingSpaces(parkingLotImage,parkingLotEmpty, parkingSpaces, occupancyStatus);
-        index++;
+        classifier.classifyParkingSpaces(emptyParkingLot,emptyParkingLot, parkingSpaces, occupancyStatus);
+
         // classifier.calculateMetrics(trueOccupancyStatus, occupancyStatus);
-        visualizer.drawParkingSpaces(parkingLotImage, occupancyStatus);
+        visualizer.drawParkingSpaces(emptyParkingLot, occupancyStatus);
         Mat minimap = visualizer.updateMinimap(occupancyStatus);
-        cv::Mat outputImage = visualizer.overlaySmallOnLarge(parkingLotImage, minimap);
-        imshow("Output", outputImage);
-        waitKey(0);
+        cv::Mat outputImage = visualizer.overlaySmallOnLarge(emptyParkingLot, minimap);
+        
+        filename  << outputDir << "/outputS" << 0 << "F" << index << ".jpg";
+
+        // Save the image with the generated filename
+        imwrite(filename.str(), outputImage);
+        index++;
     }
+
+    for (int i = 0; i < ParkingSpaceAll.size(); ++i) {
+        cout<< i << endl;
+        for (int j = 0; j < ParkingSpaceAll[i].size(); ++j) {
+            cout<< j << endl;
+            Mat parkingLotEmpty = emptyImgVector[i];
+            Mat parkingLotImage = ParkingSpaceAll[i][j];
+            
+            classifier.classifyParkingSpaces(parkingLotImage,parkingLotEmpty, parkingSpaces, occupancyStatus);
+            // classifier.calculateMetrics(trueOccupancyStatus, occupancyStatus);
+            visualizer.drawParkingSpaces(parkingLotImage, occupancyStatus);
+            Mat minimap = visualizer.updateMinimap(occupancyStatus);
+            cv::Mat outputImage = visualizer.overlaySmallOnLarge(parkingLotImage, minimap);
+
+            filename  << outputDir << "/outputS" << i << "F" << j << ".jpg";
+            // Save the image with the generated filename
+            imwrite(filename.str(), outputImage);
+        }
+    }
+    waitKey(0);
+
+
+    cout<< "classification finished" << endl;
+
+    //--------------------------------------------------------------------------
+
 
     CarSegmenter segmenter;
 
