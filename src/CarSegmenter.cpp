@@ -388,3 +388,20 @@ Mat CarSegmenter::createSegmentMask(const Mat& img) {
     }
     return mask;
 }
+
+//------------------------------
+// Apply Mask to the original image
+//------------------------------
+// Applies the mask to the original image, coloring the pixels according to the mask values.
+Mat CarSegmenter::applyMaskToImage(const Mat& img, const Mat& mask) {
+    Mat result = img.clone();
+    for (int i = 0; i < img.rows; i++) {
+        for (int j = 0; j < img.cols; j++) {
+            if (mask.at<uchar>(i, j) == 1)
+                result.at<Vec3b>(i, j) = Vec3b(0, 0, 255);
+            else if (mask.at<uchar>(i, j) == 2)
+                result.at<Vec3b>(i, j) = Vec3b(0, 255, 0);
+        }
+    }
+    return result;
+}

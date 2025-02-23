@@ -1263,7 +1263,11 @@ CMakeFiles/ParkingLotAnalysis.dir/src/Loader.cpp.o: ../src/Loader.cpp \
   /usr/local/include/opencv4/opencv2/video.hpp \
   /usr/local/include/opencv4/opencv2/video/tracking.hpp \
   /usr/local/include/opencv4/opencv2/video/background_segm.hpp \
-  ../include/tinyxml2.h
+  ../include/tinyxml2.h \
+  /usr/include/pugixml.hpp \
+  /usr/include/pugiconfig.hpp \
+  /usr/include/c++/11/iterator \
+  /usr/include/c++/11/bits/stream_iterator.h
 
 CMakeFiles/ParkingLotAnalysis.dir/src/ParkingSpaceClassifier.cpp.o: ../src/ParkingSpaceClassifier.cpp \
   /usr/include/stdc-predef.h \
@@ -2955,6 +2959,10 @@ CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: ../src/main.cpp \
   ../include/Visualizer.h \
   ../include/Evaluator.h \
   ../include/Loader.h \
+  /usr/include/pugixml.hpp \
+  /usr/include/pugiconfig.hpp \
+  /usr/include/c++/11/iterator \
+  /usr/include/c++/11/bits/stream_iterator.h \
   ../include/tinyxml2.h \
   /usr/include/c++/11/random \
   /usr/include/c++/11/bits/random.h \
@@ -2962,7 +2970,13 @@ CMakeFiles/ParkingLotAnalysis.dir/src/main.cpp.o: ../src/main.cpp \
   /usr/include/c++/11/bits/random.tcc \
   /usr/include/c++/11/numeric \
   /usr/include/c++/11/bits/stl_numeric.h \
-  /usr/include/c++/11/pstl/glue_numeric_defs.h
+  /usr/include/c++/11/pstl/glue_numeric_defs.h \
+  /usr/include/c++/11/filesystem \
+  /usr/include/c++/11/bits/fs_fwd.h \
+  /usr/include/c++/11/bits/fs_path.h \
+  /usr/include/c++/11/codecvt \
+  /usr/include/c++/11/bits/fs_dir.h \
+  /usr/include/c++/11/bits/fs_ops.h
 
 CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.o: ../src/tinyxml2.cpp \
   /usr/include/stdc-predef.h \
@@ -3057,6 +3071,12 @@ CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.o: ../src/tinyxml2.cpp \
 
 ../src/tinyxml2.cpp:
 
+/usr/include/c++/11/bits/fs_ops.h:
+
+/usr/include/c++/11/bits/fs_dir.h:
+
+/usr/include/c++/11/filesystem:
+
 /usr/include/c++/11/numeric:
 
 /usr/include/c++/11/bits/random.h:
@@ -3072,6 +3092,10 @@ CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.o: ../src/tinyxml2.cpp \
 ../include/ParkingSpaceDetector.h:
 
 ../src/ParkingSpaceDetector.cpp:
+
+/usr/include/pugiconfig.hpp:
+
+/usr/include/pugixml.hpp:
 
 ../src/Loader.cpp:
 
@@ -3160,6 +3184,8 @@ CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.o: ../src/tinyxml2.cpp \
 /usr/local/include/opencv4/opencv2/flann/allocator.h:
 
 /usr/local/include/opencv4/opencv2/flann/heap.h:
+
+/usr/include/c++/11/bits/stream_iterator.h:
 
 /usr/local/include/opencv4/opencv2/objdetect/barcode.hpp:
 
@@ -3515,6 +3541,8 @@ CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.o: ../src/tinyxml2.cpp \
 
 /usr/include/x86_64-linux-gnu/asm/errno.h:
 
+/usr/include/c++/11/bits/fs_path.h:
+
 /usr/include/c++/11/bits/random.tcc:
 
 /usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
@@ -3635,6 +3663,8 @@ CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.o: ../src/tinyxml2.cpp \
 
 /usr/include/x86_64-linux-gnu/bits/waitflags.h:
 
+/usr/include/c++/11/iterator:
+
 /usr/include/c++/11/bits/range_access.h:
 
 /usr/include/x86_64-linux-gnu/bits/floatn.h:
@@ -3739,6 +3769,8 @@ CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.o: ../src/tinyxml2.cpp \
 
 /usr/include/c++/11/bits/vector.tcc:
 
+/usr/include/c++/11/codecvt:
+
 /usr/include/c++/11/bits/streambuf.tcc:
 
 /usr/include/string.h:
@@ -3812,6 +3844,8 @@ CMakeFiles/ParkingLotAnalysis.dir/src/tinyxml2.cpp.o: ../src/tinyxml2.cpp \
 ../include/tinyxml2.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h:
+
+/usr/include/c++/11/bits/fs_fwd.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/clockid_t.h:
 

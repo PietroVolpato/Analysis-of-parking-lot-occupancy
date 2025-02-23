@@ -10,15 +10,33 @@
 #include <list>
 #include <algorithm>
 #include <random>
+#include <filesystem>
 
 using namespace cv;
 using namespace std;
+namespace fs = std::filesystem;
 
 struct ParkingSpace {
     int id;
     RotatedRect rect;
     bool occupied;
 };
+
+void saveImages(const vector<Mat>& images, const string& folderPath, const string& prefix = "image") {
+    // Create the folder if it does not exist
+    if (!fs::exists(folderPath)) {
+        fs::create_directories(folderPath);
+    }
+    
+    for (size_t i = 0; i < images.size(); ++i) {
+        string filePath = folderPath + "/" + prefix + "_" + to_string(i) + ".png";
+        if (!cv::imwrite(filePath, images[i])) {
+            cerr << "Error saving the image: " << filePath << endl;
+        } else {
+            cout << "Saved: " << filePath << endl;
+        }
+    }
+}
 
 int main(int argc, char** argv) {
     // Create the loader
@@ -43,11 +61,8 @@ int main(int argc, char** argv) {
     }
     cout<< ParkingSpaceAll[4].size() << endl;
     // Load the ground truth bounding boxes
-    String path = loader.loadXmlAddress(0)[0];
-    cout << path << endl;
-    vector<bool> occupancyStatusGroundTruth;
-    vector<RotatedRect> groundtruthBBoxes = loader.extractBoundingBoxesFromXML(path, occupancyStatusGroundTruth);
-    cout << groundtruthBBoxes.size() << endl;
+   vector<RotatedRect> groundtruthBBoxes = loader.getBBoxes("../data/sequence0/bounding_boxes/2013-02-24_10_05_04.xml");
+
 
     // Load all the masks for the evaluation
     vector<Mat> evaluationMaskVector;
@@ -118,14 +133,16 @@ int main(int argc, char** argv) {
         // parkingSpacesVector.push_back(detector.detectParkingSpacesSimple(lines));
     }
 
-    // // Draw the parking spaces
-    // vector<Mat> imgWithParkingSpacesVector;
-    // for (size_t i = 0; i < emptyImgVector.size(); ++i) {
-    //     Mat img = emptyImgVector[i];
-    //     const auto& parkingSpaces = parkingSpacesVector[i];
-    //     Mat imgWithParkingSpaces = detector.drawParkingSpaces(img, parkingSpaces);
-    //     imgWithParkingSpacesVector.push_back(imgWithParkingSpaces);
-    // }
+    // Draw the parking spaces
+    vector<Mat> imgWithParkingSpacesVector;
+    for (size_t i = 0; i < emptyImgVector.size(); ++i) {
+        Mat img = emptyImgVector[i];
+        const auto& parkingSpaces = parkingSpacesVector[i];
+        Mat imgWithParkingSpaces = detector.drawParkingSpaces(img, parkingSpaces);
+        imgWithParkingSpacesVector.push_back(imgWithParkingSpaces);
+    }
+
+    // saveImages(imgWithParkingSpacesVector, "../result/parking_spaces", "parking_space");
 
     // Show the images
     // for (const auto& img: imgWithLinesVector) {
@@ -254,22 +271,22 @@ int main(int argc, char** argv) {
     // Filter the bounding boxes
     vector<vector<RotatedRect>> filteredBBoxesVector;
     for (auto& bboxes : bboxesVector) {
-        // filteredBBoxesVector.push_back(segmenter.filterBBoxes(bboxes));
+        filteredBBoxesVector.push_back(segmenter.filterBBoxes(bboxes));
     }
 
-    // Draw the bounding boxes
-    for (size_t i = 0; i < imgVector.size(); ++i) {
-        Mat img = imgVector[i];
-        // const auto& bboxes = bboxesVector[i];
-        const auto& bboxes = filteredBBoxesVector[i];
-        segmenter.drawBBoxes(img, bboxes);
-        segmenter.showImages(img);
-    }
+    // // Draw the bounding boxes
+    // for (size_t i = 0; i < imgVector.size(); ++i) {
+    //     Mat img = imgVector[i];
+    //     const auto& bboxes = bboxesVector[i];
+    //     // const auto& bboxes = filteredBBoxesVector[i];
+    //     segmenter.drawBBoxes(img, bboxes);
+    //     segmenter.showImages(img);
+    // }
     
     // Segment the cars
     vector<Mat> segmentedCarsVector;
     for (size_t i = 0; i < imgVector.size(); ++i) {
-        const auto& bboxes = bboxesVector[i];
+        const auto& bboxes = filteredBBoxesVector[i];
         const auto& mask = enhancedMaskVector[i];
         Mat img = Mat::zeros(imgVector[i].size(), CV_8UC3);
         segmentedCarsVector.push_back(segmenter.segmentCar(bboxes, groundtruthBBoxes, mask, img));
@@ -281,9 +298,22 @@ int main(int argc, char** argv) {
         segmentedMaskVector.push_back(segmenter.createSegmentMask(img));
     }
 
+    // Apply the mask to the original image
+    vector<Mat> imgWithSegmentedCarsVector;
+    for (size_t i = 0; i < imgVector.size(); ++i) {
+        Mat img = imgVector[i];
+        const auto& segmentedMask = segmentedMaskVector[i];
+        Mat imgWithSegmentedCars = segmenter.applyMaskToImage(img, segmentedMask);
+        imgWithSegmentedCarsVector.push_back(imgWithSegmentedCars);
+    }
+
+    // Save the images
+    // saveImages(imgWithSegmentedCarsVector, "../result/segmentation", "segmented_car");
+
+
     // Show the images
-    for (const auto& img: segmentedMaskVector) {
-        // segmenter.showImages(img);
+    for (const auto& img: segmentedCarsVector) {
+        segmenter.showImages(img);
     }
 
     // // Evaluate the segmentation

@@ -37,6 +37,7 @@ class CarSegmenter {
         cv::Mat enhanceMask(const cv::Mat& mask);
         cv::Mat segmentCar (const std::vector<cv::RotatedRect>& bboxes, const std::vector<cv::RotatedRect>& groundtruthBBoxes, const cv::Mat& mask, cv::Mat& img);
         cv::Mat createSegmentMask (const cv::Mat& img);
+        cv::Mat applyMaskToImage (const cv::Mat& img, const cv::Mat& mask);
         std::vector<cv::Rect> newmethod(cv::Mat& mask, cv::Mat& img);
 };
 
