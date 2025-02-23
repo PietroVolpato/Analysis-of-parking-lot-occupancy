@@ -86,3 +86,35 @@ void ParkingSpaceClassifier::classifyParkingSpaces(const Mat &parkingLotImage, c
         occupancyStatus.push_back(ratio >= emptyThreshold);
     }
 }
+
+void ParkingSpaceClassifier::calculateMetrics(const vector<bool>& original, const vector<bool>& predicted) {
+    // Initialize counts for TP, FN, FP, TN
+    int TP = 0, FN = 0, FP = 0, TN = 0;
+
+    // Iterate through the vectors to calculate TP, FN, FP, TN
+    for (size_t i = 0; i < original.size(); ++i) {
+        if (original[i] && predicted[i]) {
+            TP++; // True Positive
+        } else if (original[i] && !predicted[i]) {
+            FN++; // False Negative
+        } else if (!original[i] && predicted[i]) {
+            FP++; // False Positive
+        } else {
+            TN++; // True Negative
+        }
+    }
+
+    // Calculate Precision, Recall, and Accuracy
+    double precision = (TP + FP == 0) ? 0.0 : static_cast<double>(TP) / (TP + FP);
+    double recall = (TP + FN == 0) ? 0.0 : static_cast<double>(TP) / (TP + FN);
+    double accuracy = static_cast<double>(TP + TN) / (TP + TN + FP + FN);
+
+    // Output the metrics
+    std::cout << "TP: " << TP << std::endl;
+    std::cout << "FN: " << FN << std::endl;
+    std::cout << "FP: " << FP << std::endl;
+    std::cout << "TN: " << TN << std::endl;
+    std::cout << "Precision: " << precision << std::endl;
+    std::cout << "Recall: " << recall << std::endl;
+    std::cout << "Accuracy: " << accuracy << std::endl;
+}

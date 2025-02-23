@@ -15,6 +15,7 @@ public:
     // Constructer to classify parking spaces based on occupancy
     void classifyParkingSpaces(const cv::Mat &parkingLotImage, const cv::Mat &parkingLotEmpty, 
                                std::vector<cv::RotatedRect> &parkingSpaces, std::vector<bool> &occupancyStatus);
+    void calculateMetrics(const vector<bool>& original, const vector<bool>& predicted);
 
 private:
     double emptyThreshold; // Threshold for determining occupancy
