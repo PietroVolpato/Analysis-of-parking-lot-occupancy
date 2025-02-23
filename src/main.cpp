@@ -179,7 +179,7 @@ int main(int argc, char** argv) {
         cout<< i << endl;
         for (int j = 0; j < ParkingSpaceAll[i].size(); ++j) {
             cout<< j << endl;
-            Mat parkingLotEmpty = emptyImgVector[i];
+            Mat parkingLotEmpty = emptyImgVector[j];
             Mat parkingLotImage = ParkingSpaceAll[i][j];
             
             classifier.classifyParkingSpaces(parkingLotImage,parkingLotEmpty, parkingSpaces, occupancyStatus);

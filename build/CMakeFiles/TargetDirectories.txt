@@ -1,3 +1,0 @@
-/home/pietro/Analysis-of-parking-lot-occupancy/build/CMakeFiles/ParkingLotAnalysis.dir
-/home/pietro/Analysis-of-parking-lot-occupancy/build/CMakeFiles/edit_cache.dir
-/home/pietro/Analysis-of-parking-lot-occupancy/build/CMakeFiles/rebuild_cache.dir
