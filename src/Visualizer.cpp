@@ -5,7 +5,7 @@ using namespace cv;
 
 // Written by Ali Esmaeili nasab
 
-Visualizer::Visualizer(int width, int height, vector<RotatedRect>& parkingSpaces, vector<bool>& occupancyStatus) 
+Visualizer::Visualizer(int width, int height, vector<RotatedRect>& parkingSpaces) 
     : minimap_width(width), minimap_height(height), rectangles(parkingSpaces) {
         
         for (const auto& rect : rectangles) {
@@ -14,11 +14,6 @@ Visualizer::Visualizer(int width, int height, vector<RotatedRect>& parkingSpaces
         Mat H = computeHomography(findExtremePoints());  //Computing Homography Matrix "H"
         transformedCenters = applyHomography(H);
 
-        if (originalCenters.size() != occupancyStatus.size()) {
-            std::cerr << "Error: Parking centers and occupancy vectors must have the same size!\n";
-            return;
-        }
-
         rectParkingRow();
 
 
@@ -26,7 +21,7 @@ Visualizer::Visualizer(int width, int height, vector<RotatedRect>& parkingSpaces
 
 
 
-void Visualizer::drawParkingSpaces(Mat &image, const vector<bool> &occupancyStatus) {
+void Visualizer::drawParkingSpaces(const Mat &image, const vector<bool> &occupancyStatus) {
     Point center;
     
     for (size_t i = 0; i < rectangles.size(); ++i) {
@@ -86,7 +81,7 @@ void Visualizer::rectParkingRow() {
 
         for (int i = 0; i < cluster.size(); i++) {
             cx = startX_row - i * Visualizer::deltaX;
-            RotatedRect rect = RotatedRect(Point2f(cx, cy), Size2f(spaceWidth, spaceHeight), angle);
+            RotatedRect rect = RotatedRect(Point2f(cx, cy), Size2f(spaceWidth, spaceHeight), angleP);
             transformedRectangles.push_back(rect);
         }
         index++;

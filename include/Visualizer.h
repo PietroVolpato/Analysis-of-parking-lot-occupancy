@@ -7,10 +7,10 @@
 // Written by Ali Esmaeili nasab
 class Visualizer {
 public:
-    Visualizer(int width, int height, std::vector<cv::RotatedRect>& parkingSpaces, std::vector<bool>& occupancyStatus);
+    Visualizer(int width, int height, std::vector<cv::RotatedRect>& parkingSpaces);
 
     cv::Mat createMockMinimap();
-    void drawParkingSpaces(cv::Mat &image, const std::vector<bool> &occupancyStatus);
+    void drawParkingSpaces(const cv::Mat &image, const std::vector<bool> &occupancyStatus);
     cv::Mat overlaySmallOnLarge(const cv::Mat& parkingSapaceClassified, const cv::Mat& visual2D);
     cv::Mat updateMinimap(const std::vector<bool>& occupancyStatus);
 

@@ -127,6 +127,45 @@ int main(int argc, char** argv) {
         // detector.showImage(img);
     // }
 
+    vector<cv::RotatedRect> parkingSpaces = groundtruthBBoxes;
+    
+    // Removing the last 3 parking spaces representing the ones in the corner
+    for(int i=0; i<3; i++){
+        parkingSpaces.pop_back();
+    }
+
+    // Shuffle the vector so it does not maintain the sorting of the ground truth file
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(parkingSpaces.begin(), parkingSpaces.end(), g);
+
+    // Initialize the classifier and classifier with an empty threshold of 0.3
+    ParkingSpaceClassifier classifier(0.3);
+
+    Visualizer visualizer(450, 350, parkingSpaces);
+    Mat empty_minimap = visualizer.createMockMinimap();
+
+
+    // Determine the maximum width and height that can fit on the screen
+    int screenHeight = 400;  // Example screen height
+    int maxImageHeight = min(imgVector[0].rows, screenHeight);
+
+    vector<bool> occupancyStatus;
+
+    int index = 0;
+    for (const Mat& parkingLotImage: imgVector) {
+        Mat parkingLotEmpty = emptyImgVector[index % 5];
+        
+        classifier.classifyParkingSpaces(parkingLotImage,parkingLotEmpty, parkingSpaces, occupancyStatus);
+        index++;
+        // classifier.calculateMetrics(trueOccupancyStatus, occupancyStatus);
+        visualizer.drawParkingSpaces(parkingLotImage, occupancyStatus);
+        Mat minimap = visualizer.updateMinimap(occupancyStatus);
+        cv::Mat outputImage = visualizer.overlaySmallOnLarge(parkingLotImage, minimap);
+        imshow("Output", outputImage);
+        waitKey(0);
+    }
+
     CarSegmenter segmenter;
 
     // Preprocess the images
